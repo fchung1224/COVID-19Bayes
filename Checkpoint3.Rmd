@@ -7,3 +7,12 @@ output:
     toc:true
     toc_float:true
 ---
+# Data
+```{r}
+save(states_cases_data, file = 'states_cases_data.RData')
+dim(states_cases_data)
+names(states_cases_data)
+head(states_cases_data)
+summary(states_cases_data)
+```
+
