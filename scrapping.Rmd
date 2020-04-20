@@ -1,0 +1,24 @@
+---
+title: "scrapping tweets"
+author: "Federico Chung"
+date: "4/14/2020"
+output: html_document
+---
+
+```{r}
+## install rtweet from CRAN
+install.packages("rtweet")
+
+## load rtweet package
+library(rtweet)
+library(ggplot2)
+```
+
+```{r}
+rt <- search_tweets(
+  "#chinavirus", n = 18000, include_rts = FALSE
+)
+
+?search_tweets
+```
+
