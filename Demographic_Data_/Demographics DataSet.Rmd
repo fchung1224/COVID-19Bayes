@@ -1,0 +1,69 @@
+---
+title: "Demographics"
+author: "Sofia Pozsonyiova"
+date: "4/21/2020"
+output: html_document
+---
+
+```{r}
+require(choroplethr)
+require(dplyr)
+require(readr)
+```
+
+State Specific Demographics 
+```{r}
+data("df_state_demographics")
+```
+
+Election Data
+```{r}
+election <- read.csv("https://raw.githubusercontent.com/tonmcg/County_Level_Election_Results_12-16/master/US_County_Level_Presidential_Results_08-16.csv")
+election <- election %>% mutate(region = fips_code)
+```
+
+County Names + State: 
+```{r}
+data("df_county_demographics")
+RedBlue <- read.csv("https://www.macalester.edu/~ajohns24/Data/RedBluePurple.csv")
+```
+
+Combining County and State: (df_county) + redblue 
+```{r}
+county_level_demographic_data <- left_join(df_county_demographics,RedBlue)
+abb_added <- county_level_demographic_data %>% select(polyname,abb,StateColor,region)
+```
+
+Combining elect and abb:
+```{r}
+full_data_county <- left_join(election,abb_added)
+County_level_data <- read.csv("/Users/sofiapozsonyiova/Desktop/COVID-19Bayes/Demographic_Data_DRAFT/full_data_by_county.csv")
+County_level_data <-County_level_data %>% select(-x)
+```
+
+```{r}
+county_final <- County_level_data %>% group_by(polyname, abb, StateColor) %>% summarise_if(is.numeric, sum, na.rm = TRUE)
+state_demographics <- df_state_demographics %>% mutate(polyname = region) 
+state_demographics <- state_demographics %>% select(-region)
+county_final <- county_final %>% select(-region)
+
+combineddata <- left_join(county_final,state_demographics, by = "polyname")
+combineddata
+
+Demographic_Data_variables <- combineddata %>% 
+  select(-c(fips_code,total_2008,dem_2008,gop_2008,oth_2008,total_2012,dem_2012,gop_2012,oth_2012))%>% 
+  mutate(percent_white = percent_white/100) %>%
+  mutate(percent_black = percent_black/100) %>% 
+  mutate(percent_asian = percent_asian/100) %>% 
+  mutate(percent_hispanic = percent_hispanic/100) %>% 
+  mutate(percent_democrat2016 = dem_2016/total_2016) %>% 
+  mutate(percent_republican2016 = gop_2016/total_2016) %>% 
+  mutate(percent_other2016 = oth_2016/total_2016) %>% 
+  mutate(Winner = ifelse(percent_republican2016 > percent_democrat2016 & percent_republican2016 > percent_other2016, "Republican", "Democrat"))
+Demographic_Data_variables
+```
+
+
+
+
+
