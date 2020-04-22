@@ -1,66 +1,41 @@
 ---
 title: "Checkpoint 3"
-author: ""
+author: "Quinn Rafferty, Ferderico Chung, Sofia Pozsonyiova, Will Madairy"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
     toc:true
     toc_float:true
 ---
-```{r}
+```{r, warning=FALSE}
 library(dplyr)
-```
-
-
-# Data
-```{r}
-save(states_cases_data, file = 'states_cases_data.RData')
-dim(states_cases_data)
-names(states_cases_data)
-head(states_cases_data)
-summary(states_cases_data)
-
-```
-
-# Quinn Tries to Plot some stuff
-```{r}
 library(usmap)
 library(maps)
 library(ggplot2)
 library(tidyverse)
 library(ggmap)
 library(viridis)
-
-##Map for Positive Cases (Need to figure out how to make scale more feasible)
-plot_usmap(regions = "state", data=states_cases_data, values = "positive")+
-    labs(title = "Positive COVID-19 Tests") + 
-    theme(panel.background = element_rect(colour = "black"))+
-    scale_fill_continuous(low = "white", high ="darkblue", 
-                          name = "# of Positive Cases",label = scales::comma,
-                          limits = c(0,1000)) + 
-    theme(legend.position = "right") +facet_wrap(~date)
+library(rgdal)
+```
 
 
-##Map for Positive Cases but only for East Coast 
-plot_usmap(data = states_cases_data, values = "positive", include =  c(.south_atlantic, .mid_atlantic, .new_england ), color = "orange", labels=TRUE) + 
-  scale_fill_continuous( low = "white", high = "orange", 
-                         name = "Positive cases", label = scales::comma
-  ) + 
-  theme(legend.position = "right") + 
-  theme(panel.background = element_rect(colour = "black")) + 
-  labs(title = "US East Coast Positive COVID Cases")
-
+# Data
+```{r}
+save(FullDataSet, file ="FullDataSet.csv")
 ```
 
 ```{r}
-### HOW DO i FIX THE SCALE SO THAT OUTLIARS WONT MESS EVERYTHING UP???
-library(statebins)
-statebins(state_data = states_cases_data, state_col = "state",
-                     text_color = "white", value_col = "positive",
-                     brewer_pal="Reds", font_size = 3,breaks =4,
-                     legend_title="# of Positive COVID-19 Cases",
-                 labels = c("0-5000", "5000-10000", "10000-20000", "20000-35000"))
+dim(FullDataSet)
+names(FullDataSet)
+head(FullDataSet)
+summary(FullDataSet)
+colnames(FullDataSet)
 ```
+
+
+
+
+
 
 
 
