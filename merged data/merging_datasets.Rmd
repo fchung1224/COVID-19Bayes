@@ -8,11 +8,12 @@ output: html_document
 ```{r}
 library(ggplot2)
 library(dplyr)
+library(naniar)
 ```
 
 ```{r}
-demographic<-read.csv("Demographic_Data.csv")
-covid<-read.csv("states_current.csv")
+demographic<-read.csv("FINALDemographic_Data.csv")
+covid<-read.csv("states_cases_data.csv")
 stayhome<-read.csv("quarantine.csv")
 google<-read.csv("Google_final.csv")
 ```
@@ -20,11 +21,7 @@ google<-read.csv("Google_final.csv")
 ```{r}
 colnames(demographic)[2] <- "State"
 
-covid<-covid%>%
-  mutate(dateModified = as.Date(substr(dateModified,start = 0,stop = 10)),
-         dateChecked = as.Date(substr(dateChecked,start = 0,stop = 10)))%>%
-  select(-c(notes,hash))
-colnames(covid)[1] <- "State"
+colnames(covid)[2] <- "State"
 
 stayhome<-stayhome %>% replace_with_na(replace = list(StayAtHome_date = "#N/A"))
 no_na<-subset(stayhome,stayhome$StayAtHome_date!="NA") 
@@ -44,5 +41,6 @@ all<-demographic%>%
 all
 
 write.csv(all,"FullDataSet.csv")
+names(all)
 ```
 
