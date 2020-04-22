@@ -47,7 +47,6 @@ require(bayesplot)
 
 # Data
 ```{r}
-load("FinalDataSet.csv")
 ```
 
 Re-Cleaned 
