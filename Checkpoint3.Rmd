@@ -52,7 +52,8 @@ Finaldata<- read.csv("FinalDataSet.csv")
 
 Re-Cleaned 
 ```{r}
-Finaldata <- Finaldata %>% select(-c(X,X.1)) 
+Finaldata <- Finaldata %>% select(-c(X,X.1)) %>% 
+  mutate(Region = ifelse(State %in% c("AK","CA","OR","WA","HI"), "West", ifelse(State %in% c("CO","UT","ID","MT","WY", "NM", "AZ", "NV"), "Mountain", ifelse(State %in% c("SD","ND","MN","KS","IN", "MI", "NE", "IA", "WI","IL", "OH", "MO", "OK"), "Midwest",  ifelse(State %in% c("TX","AL","MS","FL","AR", "WV", "TN", "NC", "SC","GA", "VA", "KY", "LA"), "South", ifelse(State %in% c("MD","PA","DE","NJ","NY", "MA", "CT", "NH", "VT","ME", "RI", "DC"), "Northeast", 0))))))
 ```
 
 
@@ -181,9 +182,11 @@ ggplot(Finaldata, aes(x = per_capita_income)) +
 
 
 
-
 #Analysis 
 
+$$
+
+$$
 
 
 
