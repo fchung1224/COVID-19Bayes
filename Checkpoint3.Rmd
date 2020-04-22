@@ -28,6 +28,13 @@ library(tidyverse)
 library(ggmap)
 library(viridis)
 library(rgdal)
+
+require(janitor)
+require(reshape2)
+require(tidyr)
+require(rstan)
+require(rstanarm)
+require(bayesplot)
 ```
 
 
@@ -85,6 +92,12 @@ colnames(FullDataSet)
 
 
 #Analysis 
+
+
+
+
+\
+\
 
 
 
