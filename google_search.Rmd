@@ -1,0 +1,91 @@
+---
+title: "google_search"
+author: "Federico Chung"
+date: "4/21/2020"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+google_search<-read.csv("googlesearch.csv")
+
+```
+
+```{r}
+google_search<-google_search%>%
+  mutate(Day = paste(as.character(Day),"20",sep =""))%>%
+  mutate(Day = as.Date(Day, format = "%m/%d/%Y"))
+```
+
+```{r}
+ChinaVirus<-google_search%>%
+  select(Day,contains("china.virus"))
+KungFlu<-google_search%>%
+  select(Day,contains("Kung.Flu"))
+```
+
+```{r}
+
+
+states<- read.csv("us_states.csv")
+
+states<-states%>%
+  select(Alabama, AL)
+states
+colnames(states)<-(c("StateName","State"))
+
+alabama<-c(NA,NA)
+
+all_states<- rbind(states,alabama)
+
+all_states
+
+states_final_1<-all_states%>%
+  mutate(StateName=as.character(StateName),State = as.character(State))%>%
+  replace_na(list(StateName = "Alabama", State = "AL"))
+
+states_final_2<-rbind(states_final_1,alabama)
+
+states_final_2
+
+states_final<-states_final_2%>%
+  mutate(StateName=as.character(StateName),State = as.character(State))%>%
+  replace_na(list(StateName = "District of Columbia", State = "DC"))%>%
+  arrange(State)
+
+states_final
+
+colnames(ChinaVirus) <- c("Day",states_final$State)
+
+Final_ChinaVirus<-ChinaVirus%>%
+  gather("State","ChinaVirusInterest",2:ncol(ChinaVirus))
+
+colnames(KungFlu) <- c("Day",states_final$State)
+
+Final_KungFlu<-KungFlu%>%
+  gather("State","KungFluInterest",2:ncol(KungFlu))
+
+Time_series_Google<-Final_ChinaVirus%>%
+  left_join(Final_KungFlu)
+
+write.csv(Time_series_Google,"Time_series_Google.csv")
+```
+
+
+```{r}
+day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
+day2<-as.Date("03/24/2020",format = "%m/%d/%Y")
+
+Google_final<-Time_series_Google%>%
+  filter(Day<=day2)%>%
+  group_by(State)%>%
+  summarize(mean_ChinaVirusInterest = mean(ChinaVirusInterest),
+            mean_KungFluInterest = mean(KungFluInterest))
+
+write.csv(Google_final,"Google_final.csv")
+```
+

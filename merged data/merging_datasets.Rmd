@@ -11,6 +11,38 @@ library(dplyr)
 ```
 
 ```{r}
+demographic<-read.csv("Demographic_Data.csv")
+covid<-read.csv("states_current.csv")
+stayhome<-read.csv("quarantine.csv")
+google<-read.csv("Google_final.csv")
+```
 
+```{r}
+colnames(demographic)[2] <- "State"
+
+covid<-covid%>%
+  mutate(dateModified = as.Date(substr(dateModified,start = 0,stop = 10)),
+         dateChecked = as.Date(substr(dateChecked,start = 0,stop = 10)))%>%
+  select(-c(notes,hash))
+colnames(covid)[1] <- "State"
+
+stayhome<-stayhome %>% replace_with_na(replace = list(StayAtHome_date = "#N/A"))
+no_na<-subset(stayhome,stayhome$StayAtHome_date!="NA") 
+na<-stayhome%>%
+    anti_join(no_na)%>%
+    mutate(StayAtHome_date =as.Date(as.character(StayAtHome_date),format = "%m-%d-%Y"), na.rm = TRUE)
+no_na1<-no_na%>%
+  mutate(StayAtHome_date =as.Date(as.character(StayAtHome_date),format = "%m/%d/%Y"), na.rm = TRUE)
+stayhomefinal<-rbind(no_na1,na)
+
+
+all<-demographic%>%
+  left_join(covid)%>%
+  left_join(stayhomefinal)%>%
+  left_join(google)
+
+all
+
+write.csv(all,"FullDataSet.csv")
 ```
 
