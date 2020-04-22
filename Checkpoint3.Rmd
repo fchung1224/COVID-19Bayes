@@ -52,7 +52,7 @@ Finaldata<- read.csv("FinalDataSet.csv")
 
 Re-Cleaned 
 ```{r}
-FullDataSet <- FullDataSet %>% select(-c(median_rent))
+Finaldata <- Finaldata %>% select(-c(X,X.1)) 
 ```
 
 
@@ -66,21 +66,123 @@ Our dataset, `Demographic`, was created by merging three other datasets which al
 
 ##Dataset Details 
 ```{r}
-dim(FullDataSet)
+dim(Finaldata)
 
-names(FullDataSet)
+names(Finaldata)
 
-head(FullDataSet)
+head(Finaldata)
 
-summary(FullDataSet)
+summary(Finaldata)
 
-colnames(FullDataSet)
+colnames(Finaldata)
 ```
 
+##Variables of Interest
+
++------------------------+---------------------------------------------------+
+| Variables:             | Meaning:                                          |
++========================+===================================================+
+| `polyname`             | State Name                                        |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `StateColor`           | Political Leaning                                 |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_hispanic`      | Percent of the Population that is Hispanic        |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_white`        | Percent of the Population that is White           |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_asian`        | Percent of the Population that is Asian           |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_black`        | Percent of Population that is Black               |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`total_population`      | Total State Population                            | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`per_capita_income`     | Income per Capita                                 |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_democrat2016`  | Percent of votes won by Democrat (Clinton)        |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_republican2016`| Percent of votes won by Republican (Trump)        | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `Winner`               | Indicator for whether a Republican or Democrat Won| 
+|                        |                                                   |  
++------------------------+---------------------------------------------------+
+|`total_2016`            | Total Number of Votes                             | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
 
 ##Visualizations 
 
 
+###Demographic 
+```{r}
+#Demographic: Identification 
+Finaldata <- data.frame(Finaldata) %>% mutate(state = State)
+plot_usmap(data = Finaldata, values = "percent_white", color = "white") + 
+  scale_fill_continuous(name = "Percent White", label = scales::comma) + 
+  theme(legend.position = "right")+ ggtitle("Percent of Residents that Identify as White") + 
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+)
+
+plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
+  scale_fill_continuous( name = "Percent Asian", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent of Residents that Identify as Asian") + 
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+)
+
+plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
+  scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent of Residents that Identify as Asian") +
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+) 
+
+#By Results 
+plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
+  scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent Asian by General Election Results")+
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+) + facet_wrap(~Winner)
+
+
+#By income 
+plot_usmap(data = Finaldata, values = "per_capita_income", color = "white") + 
+  scale_fill_continuous(low = "sky blue", high = "black", name = "$ Per Capita", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent Capita Income")+
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+) 
+
+ggplot(Finaldata, aes(x = per_capita_income, fill = StateColor)) + 
+    geom_density(alpha = .8)+ ggtitle("Income per Capita") + xlab("$") + ylab("Density")
+
+ggplot(Finaldata, aes(x = per_capita_income)) + 
+    geom_density()+ ggtitle("Income per Capita") + xlab("$") + ylab("Density") 
+
+ggplot(Finaldata, aes(x = percent_republican2016)) + 
+    geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density")
+
+ggplot(Finaldata, aes(x = percent_republican2016)) + 
+    geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density") + facet_wrap(~StateColor)
+
+ggplot(Finaldata, aes(x = percent_asian, y = percent_republican2016, color = Winner)) + 
+    scale_color_manual(values = c("blue","purple","red")) + 
+    geom_point(alpha = 0.8) + geom_text(aes(label=ifelse(percent_asian>.2,as.character(state),"")),hjust=1.2,vjust=0)+ geom_text(aes(label=ifelse(percent_republican2016<.2,as.character(state),"")),hjust=-.1,vjust=0) + ggtitle("Percent of Asians and Trump Support by Election Outcome") + xlab("Percent Asian") + ylab("Trump Support")
+
+ggplot(Finaldata, aes(x = per_capita_income)) + 
+    geom_density()+ ggtitle("Per Capita Income") + xlab("Per Capita Income") + ylab("Density") + facet_wrap(~Winner)
+```
 
 
 
