@@ -7,6 +7,18 @@ output:
     toc:true
     toc_float:true
 ---
+
+
+
+
+\
+\
+
+
+
+
+#Libraries 
+
 ```{r, warning=FALSE}
 library(dplyr)
 library(usmap)
@@ -19,18 +31,62 @@ library(rgdal)
 ```
 
 
+
+\
+\
+
+
+
+
 # Data
 ```{r}
-save(FullDataSet, file ="FullDataSet.csv")
+load("FullDataSet.csv")
 ```
 
+Re-Cleaned 
+```{r}
+FullDataSet <- FullDataSet %>% select(-c(median_rent))
+```
+
+
+
+##Dataset Description 
+**Put in Data Descriptions Here**
+
+
+
+
+##Dataset Details 
 ```{r}
 dim(FullDataSet)
+
 names(FullDataSet)
+
 head(FullDataSet)
+
 summary(FullDataSet)
+
 colnames(FullDataSet)
 ```
+
+
+##Visualizations 
+
+
+
+
+
+
+\
+\
+
+
+
+
+#Analysis 
+
+
+
 
 
 
