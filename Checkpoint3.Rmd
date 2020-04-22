@@ -7,6 +7,18 @@ output:
     toc:true
     toc_float:true
 ---
+
+
+
+
+\
+\
+
+
+
+
+#Libraries 
+
 ```{r, warning=FALSE}
 library(dplyr)
 library(usmap)
@@ -19,18 +31,63 @@ library(rgdal)
 ```
 
 
+
+\
+\
+
+
+
+
 # Data
 ```{r}
-save(FullDataSet, file ="FullDataSet.csv")
+load("FullDataSet.csv")
 ```
 
+Re-Cleaned 
+```{r}
+FullDataSet <- FullDataSet %>% select(-c(median_rent))
+```
+
+
+
+##Dataset Description 
+**Put in Data Descriptions Here**
+
+
+`Demographic:`
+Our dataset, `Demographic`, was created by merging three other datasets which all contained different demographic and election information. We obtained the main portion of our demographic data from the US Census Bureau’s American Community Survey (ACS) which is an ongoing survey administered by the U.S. Census Bureau. It  gathers information on income, employment, housing characteristics, etc, annually for all the 50 U.S. States on the county and state level. To access the county-level dataset we used the R package called Choroplethr which provides API connections to data sources like the ACS. The ACS County-Level dataset was then merged with a county-level election outcome dataset that was created by Tony McGoven. Tony’s dataset contained presidential election results for 2008,2012, and 2016 but we chose to focus solely on the most recent election,2016. That said, the 2016 election results at the county-level were scraped from results published by Townhall.com. However, the State of Alaska reports results at the precinct or state level so there was no county-level data available. Therefore, another dataset had to be created that contained the election results for Alaska and this was done using the official election results provided by the Alaska Division of Elections and was later merged in. The final dataset that was used came from Alicia Johnson and it contained information on a state’s political leaning. Meaning it categorizes each county as belonging to a blue/red/purple state based on the state categorizations at 279towin. 
+
+##Dataset Details 
 ```{r}
 dim(FullDataSet)
+
 names(FullDataSet)
+
 head(FullDataSet)
+
 summary(FullDataSet)
+
 colnames(FullDataSet)
 ```
+
+
+##Visualizations 
+
+
+
+
+
+
+\
+\
+
+
+
+
+#Analysis 
+
+
+
 
 
 
