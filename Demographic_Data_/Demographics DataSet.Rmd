@@ -5,50 +5,52 @@ date: "4/21/2020"
 output: html_document
 ---
 
-```{r}
+According to Ton MCG...the state of alask resports results at the precinct or state level; no county level data available 
+
+```{r message=FALSE, warning=FALSE}
 require(choroplethr)
 require(dplyr)
 require(readr)
 ```
 
 State Specific Demographics 
-```{r}
+```{r message=FALSE, warning=FALSE}
 data("df_state_demographics")
 ```
 
 Election Data
-```{r}
+```{r message=FALSE, warning=FALSE}
 election <- read.csv("https://raw.githubusercontent.com/tonmcg/County_Level_Election_Results_12-16/master/US_County_Level_Presidential_Results_08-16.csv")
 election <- election %>% mutate(region = fips_code)
+
 ```
 
 County Names + State: 
-```{r}
+```{r message=FALSE, warning=FALSE}
 data("df_county_demographics")
 RedBlue <- read.csv("https://www.macalester.edu/~ajohns24/Data/RedBluePurple.csv")
 ```
 
 Combining County and State: (df_county) + redblue 
-```{r}
+```{r message=FALSE, warning=FALSE}
 county_level_demographic_data <- left_join(df_county_demographics,RedBlue)
 abb_added <- county_level_demographic_data %>% select(polyname,abb,StateColor,region)
 ```
 
 Combining elect and abb:
-```{r}
-full_data_county <- left_join(election,abb_added)
-County_level_data <- read.csv("/Users/sofiapozsonyiova/Desktop/COVID-19Bayes/Demographic_Data_DRAFT/full_data_by_county.csv")
-County_level_data <-County_level_data %>% select(-x)
+```{r message=FALSE, warning=FALSE}
+full_data_county <- left_join(election,abb_added, by = "region")
+County_level_data <- read.csv("/Users/sofiapozsonyiova/Desktop/COVID-19Bayes/Demographic_Data_/full_data_by_county.csv")
+County_level_data <-County_level_data 
 ```
 
-```{r}
-county_final <- County_level_data %>% group_by(polyname, abb, StateColor) %>% summarise_if(is.numeric, sum, na.rm = TRUE)
+```{r message=FALSE, warning=FALSE}
+county_final<- County_level_data %>% group_by(polyname, abb, StateColor) %>% summarise_if(is.numeric, sum, na.rm = TRUE)
 state_demographics <- df_state_demographics %>% mutate(polyname = region) 
 state_demographics <- state_demographics %>% select(-region)
 county_final <- county_final %>% select(-region)
 
 combineddata <- left_join(county_final,state_demographics, by = "polyname")
-combineddata
 
 Demographic_Data_variables <- combineddata %>% 
   select(-c(fips_code,total_2008,dem_2008,gop_2008,oth_2008,total_2012,dem_2012,gop_2012,oth_2012))%>% 
@@ -59,11 +61,172 @@ Demographic_Data_variables <- combineddata %>%
   mutate(percent_democrat2016 = dem_2016/total_2016) %>% 
   mutate(percent_republican2016 = gop_2016/total_2016) %>% 
   mutate(percent_other2016 = oth_2016/total_2016) %>% 
-  mutate(Winner = ifelse(percent_republican2016 > percent_democrat2016 & percent_republican2016 > percent_other2016, "Republican", "Democrat"))
-Demographic_Data_variables
+  mutate(Winner = ifelse(percent_republican2016 > percent_democrat2016 & percent_republican2016 > percent_other2016, "Republican", "Democrat"))%>% filter(total_2016 != 635888)
+#Saving 
+#write.csv(Demographic_Data_variables,"Demographic_Data.csv")
+```
+
+OUR DATA 
+```{r message=FALSE, warning=FALSE}
+FinalDemographic <- read.csv("/Users/sofiapozsonyiova/Desktop/COVID-19Bayes/Demographic_Data_/FINALDemographic_Data.csv")
+#save(FinalDemographic, file = 'FinalDemographic.RData')
+```
+
+Data:
+
+Our dataset, `Demographic`, was created by merging three other datasets which all contained different demographic and election information. We obtained the main portion of our demographic data from the US Census Bureau’s American Community Survey (ACS) which is an ongoing survey administered by the U.S. Census Bureau. It  gathers information on characteristics like income, employment, and housing  annually for all the 50 U.S. States on the county and state level. To access the county-level dataset we used the R package called Choroplethr which provides API connections to data sources like the ACS. The ACS County-Level dataset was then merged with a county-level election outcome dataset that was created by Tony McGoven. Tony’s dataset contained presidential election results for 2008,2012, and 2016 but we chose to focus solely on the most recent election,2016. That said, the 2016 election results at the county-level were scraped from results published by Townhall.com. However, the State of Alaska reports results at the precinct or state level so there was no county-level data available. Therefore, another dataset had to be created that contained the election results for Alaska and this was done using the official election results provided by the Alaska Division of Elections and was later merged in. The final dataset that was used came from Alicia Johnson and it contained information on a state’s political leaning. Meaning it categorizes each county as belonging to a blue/red/purple state based on the state categorizations at 279towin. 
+
+
+Information on the data itself: 
+
+```{r message=FALSE, warning=FALSE}
+#Dimensions:
+dim(FinalDemographic)
+#51 Observations and 19 variables 
+
+#Variable Names:
+names(FinalDemographic)
+
+#Head: 
+head(FinalDemographic)
+
+#Summary:
+summary(FinalDemographic)
+```
+
++------------------------+---------------------------------------------------+
+| Variables:             | Meaning:                                          |
++========================+===================================================+
+| `polyname`             | State Name                                        |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `StateColor`           | Political Leaning                                 |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_hispanic`      | Percent of the Population that is Hispanic        |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_white`        | Percent of the Population that is White           |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_asian`        | Percent of the Population that is Asian           |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_black`        | Percent of Population that is Black               |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`total_population`      | Total State Population                            | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`per_capita_income`     | Income per Capita                                 |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_democrat2016`  | Percent of votes won by Democrat (Clinton)        |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_republican2016`| Percent of votes won by Republican (Trump)        | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `Winner`               | Indicator for whether a Republican or Democrat Won| 
+|                        |                                                   |  
++------------------------+---------------------------------------------------+
+|`total_2016`            | Total Number of Votes                             | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+
+
+```{r message=FALSE, warning=FALSE}
+library(choroplethrMaps)
+library(usmap)
+library(ggplot2)
+
+
+mapdata <- FinalDemographic %>% mutate(state = polyname)
+
+# plot_usmap(data = dat_sub, values = 'total.receipts', color = "red") + 
+#   scale_fill_continuous(low = "white", high = "blue", name = "Total Receipts", label = scales::comma) + theme(legend.position = "right") + facet_wrap(~party) 
 ```
 
 
+Visualizations: 
+```{r, warning=FALSE}
+#Demographic: Identification 
+plot_usmap(data = mapdata, values = "percent_white", color = "white") + 
+  scale_fill_continuous(name = "Percent White", label = scales::comma) + 
+  theme(legend.position = "right")+ ggtitle("Percent of Residents that Identify as White") + 
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+)
+
+plot_usmap(data = mapdata, values = "percent_asian", color = "white") + 
+  scale_fill_continuous( name = "Percent Asian", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent of Residents that Identify as Asian") + 
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+)
+
+plot_usmap(data = mapdata, values = "percent_asian", color = "white") + 
+  scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent of Residents that Identify as Asian") +
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+) 
+```
+The above visualization is looking at the percent of residents that identify as Asian within the United States. This information is valuable to us since we are trying to understand ___. As you can see, there is a higher percent of residents that identify as Asian in places like California and Washington, but the most being in Hawaii. From this visualization we can also see that that Midwest and the South tend to have a small percentage of residents identifying as Asian. 
 
 
+Polling Visualizations: 
+```{r, warning=FALSE}
+#By Results 
+plot_usmap(data = mapdata, values = "percent_asian", color = "white") + 
+  scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent Asian by General Election Results")+
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+) + facet_wrap(~Winner)
+
+
+#By income 
+plot_usmap(data = mapdata, values = "per_capita_income", color = "white") + 
+  scale_fill_continuous(low = "sky blue", high = "black", name = "$ Per Capita", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent Capita Income")+
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+) 
+```
+
+```{r}
+ggplot(mapdata, aes(x = percent_republican2016, fill = StateColor)) + 
+    geom_density(alpha = 0.5) + 
+    scale_fill_manual(values = c("blue","purple","red")) +ggtitle("Trump Support by State Affiliation") + xlab("Trump Support")+ylab("Density")
+
+ggplot(mapdata, aes(x = percent_asian, y = percent_republican2016, color = StateColor)) + 
+    geom_point(alpha = 0.5) + 
+    scale_color_manual(values = c("blue","purple","red")) + 
+    facet_wrap( ~ Winner) + ggtitle("Percent of Asians and Trump Support by Election Outcome") + xlab("Percent Asian") + ylab("Trump Support")
+
+ggplot(mapdata, aes(x = percent_asian, y = percent_republican2016, color = Winner)) + 
+    scale_color_manual(values = c("blue","purple","red")) + 
+    geom_point(alpha = 0.8) + geom_text(aes(label=ifelse(percent_asian>.2,as.character(state),"")),hjust=1.2,vjust=0)+ geom_text(aes(label=ifelse(percent_republican2016<.2,as.character(state),"")),hjust=-.1,vjust=0) + ggtitle("Percent of Asians and Trump Support by Election Outcome") + xlab("Percent Asian") + ylab("Trump Support")
+
+ggplot(mapdata, aes(x = per_capita_income)) + 
+    geom_density()+ ggtitle("Per Capita Income") + xlab("Per Capita Income") + ylab("Density") + facet_wrap(~Winner)
+```
+Univariate Plots
+```{r}
+ggplot(mapdata, aes(x = percent_republican2016)) + 
+    geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density") 
+
+ggplot(mapdata, aes(x = percent_republican2016)) + 
+    geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density")
+
+ggplot(mapdata, aes(x = percent_republican2016)) + 
+    geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density") + facet_wrap(~StateColor)
+
+ggplot(mapdata, aes(x = per_capita_income)) + 
+    geom_density()+ ggtitle("Income per Capita") + xlab("$") + ylab("Density") 
+
+ggplot(mapdata, aes(x = per_capita_income, fill = StateColor)) + 
+    geom_density(alpha = .8)+ ggtitle("Income per Capita") + xlab("$") + ylab("Density")
+```
 
