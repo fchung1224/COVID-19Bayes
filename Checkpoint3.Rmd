@@ -55,7 +55,7 @@ Re-Cleaned
 ```{r} 
 google <- google %>%  select(-c(X.1))
 Finaldata <- Finaldata %>% select(-c(X)) 
-Finaldata <- Finaldata %>% mutate(as.Date(Day))
+Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
 ```
 
 
@@ -236,7 +236,7 @@ ggplot(Finaldata, aes(x = per_capita_income)) +
 
 ```{r}
 ## Creating a df of just the cases the week before 3/17
-weekbefore <- data.frame(Finaldata) %>% filter(Day <= as.character(as.Date("2020-03-17")))
+weekbefore <- data.frame(Finaldata) %>% filter(Day <= as.Date("2020-03-17"))
 
 plot1<- plot_usmap(data = weekbefore, values = "positive", color = "white") + 
   scale_fill_continuous(name = "Cases", label = scales::comma) + 
@@ -255,6 +255,7 @@ plot2<-plot_usmap(data = weekafter, values = "positive", color = "white") +
 plot.title = element_text(color="Black", size=5)
 )
 
+
 # The number of Positive Covid Cases, comparison before and after the China Virus announcement 
 grid.arrange(plot1, plot2, ncol=2)
 ```
@@ -266,21 +267,21 @@ ggplot(Finaldata, aes(x = positive, fill = StateColor)) +
 ```
 
 ```{r}
-## Positive COVID cases map before and after week 
-plot3<-statebins(state_data = weekbefore, state_col = "State",
-                     text_color = "white", value_col = "positive",
-                     brewer_pal="Spectral", font_size = 3,breaks =7,
-                     legend_title="Week Before",
-                 labels = c("0","1-5","5-10","10-20","20-30","30-40","50-100"))
-
-### Drastic scale change, needs work for comparison sake
-plot4<-statebins(state_data = weekafter, state_col = "state",
-                     text_color = "white", value_col = "positive",
-                     brewer_pal="Spectral", font_size = 3,breaks =6,
-                     legend_title="Week After",labels = c("1-100", "100-500", "500-5000", "5000-15000", "15000-25000", "25000-35000"))
-
-plot3
-plot4
+# ## Positive COVID cases map before and after week 
+# plot3<-statebins(state_data = weekbefore, state_col = "State",
+#                      text_color = "white", value_col = "positive",
+#                      brewer_pal="Spectral", font_size = 3,breaks =7,
+#                      legend_title="Week Before",
+#                  labels = c("0","1-5","5-10","10-20","20-30","30-40","50-100"))
+# 
+# ### Drastic scale change, needs work for comparison sake
+# plot4<-statebins(state_data = weekafter, state_col = "state",
+#                      text_color = "white", value_col = "positive",
+#                      brewer_pal="Spectral", font_size = 3,breaks =6,
+#                      legend_title="Week After",labels = c("1-100", "100-500", "500-5000", "5000-15000", "15000-25000", "25000-35000"))
+# 
+# plot3
+# plot4
 ```
 
 
@@ -304,98 +305,7 @@ ggplot(Finaldata, aes(x = Day, y = ChinaVirusInterest, color = factor(State))) +
 
 # Analysis 
 
-```{r}
-set.seed(84735)
-test1 <- Finaldata %>% 
-  select(mean_KungFluInterest, percent_republican2016, percent_asian, StateColor) %>%
-  na.omit() %>% 
-  sample_n(500)
 
-names(test1) <- tolower(names(test1))
-
-test1
-```
-
-```{r}
-set.seed(454)
-building_mod <- stan_glm(
-  mean_kungfluinterest ~ percent_republican2016 + percent_asian +statecolor, 
-  data = test1, 
-  family = gaussian, 
-  chains = 4, iter = 10000
-)
-```
-
-
-```{r}
-mcmc_trace(building_mod)
-mcmc_dens_overlay(building_mod)
-```
-
-```{r}
-pp_check(building_mod)
-
-# Could build like the sleep study, 50 frames one for each state and how Google Trends changed over time, each state has its own trajectory
-# Can we look at each state and how their interest changes over time and if that's related to how many cases are in the state 
-
-#What's the trend in interest and how does it depend on cases? 
-```
-
-```{r}
-summary_building_mod <- summary(building_mod)
-
-head(as.data.frame(summary_building_mod),-2)
-```
-
-
-```{r, include=FALSE}
-prediction_summary_data <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
-  # Calculate summary statistics of simulated 
-  # posterior predictive models for each case
-  l_outer <- function(x){quantile(x, (1-prob_outer) / 2)}
-  l_inner <- function(x){quantile(x, (1-prob_inner) / 2)}
-  u_inner <- function(x){quantile(x, 1 - (1-prob_inner) / 2)}
-  u_outer <- function(x){quantile(x, 1 - (1-prob_outer) / 2)}
-  df <- data.frame(yrep) %>% 
-    summarize_all(list(mean, sd, median, mad, l_outer, l_inner, u_inner, u_outer)) %>%
-    unlist() %>% 
-    matrix(., length(y), 8) %>% 
-    data.frame()
-  names(df) <- c("post_mean", "post_sd", "post_median", "post_mad", "l_outer", "l_inner", "u_inner", "u_outer")
-  data.frame(cbind(y, df))
-}
-
-
-prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
-  # This function summarizes the predictions across all cases
-  pred_data <- prediction_summary_data(y, yrep, prob_inner = prob_inner, prob_outer = prob_outer) %>% 
-    mutate(error = y - post_median) %>% 
-    mutate(error_scaled = error / post_mad) %>% 
-    mutate(within_inner = (y >= l_inner) & (y <= u_inner)) %>% 
-    mutate(within_outer = (y >= l_outer) & (y <= u_outer))
-  
-  
-  pred_summary <- pred_data %>% 
-    summarize(mae = median(abs(error)), 
-      mae_scaled = median(abs(error_scaled)),
-      within_inner = mean(within_inner),
-      within_outer = mean(within_outer)
-    )
-  names(pred_summary)[3] <- paste0("within_", prob_inner*100)
-  names(pred_summary)[4] <- paste0("within_", prob_outer*100)
-  
-  pred_summary
-}
-```
-
-```{r}
-preds <- posterior_predict(building_mod,newdata = test1) # Ask Alicia 
-prediction_summary(y = test1$mean_kungfluinterest, yprep = preds)
-
-```
-
-\
-\
 
 
 
