@@ -52,7 +52,8 @@ google<-read.csv("Google/googlefinal.csv")
 
 Re-Cleaned 
 ```{r}
-Finaldata <- Finaldata %>% select(-c(X))
+Finaldata <- Finaldata %>% select(-c(X)) 
+Finaldata <- Finaldata %>% mutate(Day = as.Date(as.character(Day)))
 ```
 
 
@@ -216,7 +217,11 @@ ggplot(Finaldata, aes(x = per_capita_income)) +
 
 ```{r}
 ## Creating a df of just the cases the week before 3/17
-weekbefore <- data.frame(Finaldata) %>% filter(date <= as.Date("2020-03-17"))
+day1<-as.Date("2020-03-17")
+weekbefore <- Finaldata %>% filter(Day <= day1)
+
+Finaldata %>% 
+  filter(Day <= day1)
 
 plot1<- plot_usmap(data = weekbefore, values = "positive", color = "white") + 
   scale_fill_continuous(name = "Cases", label = scales::comma) + 
@@ -226,7 +231,7 @@ plot.title = element_text(color="Black", size=8)
 )
 
 ## Creating a df of just the cases the week after 3/17
-weekafter <- data.frame(Finaldata) %>% filter(date >= as.Date("2020-03-17"))
+weekafter <- data.frame(Finaldata) %>% filter(Day >= as.Date("2020-03-17"))
 
 plot2<-plot_usmap(data = weekafter, values = "positive", color = "white") + 
   scale_fill_continuous(name = "Cases", label = scales::comma) + 
