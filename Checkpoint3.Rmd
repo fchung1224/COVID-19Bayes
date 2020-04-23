@@ -45,6 +45,9 @@ require(bayesplot)
 ```{r}
 Finaldata<- read.csv("FinalDataSet.csv")
 ```
+```{r}
+google<-read.csv("Google/googlefinal.csv")
+```
 
 Re-Cleaned 
 ```{r}
@@ -151,6 +154,13 @@ colnames(Finaldata)
 
 
 ##Visualizations 
+```{r}
+google %>% 
+  group_by(Region, Day) %>% 
+  summarize(ChinaVirusSearch = median(ChinaVirusInterest)) %>% 
+  ggplot(aes(x=Day, y=ChinaVirusSearch, color=Region))+
+  geom_point()
+```
 
 
 ### Demographic 
