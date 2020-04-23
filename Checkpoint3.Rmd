@@ -81,7 +81,7 @@ colnames(Finaldata)
 ##Variables of Interest
 
 +------------------------+---------------------------------------------------+
-| Variables:             | Meaning:                                          |
+| Variables:             | Description:                                      |
 +========================+===================================================+
 | `polyname`             | State Name                                        |
 |                        |                                                   | 
@@ -119,6 +119,32 @@ colnames(Finaldata)
 |`total_2016`            | Total Number of Votes                             | 
 |                        |                                                   | 
 +------------------------+---------------------------------------------------+
+|`Positive`              | Number of reported positive COVID-19 cases        | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`Negative`              | Number of reported negative COVID-19 cases        | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`date`                  | Date of report                                    | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`death`                 | Total Number of reported deaths due to COVID-19   | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`hospitalized`          | Total Number of indivudals hopitalized due        |
+|                        | to COVID-19                                       |
++------------------------+---------------------------------------------------+
+|`totalTestResults`      | Total Number test results (Positive +Negative)    | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`FIPS`                  | A five-digit Federal Information Processing       |
+|                        | Standards code which uniquely identified counties |
+|                        | and county                                        | 
++------------------------+---------------------------------------------------+
+
+
+
+
 
 ##Visualizations 
 
