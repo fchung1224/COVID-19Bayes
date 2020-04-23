@@ -48,10 +48,12 @@ Finaldata<- read.csv("time_series_final_Data.csv")
 
 ```{r}
 google<-read.csv("Google/googlefinal.csv")
+names(google)
 ```
 
 Re-Cleaned 
-```{r}
+```{r} 
+google <- google %>%  select(-c(X.1))
 Finaldata <- Finaldata %>% select(-c(X)) 
 Finaldata <- Finaldata %>% mutate(as.Date(Day))
 ```
@@ -158,11 +160,24 @@ colnames(Finaldata)
 
 ##Visualizations 
 ```{r}
-google %>% 
+library(plotly)
+#google_ts<-read.csv("Time_series_Google.csv")
+
+day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
+day2<-as.Date("03/24/2020",format = "%m/%d/%Y")
+
+google_ts<-google%>%
+  mutate(Day = as.Date(as.character(Day)))
+
+a<-google_ts %>% 
+  #filter(Day<=day2)%>%
+  #filter(Day>=day1)%>%
   group_by(Region, Day) %>% 
   summarize(ChinaVirusSearch = median(ChinaVirusInterest)) %>% 
   ggplot(aes(x=Day, y=ChinaVirusSearch, color=Region))+
   geom_point()
+
+ggplotly(a)
 ```
 
 
@@ -252,8 +267,7 @@ ggplot(Finaldata, aes(x = positive, fill = StateColor)) +
 
 ```{r}
 ## Positive COVID cases map before and after week 
-library(statebins)
-plot3<-statebins(state_data = weekbefore, state_col = "state",
+plot3<-statebins(state_data = weekbefore, state_col = "State",
                      text_color = "white", value_col = "positive",
                      brewer_pal="Spectral", font_size = 3,breaks =7,
                      legend_title="Week Before",
