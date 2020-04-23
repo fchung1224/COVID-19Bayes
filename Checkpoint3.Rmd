@@ -40,6 +40,57 @@ require(bayesplot)
 
 
 
+#Functions 
+
+
+```{r, include=FALSE}
+prediction_summary_data <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
+  # Calculate summary statistics of simulated 
+  # posterior predictive models for each case
+  l_outer <- function(x){quantile(x, (1-prob_outer) / 2)}
+  l_inner <- function(x){quantile(x, (1-prob_inner) / 2)}
+  u_inner <- function(x){quantile(x, 1 - (1-prob_inner) / 2)}
+  u_outer <- function(x){quantile(x, 1 - (1-prob_outer) / 2)}
+  df <- data.frame(yrep) %>% 
+    summarize_all(list(mean, sd, median, mad, l_outer, l_inner, u_inner, u_outer)) %>%
+    unlist() %>% 
+    matrix(., length(y), 8) %>% 
+    data.frame()
+  names(df) <- c("post_mean", "post_sd", "post_median", "post_mad", "l_outer", "l_inner", "u_inner", "u_outer")
+  data.frame(cbind(y, df))
+}
+
+
+prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
+  # This function summarizes the predictions across all cases
+  pred_data <- prediction_summary_data(y, yrep, prob_inner = prob_inner, prob_outer = prob_outer) %>% 
+    mutate(error = y - post_median) %>% 
+    mutate(error_scaled = error / post_mad) %>% 
+    mutate(within_inner = (y >= l_inner) & (y <= u_inner)) %>% 
+    mutate(within_outer = (y >= l_outer) & (y <= u_outer))
+  
+  
+  pred_summary <- pred_data %>% 
+    summarize(mae = median(abs(error)), 
+      mae_scaled = median(abs(error_scaled)),
+      within_inner = mean(within_inner),
+      within_outer = mean(within_outer)
+    )
+  names(pred_summary)[3] <- paste0("within_", prob_inner*100)
+  names(pred_summary)[4] <- paste0("within_", prob_outer*100)
+  
+  pred_summary
+}
+```
+
+
+
+
+\
+\
+
+
+
 
 # Data
 ```{r}
@@ -185,12 +236,6 @@ ggplotly(a)
 ```{r}
 #Demographic: Identification 
 Finaldata <- data.frame(Finaldata) %>% mutate(state = State)
-plot_usmap(data = Finaldata, values = "percent_white", color = "white") + 
-  scale_fill_continuous(name = "Percent White", label = scales::comma) + 
-  theme(legend.position = "right")+ ggtitle("Percent of Residents that Identify as White") + 
-  theme(
-plot.title = element_text(color="Black", size=14, face="bold")
-)
 
 plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
   scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
@@ -199,43 +244,29 @@ plot_usmap(data = Finaldata, values = "percent_asian", color = "white") +
 plot.title = element_text(color="Black", size=14, face="bold")
 ) 
 
-#By Results 
-plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
-  scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
-  theme(legend.position = "right") + ggtitle("Percent Asian by General Election Results")+
-  theme(
-plot.title = element_text(color="Black", size=14, face="bold")
-) + facet_wrap(~Winner)
-
-
-#By income 
-plot_usmap(data = Finaldata, values = "per_capita_income", color = "white") + 
-  scale_fill_continuous(low = "sky blue", high = "black", name = "$ Per Capita", label = scales::comma) + 
-  theme(legend.position = "right") + ggtitle("Percent Capita Income")+
-  theme(
-plot.title = element_text(color="Black", size=14, face="bold")
-) 
-
 #Income by state affiliation 
 ggplot(Finaldata, aes(x = per_capita_income, fill = StateColor)) + 
-    geom_density(alpha = .8)+ ggtitle("Income per Capita") + xlab("$") + ylab("Density")
+    geom_density(alpha = .8)+ ggtitle("Income per Capita") + xlab("$") + ylab("Density") +scale_fill_manual(values=c("blue", "purple", "red"))
 
 #Trump Support 
-ggplot(Finaldata, aes(x = percent_republican2016)) + 
-    geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density")
+
+plot_usmap(data = Finaldata, values = "percent_republican2016", color = "white") + 
+  scale_fill_continuous(low = "sky blue", high = "black", name = "Trump Support", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent of Residents that Identify as Asian") +
+  theme(plot.title = element_text(color="Black", size=14, face="bold")) 
+
 
 ggplot(Finaldata, aes(x = percent_asian, y = percent_republican2016, color = Winner)) + 
     scale_color_manual(values = c("blue","purple","red")) + 
-    geom_point(alpha = 0.8) + geom_text(aes(label=ifelse(percent_asian>.2,as.character(state),"")),hjust=1.2,vjust=0)+ geom_text(aes(label=ifelse(percent_republican2016<.2,as.character(state),"")),hjust=-.1,vjust=0) + ggtitle("Percent of Asians and Trump Support by Election Outcome") + xlab("Percent Asian") + ylab("Trump Support")
+    geom_point(alpha = 0.8) + geom_text(aes(label=ifelse(percent_asian>.2,as.character(state),"")),hjust=1.2,vjust=0)+ geom_text(aes(label=ifelse(percent_republican2016<.2,as.character(state),"")),hjust=-.1,vjust=0) + ggtitle("Percent of Asians and Trump Support by Election Outcome") + xlab("Percent Asian") + ylab("Trump Support") 
 
-ggplot(Finaldata, aes(x = per_capita_income)) + 
-    geom_density()+ ggtitle("Per Capita Income") + xlab("Per Capita Income") + ylab("Density") + facet_wrap(~Winner)
 ```
 
 ### COVID-19 Cases 
 
-```{r}
+```{r echo=FALSE}
 ## Creating a df of just the cases the week before 3/17
+#Scale.fill color manual ??? so to go from green to red
 weekbefore <- data.frame(Finaldata) %>% filter(Day <= as.character(as.Date("2020-03-17")))
 
 plot1<- plot_usmap(data = weekbefore, values = "positive", color = "white") + 
@@ -290,11 +321,12 @@ ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) +
   geom_density(alpha = 0.5)
 
 ```
+
 ```{r}
 ggplot(Finaldata, aes(x = Day, y = ChinaVirusInterest, color = factor(State))) + 
     geom_point() + 
     geom_smooth(method = "lm", se = FALSE) + 
-    facet_wrap(~ State) + 
+    facet_wrap(~ Region) + 
     theme(legend.position = "none")
 ```
 \
@@ -348,60 +380,20 @@ head(as.data.frame(summary_building_mod),-2)
 ```
 
 
-```{r, include=FALSE}
-prediction_summary_data <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
-  # Calculate summary statistics of simulated 
-  # posterior predictive models for each case
-  l_outer <- function(x){quantile(x, (1-prob_outer) / 2)}
-  l_inner <- function(x){quantile(x, (1-prob_inner) / 2)}
-  u_inner <- function(x){quantile(x, 1 - (1-prob_inner) / 2)}
-  u_outer <- function(x){quantile(x, 1 - (1-prob_outer) / 2)}
-  df <- data.frame(yrep) %>% 
-    summarize_all(list(mean, sd, median, mad, l_outer, l_inner, u_inner, u_outer)) %>%
-    unlist() %>% 
-    matrix(., length(y), 8) %>% 
-    data.frame()
-  names(df) <- c("post_mean", "post_sd", "post_median", "post_mad", "l_outer", "l_inner", "u_inner", "u_outer")
-  data.frame(cbind(y, df))
-}
 
 
-prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
-  # This function summarizes the predictions across all cases
-  pred_data <- prediction_summary_data(y, yrep, prob_inner = prob_inner, prob_outer = prob_outer) %>% 
-    mutate(error = y - post_median) %>% 
-    mutate(error_scaled = error / post_mad) %>% 
-    mutate(within_inner = (y >= l_inner) & (y <= u_inner)) %>% 
-    mutate(within_outer = (y >= l_outer) & (y <= u_outer))
-  
-  
-  pred_summary <- pred_data %>% 
-    summarize(mae = median(abs(error)), 
-      mae_scaled = median(abs(error_scaled)),
-      within_inner = mean(within_inner),
-      within_outer = mean(within_outer)
-    )
-  names(pred_summary)[3] <- paste0("within_", prob_inner*100)
-  names(pred_summary)[4] <- paste0("within_", prob_outer*100)
-  
-  pred_summary
-}
-```
+\
+\
+
+
+
+
 
 ```{r}
 preds <- posterior_predict(building_mod,newdata = test1) # Ask Alicia 
 prediction_summary(y = test1$mean_kungfluinterest, yprep = preds)
 
 ```
-
-\
-\
-
-
-
-
-
-
 
 
 
