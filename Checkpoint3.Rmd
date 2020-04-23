@@ -1,7 +1,7 @@
 ---
 title: "Checkpoint 3"
 author: "Quinn Rafferty, Sofia Pozsonyiova, Will Madairy, Federico Chung"
-date: ""
+date: "4/24/2020"
 output: 
   html_document:
     toc: true
@@ -58,8 +58,6 @@ Finaldata <- Finaldata %>% select(-c(X,X.1)) %>%
 
 
 ##Dataset Description 
-**Put in Data Descriptions Here**
-
 
 `Demographic:`
 Our dataset, `Demographic`, was created by merging three other datasets which all contained different demographic and election information. We obtained the main portion of our demographic data from the US Census Bureau’s American Community Survey (ACS) which is an ongoing survey administered by the U.S. Census Bureau. It  gathers information on income, employment, housing characteristics, etc, annually for all the 50 U.S. States on the county and state level. To access the county-level dataset we used the R package called Choroplethr which provides API connections to data sources like the ACS. The ACS County-Level dataset was then merged with a county-level election outcome dataset that was created by Tony McGoven. Tony’s dataset contained presidential election results for 2008,2012, and 2016 but we chose to focus solely on the most recent election,2016. That said, the 2016 election results at the county-level were scraped from results published by Townhall.com. However, the State of Alaska reports results at the precinct or state level so there was no county-level data available. Therefore, another dataset had to be created that contained the election results for Alaska and this was done using the official election results provided by the Alaska Division of Elections and was later merged in. The final dataset that was used came from Alicia Johnson and it contained information on a state’s political leaning. Meaning it categorizes each county as belonging to a blue/red/purple state based on the state categorizations at 279towin. 
@@ -218,7 +216,7 @@ ggplot(Finaldata, aes(x = per_capita_income)) +
 
 ```{r}
 ## Creating a df of just the cases the week before 3/17
-weekbefore <- data.frame(states_cases_data) %>% filter(date <= as.Date("2020-03-17"))
+weekbefore <- data.frame(Finaldata) %>% filter(date <= as.Date("2020-03-17"))
 
 plot1<- plot_usmap(data = weekbefore, values = "positive", color = "white") + 
   scale_fill_continuous(name = "Cases", label = scales::comma) + 
@@ -228,7 +226,7 @@ plot.title = element_text(color="Black", size=8)
 )
 
 ## Creating a df of just the cases the week after 3/17
-weekafter <- data.frame(states_cases_data) %>% filter(date >= as.Date("2020-03-17"))
+weekafter <- data.frame(Finaldata) %>% filter(date >= as.Date("2020-03-17"))
 
 plot2<-plot_usmap(data = weekafter, values = "positive", color = "white") + 
   scale_fill_continuous(name = "Cases", label = scales::comma) + 
@@ -242,12 +240,13 @@ grid.arrange(plot1, plot2, ncol=2)
 ```
 
 ```{r}
-# 
+# Positive COVID cases aggregated by party 
 ggplot(Finaldata, aes(x = positive, fill = StateColor)) + 
     geom_density(alpha = .8)+ ggtitle("Positive COVID-19 Cases by State Party") + xlab("Cases") + ylab("Density")+xlim(0,500)
 ```
 
 ```{r}
+## Positive COVID cases map before and after week 
 library(statebins)
 plot3<-statebins(state_data = weekbefore, state_col = "state",
                      text_color = "white", value_col = "positive",
