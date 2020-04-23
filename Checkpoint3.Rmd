@@ -347,6 +347,7 @@ prediction_summary(y = test1$mean_kungfluinterest, yprep = preds)
 
 
 ```{r}
+library(plotly)
 google_ts<-read.csv("Time_series_Google.csv")
 
 day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
