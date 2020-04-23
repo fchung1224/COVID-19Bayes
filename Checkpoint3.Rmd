@@ -350,6 +350,25 @@ prediction_summary(y = test1$mean_kungfluinterest, yprep = preds)
 
 
 
+```{r}
+google_ts<-read.csv("Time_series_Google.csv")
+
+day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
+day2<-as.Date("03/24/2020",format = "%m/%d/%Y")
+
+google_ts_reg<-google_ts_reg%>%
+  mutate(Day = as.Date(as.character(Day)))
+
+a<-google_ts_reg %>% 
+  #filter(Day<=day2)%>%
+  #filter(Day>=day1)%>%
+  group_by(Region, Day) %>% 
+  summarize(ChinaVirusSearch = median(ChinaVirusInterest)) %>% 
+  ggplot(aes(x=Day, y=ChinaVirusSearch, color=Region))+
+  geom_point()
+
+ggplotly(a)
+```
 
 
 
