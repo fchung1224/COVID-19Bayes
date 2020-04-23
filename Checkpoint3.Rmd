@@ -266,23 +266,6 @@ ggplot(Finaldata, aes(x = positive, fill = StateColor)) +
     geom_density(alpha = .8)+ ggtitle("Positive COVID-19 Cases by State Party") + xlab("Cases") + ylab("Density")+xlim(0,500)
 ```
 
-```{r}
-# ## Positive COVID cases map before and after week 
-# plot3<-statebins(state_data = weekbefore, state_col = "State",
-#                      text_color = "white", value_col = "positive",
-#                      brewer_pal="Spectral", font_size = 3,breaks =7,
-#                      legend_title="Week Before",
-#                  labels = c("0","1-5","5-10","10-20","20-30","30-40","50-100"))
-# 
-# ### Drastic scale change, needs work for comparison sake
-# plot4<-statebins(state_data = weekafter, state_col = "state",
-#                      text_color = "white", value_col = "positive",
-#                      brewer_pal="Spectral", font_size = 3,breaks =6,
-#                      legend_title="Week After",labels = c("1-100", "100-500", "500-5000", "5000-15000", "15000-25000", "25000-35000"))
-# 
-# plot3
-# plot4
-```
 
 
 ## Final Dataset
