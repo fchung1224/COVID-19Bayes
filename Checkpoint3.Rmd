@@ -53,7 +53,7 @@ google<-read.csv("Google/googlefinal.csv")
 Re-Cleaned 
 ```{r}
 Finaldata <- Finaldata %>% select(-c(X)) 
-Finaldata <- Finaldata %>% mutate(Day = as.Date(as.character(Day)))
+Finaldata <- Finaldata %>% mutate(as.Date(Day))
 ```
 
 
@@ -153,7 +153,7 @@ colnames(Finaldata)
 
 
 ##Visualizations 
-```{r echo=FALSE}
+```{r}
 google %>% 
   group_by(Region, Day) %>% 
   summarize(ChinaVirusSearch = median(ChinaVirusInterest)) %>% 
@@ -217,11 +217,7 @@ ggplot(Finaldata, aes(x = per_capita_income)) +
 
 ```{r}
 ## Creating a df of just the cases the week before 3/17
-day1<-as.Date("2020-03-17")
-weekbefore <- Finaldata %>% filter(Day <= day1)
-
-Finaldata %>% 
-  filter(Day <= day1)
+weekbefore <- data.frame(Finaldata) %>% filter(Day <= as.character(as.Date("2020-03-17")))
 
 plot1<- plot_usmap(data = weekbefore, values = "positive", color = "white") + 
   scale_fill_continuous(name = "Cases", label = scales::comma) + 
@@ -267,6 +263,13 @@ plot4<-statebins(state_data = weekafter, state_col = "state",
 
 plot3
 plot4
+```
+
+
+## Final Dataset
+```{r}
+ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
+  geom_density(alpha = 0.5)
 ```
 
 \
