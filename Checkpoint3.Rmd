@@ -8,13 +8,8 @@ output:
     toc_float: true
 ---
 
-
-
-
 \
 \
-
-
 
 
 #Libraries 
@@ -28,6 +23,7 @@ library(tidyverse)
 library(ggmap)
 library(viridis)
 library(rgdal)
+library(gridExtra)
 
 require(janitor)
 require(reshape2)
@@ -64,6 +60,9 @@ Finaldata <- Finaldata %>% select(-c(X,X.1)) %>%
 
 `Demographic:`
 Our dataset, `Demographic`, was created by merging three other datasets which all contained different demographic and election information. We obtained the main portion of our demographic data from the US Census Bureau’s American Community Survey (ACS) which is an ongoing survey administered by the U.S. Census Bureau. It  gathers information on income, employment, housing characteristics, etc, annually for all the 50 U.S. States on the county and state level. To access the county-level dataset we used the R package called Choroplethr which provides API connections to data sources like the ACS. The ACS County-Level dataset was then merged with a county-level election outcome dataset that was created by Tony McGoven. Tony’s dataset contained presidential election results for 2008,2012, and 2016 but we chose to focus solely on the most recent election,2016. That said, the 2016 election results at the county-level were scraped from results published by Townhall.com. However, the State of Alaska reports results at the precinct or state level so there was no county-level data available. Therefore, another dataset had to be created that contained the election results for Alaska and this was done using the official election results provided by the Alaska Division of Elections and was later merged in. The final dataset that was used came from Alicia Johnson and it contained information on a state’s political leaning. Meaning it categorizes each county as belonging to a blue/red/purple state based on the state categorizations at 279towin. 
+
+`COVID-19 Cases`
+The COVID-19 data is provided by The COVID Tracking Project(CTP). All of the  data points come from state/district/territory public health authorities—or, occasionally, from trusted news reporting, official press conferences, or (very occasionally) tweets or Facebook updates from state public health authorities or governors. These numbers are updated daily at 4PM EST. The biggest weakness of this dataset is that there is no standardized methods for states to follow for data collection/report. For example, some states, like Oregon, provide the **full** set of numbers but others provide some or none of these numbers on an ongoing basis. Some crucial states in this outbreak, notably California, Washington, and New York, have not been regularly reporting their total number of people tested. The CTP aims to remedy this uncertainty in states by utilizing other reporting/measuring tools such as: "Directly asking state officials, watching news conferences, gleaning information from trusted news sources, and whatever else it takes to present reliable numbers." 
 
 ##Dataset Details 
 ```{r}
@@ -235,7 +234,7 @@ ggplot(Finaldata, aes(x = positive, fill = StateColor)) +
 library(statebins)
 plot3<-statebins(state_data = weekbefore, state_col = "state",
                      text_color = "white", value_col = "positive",
-                     brewer_pal="Spectral", font_size = 2,breaks =7,
+                     brewer_pal="Spectral", font_size = 3,breaks =7,
                      legend_title="Week Before",
                  labels = c("0","1-5","5-10","10-20","20-30","30-40","50-100"))
 
@@ -286,6 +285,11 @@ mcmc_dens_overlay(building_mod)
 
 ```{r}
 pp_check(building_mod)
+
+# Could build like the sleep study, 50 frames one for each state and how Google Trends changed over time, each state has its own trajectory
+# Can we look at each state and how their interest changes over time and if that's related to how many cases are in the state 
+
+#What's the trend in interest and how does it depend on cases? 
 ```
 
 ```{r}
