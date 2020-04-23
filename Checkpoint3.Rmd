@@ -144,12 +144,10 @@ colnames(Finaldata)
 
 
 
-
-
 ##Visualizations 
 
 
-###Demographic 
+### Demographic 
 ```{r}
 #Demographic: Identification 
 Finaldata <- data.frame(Finaldata) %>% mutate(state = State)
@@ -200,18 +198,65 @@ ggplot(Finaldata, aes(x = per_capita_income)) +
     geom_density()+ ggtitle("Per Capita Income") + xlab("Per Capita Income") + ylab("Density") + facet_wrap(~Winner)
 ```
 
-
-
-
-\
-\
-
-
-
-#Analysis 
+### COVID-19 Cases 
 
 ```{r}
-# Take a sub-sample of the data
+## Creating a df of just the cases the week before 3/17
+weekbefore <- data.frame(states_cases_data) %>% filter(date <= as.Date("2020-03-17"))
+
+plot1<- plot_usmap(data = weekbefore, values = "positive", color = "white") + 
+  scale_fill_continuous(name = "Cases", label = scales::comma) + 
+  theme(legend.position = "right")+ ggtitle("# of COVID Cases Before 3/17") + 
+  theme(
+plot.title = element_text(color="Black", size=8)
+)
+
+## Creating a df of just the cases the week after 3/17
+weekafter <- data.frame(states_cases_data) %>% filter(date >= as.Date("2020-03-17"))
+
+plot2<-plot_usmap(data = weekafter, values = "positive", color = "white") + 
+  scale_fill_continuous(name = "Cases", label = scales::comma) + 
+  theme(legend.position = "right")+ ggtitle("# of COVID Cases After 3/17") + 
+  theme(
+plot.title = element_text(color="Black", size=5)
+)
+
+# The number of Positive Covid Cases, comparison before and after the China Virus announcement 
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+```{r}
+# 
+ggplot(Finaldata, aes(x = positive, fill = StateColor)) + 
+    geom_density(alpha = .8)+ ggtitle("Positive COVID-19 Cases by State Party") + xlab("Cases") + ylab("Density")+xlim(0,500)
+```
+
+```{r}
+library(statebins)
+plot3<-statebins(state_data = weekbefore, state_col = "state",
+                     text_color = "white", value_col = "positive",
+                     brewer_pal="Spectral", font_size = 2,breaks =7,
+                     legend_title="Week Before",
+                 labels = c("0","1-5","5-10","10-20","20-30","30-40","50-100"))
+
+### Drastic scale change, needs work for comparison sake
+plot4<-statebins(state_data = weekafter, state_col = "state",
+                     text_color = "white", value_col = "positive",
+                     brewer_pal="Spectral", font_size = 3,breaks =6,
+                     legend_title="Week After",labels = c("1-100", "100-500", "500-5000", "5000-15000", "15000-25000", "25000-35000"))
+
+plot3
+plot4
+```
+
+\
+\
+
+
+
+# Analysis 
+
+```{r}
 set.seed(84735)
 test1 <- Finaldata %>% 
   select(mean_KungFluInterest, percent_republican2016, percent_asian, StateColor) %>%
@@ -250,7 +295,7 @@ head(as.data.frame(summary_building_mod),-2)
 ```
 
 
-```{r}
+```{r, include=FALSE}
 prediction_summary_data <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
   # Calculate summary statistics of simulated 
   # posterior predictive models for each case
