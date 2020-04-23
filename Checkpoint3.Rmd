@@ -305,13 +305,48 @@ ggplot(Finaldata, aes(x = Day, y = ChinaVirusInterest, color = factor(State))) +
 
 # Analysis 
 
+# ```{r}
+# model_1 <- stan_glmer(
+#   ChinaVirusInterest ~ Day + (Day | State),
+#   data = Finaldata, family = gaussian,
+#   chains = 4, iter = 5000*2, refresh = 0
+# )
+# ```
+
+
+```{r}
+model_2 <- stan_glmer(
+  ChinaVirusInterest ~ (1 | Region),
+  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+)
+```
 
 
 
 
+```{r}
+mcmc_trace(model_2)
+mcmc_dens_overlay(model_2)
+```
+
+```{r}
+# Store the chains
+model_2_df <- as.array(model_2) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_2_df <- model_2_df %>% 
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[Region:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+
+ggplot(model_2_df, aes(x = correlation)) + 
+  geom_density(alpha = 0.5)
+```
 
 
-
-
-
+```{r}
+head(data.frame(summary(model_2)),-2)
+```
 
