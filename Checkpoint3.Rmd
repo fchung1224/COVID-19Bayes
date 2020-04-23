@@ -66,6 +66,10 @@ Our dataset, `Demographic`, was created by merging three other datasets which al
 `COVID-19 Cases`
 The COVID-19 data is provided by The COVID Tracking Project(CTP). All of the  data points come from state/district/territory public health authorities—or, occasionally, from trusted news reporting, official press conferences, or (very occasionally) tweets or Facebook updates from state public health authorities or governors. These numbers are updated daily at 4PM EST. The biggest weakness of this dataset is that there is no standardized methods for states to follow for data collection/report. For example, some states, like Oregon, provide the **full** set of numbers but others provide some or none of these numbers on an ongoing basis. Some crucial states in this outbreak, notably California, Washington, and New York, have not been regularly reporting their total number of people tested. The CTP aims to remedy this uncertainty in states by utilizing other reporting/measuring tools such as: "Directly asking state officials, watching news conferences, gleaning information from trusted news sources, and whatever else it takes to present reliable numbers." 
 
+`Google Search Interest`
+This data set includes two search interest indexes over time, measuring how people in each of the state’s interest in searching either “Kung Flu” or “China Virus” based on the time frame selected in the search. This data is downloaded directly from Google Trends which uses the same technique to track the interest of all searches on the platform. The main downside to this data set is the method of the indexing which makes the comparison from state to state less meaningful since each state is guaranteed to have a 100-level interest on their peak day, and the actual unknown search values can vary greatly across different states. 
+
+
 ##Dataset Details 
 ```{r}
 dim(Finaldata)
