@@ -152,7 +152,7 @@ colnames(Finaldata)
 
 
 ##Visualizations 
-```{r}
+```{r echo=FALSE}
 google %>% 
   group_by(Region, Day) %>% 
   summarize(ChinaVirusSearch = median(ChinaVirusInterest)) %>% 
