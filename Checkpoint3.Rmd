@@ -140,7 +140,14 @@ colnames(Finaldata)
 |                        | Standards code which uniquely identified counties |
 |                        | and county                                        | 
 +------------------------+---------------------------------------------------+
-
+|`KungFluInterest`       | Interest index from google searches by state.     |
+|                        | Peak search day=100, all other days in set are    |
+|                        | based searches on relative to this peak day.      | 
++------------------------+---------------------------------------------------+
+|`ChinaVirusInterest`    | Interest index from google searches by state.     |
+|                        | Peak search day=100, all other days in set are    |
+|                        | based searches on relative to this peak day.      | 
++------------------------+---------------------------------------------------+
 
 
 ##Visualizations 
