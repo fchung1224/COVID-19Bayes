@@ -181,6 +181,10 @@ ggplotly(a)
 ```
 
 
+This plot shows the relationship of “China Virus” search interest over grouped by region. This plots shows that there are certainly key events that trigger an uptick in searches overall. In this plot it is not clear which region may search China Virus more or less often, but it does show a that the regions move together in search interest, which would imply federal level events like a Donald Trump tweet to trigger these interest spikes. 
+
+
+
 ### Demographic 
 ```{r}
 #Demographic: Identification 
