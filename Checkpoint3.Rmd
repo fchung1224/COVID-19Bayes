@@ -154,12 +154,19 @@ summary(Finaldata)
 |                        | Peak search day=100, all other days in set are    |
 |                        | based searches on relative to this peak day.      | 
 +------------------------+---------------------------------------------------+
-
-
+|`Region`                | States divided into five different regions:       |
+|                        | West, South, Mountain, Northeast, Midwest         |
++------------------------+---------------------------------------------------+
+|`StayAtHome_date`       | The date states have enforced quarantine          |
++------------------------+---------------------------------------------------+
+|`Quarantine_Yes`        | An 0,1 indicator of whether states have enforced  |
+|                        | quarantine                                        |
++------------------------+---------------------------------------------------+
 # Visualizations 
 
 ## Google Set
 ```{r}
+Trump<- as.Date("03/16/2020", format = "%m/%d/%Y")
 day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
 day2<-as.Date("03/24/2020",format = "%m/%d/%Y")
 
@@ -256,8 +263,8 @@ This final demographic visualization is depicting Trump support across all state
 weekbefore <- data.frame(Finaldata) %>% filter(Day <= as.Date("2020-03-17"))
 
 plot1<- plot_usmap(data = weekbefore, values = "positive", color = "white") + 
-  scale_fill_continuous(low = "sky blue", high ="blue", 
-                          name = "Cases(#)",label = scales::comma,
+  scale_fill_gradient2(low = "white", high ="blue", mid = "skyblue",midpoint = 30,
+                          name = "Cases (#)",label = scales::comma,
                           limits = c(0,500)) + 
   theme(legend.position = "right")+ ggtitle("# of COVID Cases Before 3/17") + 
   theme(
@@ -268,8 +275,8 @@ plot.title = element_text(color="Black", size=8)
 weekafter <- data.frame(Finaldata) %>% filter(Day >= as.Date("2020-03-17"))
 
 plot2<-plot_usmap(data = weekafter, values = "positive", color = "white") + 
-   scale_fill_continuous(low = "sky blue", high ="red", 
-                          name = "Cases(#)",label = scales::comma,
+   scale_fill_gradient2(low = "white", high ="red", mid = "blue",midpoint = 500,
+                          name = "Cases (#)",label = scales::comma,
                           limits = c(0,10000)) + 
   theme(legend.position = "right")+ ggtitle("# of COVID Cases After 3/17") + 
   theme(
@@ -278,8 +285,6 @@ plot.title = element_text(color="Black", size=5)
 
 # The number of Positive Covid Cases, comparison before and after the China Virus announcement 
 grid.arrange(plot1, plot2, ncol=2)
-
-## I would like help fixing this scale
 ```
 This visualization allows us to compare the raw count of positive COVID-19 cases among the US before and after March 17th (Trump says "China Virus"). The goal of this visualization is to show the number of positive COVID-19 cases as the time progresses. From the first plot we can see there are very few states that have positive cases above 0-100. However, we see states like Washington, Michigan, California and New York have higher numbers.  The second plot shows that while there are very few states above ~2,000 there overall a higher number of positive cases among the US. This intuitively makes sense given this is an infectious disease and we would only expect there to be more positive cases over time.
 
@@ -312,16 +317,20 @@ With this visualization we wanted to observe the different slopes of each slope 
 
 # Building Models 
 
+$$\begin{aligned}
+i = \text{state, } j = \text{date, } Y = \text{China Virus Interest}\\
+Y_{ij}|b_0,b_1 \sim N(b_{0i} + b_{1i}Day_{i},\sigma^2)\\
+b_{0i} \sim N(...)\\
+b_{1i} \sim N(...)\\
+\end{aligned}$$
 
-```{r}
+```{r cache=TRUE}
+set.seed(454)
 model_1 <- stan_glmer(
   ChinaVirusInterest ~ (1 | Region),
   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
 )
 ```
-
-
-
 
 ```{r}
 mcmc_trace(model_1)
