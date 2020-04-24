@@ -192,45 +192,60 @@ plot_usmap(data = Finaldata, values = "percent_white", color = "white") +
 plot.title = element_text(color="Black", size=14, face="bold")
 )
 
+```
+Our first visualization is looking at the percent of residents that identify as white within the United States. As you can see, there is a higher percent of white identifying residents in the midwest and northeast states. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
+
+
+```{r}
 plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
   scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
   theme(legend.position = "right") + ggtitle("Percent of Residents that Identify as Asian") +
   theme(
 plot.title = element_text(color="Black", size=14, face="bold")
 ) 
-
-#By Results 
-plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
-  scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
-  theme(legend.position = "right") + ggtitle("Percent Asian by General Election Results")+
-  theme(
-plot.title = element_text(color="Black", size=14, face="bold")
-) + facet_wrap(~Winner)
+```
+The above visualization is looking at the percent of residents that identify as Asian within the United States. As you can see, there is a higher percent of residents that identify as Asian in places like California and Washington, but the most being in Hawaii. From this visualization we can also see that that Midwest and the South tend to have a small percentage of residents identifying as Asian. We are especially interested in the `percent_asian` variable as it plays a major role in our analysis. 
 
 
+```{r}
 #By income 
 plot_usmap(data = Finaldata, values = "per_capita_income", color = "white") + 
   scale_fill_continuous(low = "sky blue", high = "black", name = "$ Per Capita", label = scales::comma) + 
-  theme(legend.position = "right") + ggtitle("Percent Capita Income")+
+  theme(legend.position = "right") + ggtitle("Income per Capita")+
   theme(
 plot.title = element_text(color="Black", size=14, face="bold")
 ) 
+```
+We also wanted to take a look at the `per capita income` variable, as we believe it could be valuable within our analysis. Specifically, we are thinking that it could possibly be an indicator for the amount COVID Cases and or could really affect an individuals reaction to Trump's tweet. This visualization however, is just uni-variate as we wanted to understand the variable a bit more. As you can see, the Northeast and the West coast tend to have higher incomes per capita than places like the South for instance. 
 
+
+```{r}
 #Income by state affiliation 
-ggplot(Finaldata, aes(x = per_capita_income, fill = StateColor)) + 
-    geom_density(alpha = .8)+ ggtitle("Income per Capita") + xlab("$") + ylab("Density")
+g <- ggplot(Finaldata, aes(x = per_capita_income, fill = StateColor)) + geom_density(alpha = .8)+ ggtitle("Income per Capita") + xlab("$") + ylab("Density") 
 
+
+g + scale_fill_manual(values=c("blue", "purple", "red"))
+```
+After learning more about the `per capita income` variable we wanted to see how the variable would change when we added `State Color` into the mix. Where `State Color` signifies a state's political leaning during the election. What is interesting is that the states that were red had much lower incomes per capita than states that were blue. We see that the blue states had a much wider and higher spread of income per capita ranging all the way to $45,000. Purple states on the other hand tended to be in the middle. 
+
+
+```{r}
 #Trump Support 
 ggplot(Finaldata, aes(x = percent_republican2016)) + 
-    geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density")
+    geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density") + facet_wrap(~Region)
+```
+This visualization is looking at Trump Support during the 2016 elections across different U.S. regions. From these visualizations it seems as though each region had pretty varying support. The Northeast had this interesting peak at 0.4 but also has another slope at around 0. The Western and Mountain regions have a similar pattern happening where there are strong peaks but then those peaks start dipping down fairly drastically. The South and the Midwest tend to lean more towards higher Trump support and we don't see the "dipping" occur as much. This leads us to believe that during that election those regions had more states that favored Trump and the Republican party. 
 
+
+
+```{r}
 ggplot(Finaldata, aes(x = percent_asian, y = percent_republican2016, color = Winner)) + 
     scale_color_manual(values = c("blue","purple","red")) + 
     geom_point(alpha = 0.8) + geom_text(aes(label=ifelse(percent_asian>.2,as.character(state),"")),hjust=1.2,vjust=0)+ geom_text(aes(label=ifelse(percent_republican2016<.2,as.character(state),"")),hjust=-.1,vjust=0) + ggtitle("Percent of Asians and Trump Support by Election Outcome") + xlab("Percent Asian") + ylab("Trump Support")
 
-ggplot(Finaldata, aes(x = per_capita_income)) + 
-    geom_density()+ ggtitle("Per Capita Income") + xlab("Per Capita Income") + ylab("Density") + facet_wrap(~Winner)
 ```
+This final demographic visualization is depicting Trump support across all states among those who identify as Asian, and is then classifying whether or not Trump won in that specific state. The two outliers are labeled as Hawaii and DC. These are interesting because we see that DC had a small percent of Asian residents and also had low Trump support this is kinda expected. However, we see that Hawaii had a much larger percentage of Asian identifying residents but also still had a decent amount of Trump support. All in all though, this visualization tells us that in a way the states that had lower Asian identifying residents tended to have higher Trump support. 
+
 
 ### COVID-19 Cases 
 

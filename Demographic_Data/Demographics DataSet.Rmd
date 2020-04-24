@@ -172,7 +172,9 @@ plot_usmap(data = mapdata, values = "percent_asian", color = "white") +
 plot.title = element_text(color="Black", size=14, face="bold")
 ) 
 ```
-The above visualization is looking at the percent of residents that identify as Asian within the United States. This information is valuable to us since we are trying to understand ___. As you can see, there is a higher percent of residents that identify as Asian in places like California and Washington, but the most being in Hawaii. From this visualization we can also see that that Midwest and the South tend to have a small percentage of residents identifying as Asian. 
+The above visualization is looking at the percent of residents that identify as Asian within the United States. As you can see, there is a higher percent of residents that identify as Asian in places like California and Washington, but the most being in Hawaii. From this visualization we can also see that that Midwest and the South tend to have a small percentage of residents identifying as Asian. 
+
+
 
 
 Polling Visualizations: 
