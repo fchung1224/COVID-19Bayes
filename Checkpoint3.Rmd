@@ -24,7 +24,7 @@ library(ggmap)
 library(viridis)
 library(rgdal)
 library(gridExtra)
-
+library(plotly)
 require(janitor)
 require(reshape2)
 require(tidyr)
@@ -51,7 +51,7 @@ google<-read.csv("Google/googlefinal.csv")
 names(google)
 ```
 
-Re-Cleaned 
+## Re-Cleaned 
 ```{r} 
 google <- google %>%  select(-c(X.1))
 Finaldata <- Finaldata %>% select(-c(X)) 
@@ -60,19 +60,19 @@ Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
 
 
 
-##Dataset Description 
+## Dataset Description 
 
-`Demographic:`
+### `Demographic:`
 Our dataset, `Demographic`, was created by merging three other datasets which all contained different demographic and election information. We obtained the main portion of our demographic data from the US Census Bureau’s American Community Survey (ACS) which is an ongoing survey administered by the U.S. Census Bureau. It  gathers information on income, employment, housing characteristics, etc, annually for all the 50 U.S. States on the county and state level. To access the county-level dataset we used the R package called Choroplethr which provides API connections to data sources like the ACS. The ACS County-Level dataset was then merged with a county-level election outcome dataset that was created by Tony McGoven. Tony’s dataset contained presidential election results for 2008,2012, and 2016 but we chose to focus solely on the most recent election,2016. That said, the 2016 election results at the county-level were scraped from results published by Townhall.com. However, the State of Alaska reports results at the precinct or state level so there was no county-level data available. Therefore, another dataset had to be created that contained the election results for Alaska and this was done using the official election results provided by the Alaska Division of Elections and was later merged in. The final dataset that was used came from Alicia Johnson and it contained information on a state’s political leaning. Meaning it categorizes each county as belonging to a blue/red/purple state based on the state categorizations at 279towin. 
 
-`COVID-19 Cases`
+### `COVID-19 Cases`
 The COVID-19 data is provided by The COVID Tracking Project(CTP). All of the  data points come from state/district/territory public health authorities—or, occasionally, from trusted news reporting, official press conferences, or (very occasionally) tweets or Facebook updates from state public health authorities or governors. These numbers are updated daily at 4PM EST. The biggest weakness of this dataset is that there is no standardized methods for states to follow for data collection/report. For example, some states, like Oregon, provide the **full** set of numbers but others provide some or none of these numbers on an ongoing basis. Some crucial states in this outbreak, notably California, Washington, and New York, have not been regularly reporting their total number of people tested. The CTP aims to remedy this uncertainty in states by utilizing other reporting/measuring tools such as: "Directly asking state officials, watching news conferences, gleaning information from trusted news sources, and whatever else it takes to present reliable numbers." 
 
-`Google Search Interest`
+### `Google Search Interest`
 This data set includes two search interest indexes over time, measuring how people in each of the state’s interest in searching either “Kung Flu” or “China Virus” based on the time frame selected in the search. This data is downloaded directly from Google Trends which uses the same technique to track the interest of all searches on the platform. The main downside to this data set is the method of the indexing which makes the comparison from state to state less meaningful since each state is guaranteed to have a 100-level interest on their peak day, and the actual unknown search values can vary greatly across different states. 
 
 
-##Dataset Details 
+## Dataset Details 
 ```{r}
 dim(Finaldata)
 
@@ -81,11 +81,9 @@ names(Finaldata)
 head(Finaldata)
 
 summary(Finaldata)
-
-colnames(Finaldata)
 ```
 
-##Variables of Interest
+## Variables of Interest
 
 +------------------------+---------------------------------------------------+
 | Variables:             | Description:                                      |
@@ -158,11 +156,10 @@ colnames(Finaldata)
 +------------------------+---------------------------------------------------+
 
 
-##Visualizations 
-```{r}
-library(plotly)
-#google_ts<-read.csv("Time_series_Google.csv")
+# Visualizations 
 
+## Google Set
+```{r}
 day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
 day2<-as.Date("03/24/2020",format = "%m/%d/%Y")
 
@@ -185,9 +182,10 @@ This plot shows the relationship of “China Virus” search interest over group
 
 
 
-### Demographic 
+## Demographic 
 ```{r}
 #Demographic: Identification 
+## Might not use, how helpful is this? Possibly combine into a shiny app so people could adjust for which race to look at? 
 Finaldata <- data.frame(Finaldata) %>% mutate(state = State)
 plot_usmap(data = Finaldata, values = "percent_white", color = "white") + 
   scale_fill_continuous(name = "Percent White", label = scales::comma) + 
@@ -251,14 +249,16 @@ ggplot(Finaldata, aes(x = percent_asian, y = percent_republican2016, color = Win
 This final demographic visualization is depicting Trump support across all states among those who identify as Asian, and is then classifying whether or not Trump won in that specific state. The two outliers are labeled as Hawaii and DC. These are interesting because we see that DC had a small percent of Asian residents and also had low Trump support this is kinda expected. However, we see that Hawaii had a much larger percentage of Asian identifying residents but also still had a decent amount of Trump support. All in all though, this visualization tells us that in a way the states that had lower Asian identifying residents tended to have higher Trump support. 
 
 
-### COVID-19 Cases 
+## COVID-19 Cases 
 
 ```{r}
 ## Creating a df of just the cases the week before 3/17
 weekbefore <- data.frame(Finaldata) %>% filter(Day <= as.Date("2020-03-17"))
 
 plot1<- plot_usmap(data = weekbefore, values = "positive", color = "white") + 
-  scale_fill_continuous(name = "Cases", label = scales::comma) + 
+  scale_fill_continuous(low = "sky blue", high ="blue", 
+                          name = "Cases(#)",label = scales::comma,
+                          limits = c(0,500)) + 
   theme(legend.position = "right")+ ggtitle("# of COVID Cases Before 3/17") + 
   theme(
 plot.title = element_text(color="Black", size=8)
@@ -268,56 +268,53 @@ plot.title = element_text(color="Black", size=8)
 weekafter <- data.frame(Finaldata) %>% filter(Day >= as.Date("2020-03-17"))
 
 plot2<-plot_usmap(data = weekafter, values = "positive", color = "white") + 
-  scale_fill_continuous(name = "Cases", label = scales::comma) + 
+   scale_fill_continuous(low = "sky blue", high ="red", 
+                          name = "Cases(#)",label = scales::comma,
+                          limits = c(0,10000)) + 
   theme(legend.position = "right")+ ggtitle("# of COVID Cases After 3/17") + 
   theme(
 plot.title = element_text(color="Black", size=5)
 )
 
-
 # The number of Positive Covid Cases, comparison before and after the China Virus announcement 
 grid.arrange(plot1, plot2, ncol=2)
+
+## I would like help fixing this scale
 ```
-
-```{r}
-# Positive COVID cases aggregated by party 
-ggplot(Finaldata, aes(x = positive, fill = StateColor)) + 
-    geom_density(alpha = .8)+ ggtitle("Positive COVID-19 Cases by State Party") + xlab("Cases") + ylab("Density")+xlim(0,500)
-```
-
-
+This visualization allows us to compare the raw count of positive COVID-19 cases among the US before and after March 17th (Trump says "China Virus"). The goal of this visualization is to show the number of positive COVID-19 cases as the time progresses. From the first plot we can see there are very few states that have positive cases above 0-100. However, we see states like Washington, Michigan, California and New York have higher numbers.  The second plot shows that while there are very few states above ~2,000 there overall a higher number of positive cases among the US. This intuitively makes sense given this is an infectious disease and we would only expect there to be more positive cases over time.
 
 ## Final Dataset
 ```{r}
-ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
+b<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
   geom_density(alpha = 0.5)
 
+ggplotly(b)
 ```
+We can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusal peaksaround the 25-50 range. It is is also interesitng interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states. 
+
 ```{r}
-ggplot(Finaldata, aes(x = Day, y = ChinaVirusInterest, color = factor(State))) + 
+c<- ggplot(Finaldata, aes(x = Day, y = ChinaVirusInterest, color = factor(State))) + 
     geom_point() + 
     geom_smooth(method = "lm", se = FALSE) + 
     facet_wrap(~ State) + 
     theme(legend.position = "none")
+
+ggplotly(c)
 ```
+With this visualization we wanted to observe the different slopes of each slope of interest in the term China Virus over time. Arguably, the slopes of interest among the states are not significantly different. There are some interesting downward slopes in states like Wyoming but we would need to dig a bit deeper into this to fully understand what it means. However, a really interesting facet of this viusalization is that we can see a pattern among all states ofpeaks and valleys. In other words, from observation, the majority of states demonstrate a pattern correlated to the day. This would be interesting to explore further and see how it interacts with other aspects like number of COVID cases by state. 
+
+
+
 \
 \
 
 
 
-# Analysis 
-
-# ```{r}
-# model_1 <- stan_glmer(
-#   ChinaVirusInterest ~ Day + (Day | State),
-#   data = Finaldata, family = gaussian,
-#   chains = 4, iter = 5000*2, refresh = 0
-# )
-# ```
+# Building Models 
 
 
 ```{r}
-model_2 <- stan_glmer(
+model_1 <- stan_glmer(
   ChinaVirusInterest ~ (1 | Region),
   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
 )
@@ -327,28 +324,31 @@ model_2 <- stan_glmer(
 
 
 ```{r}
-mcmc_trace(model_2)
-mcmc_dens_overlay(model_2)
+mcmc_trace(model_1)
+mcmc_dens_overlay(model_1)
 ```
 
 ```{r}
 # Store the chains
-model_2_df <- as.array(model_2) %>% 
+model_1_df <- as.array(model_1) %>% 
   melt %>% 
   pivot_wider(names_from = parameters, values_from = value)
 
 # Wrangle the chains
 # Note the need for `...` around the sigma_sq_b
-model_2_df <- model_2_df %>% 
+model_1_df <- model_1_df %>% 
   mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[Region:(Intercept),(Intercept)]`) %>% 
   mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
 
-ggplot(model_2_df, aes(x = correlation)) + 
+ggplot(model_1_df, aes(x = correlation)) + 
   geom_density(alpha = 0.5)
 ```
 
 
 ```{r}
-head(data.frame(summary(model_2)),-2)
+head(data.frame(summary(model_1)),-2)
 ```
 
+
+# Next Steps
+The obvious improvements we need to make is exploring more models. We can see from our visualizations that are there are a wide variety of relationships we can dig into with our dataset. However, as a group, we need to decide what path(s) to take. Once we decide on which relationship(s) we want to analyze further, then this project can be enhanced with possibly animiated visualizations or even a shiny app.
