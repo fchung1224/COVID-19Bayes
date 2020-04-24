@@ -318,7 +318,7 @@ With this visualization we wanted to observe the different slopes of each slope 
 # Building Models 
 
 $$\begin{aligned}
-i = \text{state, } j = \text{date, } Y = \text{China Virus Interest}\\
+i = \text{region, } j = \text{date, } Y = \text{China Virus Interest}\\
 Y_{ij}|b_0,b_1 \sim N(b_{0i} + b_{1i}Day_{i},\sigma^2)\\
 b_{0i} \sim N(...)\\
 b_{1i} \sim N(...)\\
@@ -326,6 +326,11 @@ b_{1i} \sim N(...)\\
 
 ```{r cache=TRUE}
 set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+
 model_1 <- stan_glmer(
   ChinaVirusInterest ~ (1 | Region),
   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
@@ -336,6 +341,11 @@ model_1 <- stan_glmer(
 mcmc_trace(model_1)
 mcmc_dens_overlay(model_1)
 ```
+
+
+From what we can see from the trace plot the intercepts for each region are not very different from each other. We could see that it is possible that the midwest and the north east have a higher intercept compared to the west, but the mean is centered around 0 for almost all of them. We would rather use states to see if we see differing intercepts through states but unfortunatelly our code did not run. 
+
+Our model shows that the chains are stable maybe telling us that the model might work with lower chain iterations. 
 
 ```{r}
 # Store the chains
@@ -353,6 +363,7 @@ ggplot(model_1_df, aes(x = correlation)) +
   geom_density(alpha = 0.5)
 ```
 
+In our correlation density plot we can see that the values are not very correlated accross regions meaning that regions is probably a bad way to segment them. 
 
 ```{r}
 head(data.frame(summary(model_1)),-2)

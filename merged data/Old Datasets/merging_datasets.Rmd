@@ -15,7 +15,22 @@ library(naniar)
 demographic<-read.csv("FINALDemographic_Data.csv")
 covid<-read.csv("states_cases_data.csv")
 stayhome<-read.csv("quarantine.csv")
-google<-read.csv("Google_final.csv")
+google<-read.csv("time_series_google.csv")
+
+google<-
+  google%>%
+  mutate(Day=as.Date(Day))
+
+day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
+day2<-as.Date("03/24/2020",format = "%m/%d/%Y")
+
+
+google_timeseries<-
+  google%>%
+  filter(Day<=day2)%>%
+  filter(Day>=day1)
+
+
 ```
 
 ```{r}
@@ -33,14 +48,52 @@ no_na1<-no_na%>%
 stayhomefinal<-rbind(no_na1,na)
 
 
-all<-demographic%>%
-  left_join(covid)%>%
-  left_join(stayhomefinal)%>%
-  left_join(google)
 
-all
+
+covid<-covid%>%
+  mutate(Day = as.Date(date, format = "%m/%d/%Y"))
+
+colnames(covid)[2] <- "State"
+
+covid%>%
+  group_by(State)
+
+google_timeseries<-google_timeseries%>%
+  select(-c(X))
+
+
 
 write.csv(all,"FinalDataSet.csv")
 names(all)
+
+
+
+time_series_final_Data<-google_timeseries%>%
+  left_join(covid)%>%
+  select(-c(date))%>%
+  left_join(stayhome)%>%
+  left_join(demographic)%>% 
+  mutate(Region = ifelse(State %in% c("AK","CA","OR","WA","HI"), "West", ifelse(State %in% c("CO","UT","ID","MT","WY", "NM", "AZ", "NV"), "Mountain", ifelse(State %in% c("SD","ND","MN","KS","IN", "MI", "NE", "IA", "WI","IL", "OH", "MO", "OK"), "Midwest",  ifelse(State %in% c("TX","AL","MS","FL","AR", "WV", "TN", "NC", "SC","GA", "VA", "KY", "LA"), "South", ifelse(State %in% c("MD","PA","DE","NJ","NY", "MA", "CT", "NH", "VT","ME", "RI", "DC"), "Northeast", 0))))))
+
+write.csv(time_series_final_Data,"time_series_final_Data.csv")
+```
+
+
+```{r}
+Trump<- as.Date("03/16/2020", format = "%m/%d/%Y")
+
+glimpse(time_series_final_Data)
+time_series_final_Data%>%
+  group_by(StateColor, Day)%>%
+  mutate(mean_ChinaVirusInterest = mean(ChinaVirusInterest))%>%
+  ggplot(aes(x = Day, y = mean_ChinaVirusInterest, color = StateColor))+
+  geom_smooth(fill=NA)+
+  geom_vline(xintercept = Trump)+
+  geom_text(aes(Trump , 30, label = "Trump Tweets China Virus", vjust = -1), size = 3, color = "black")+
+  scale_color_manual(values = c("#0000FF", "#800080", "#FF0000"))
+
+time_series_final_Data%>%
+  
+
 ```
 
