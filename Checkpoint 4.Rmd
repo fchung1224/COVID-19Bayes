@@ -1,0 +1,15 @@
+---
+title: "Checkpoint 4"
+author: "Will Madairy, Sofia Pozsonyiova, Quinn Rafferty, Federico Chung"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+header-includes:
+  - \usepackage{tabularx}
+output:
+  pdf_document: default
+  html_document: default
+abstract: ""
+---
+
+
+
+
