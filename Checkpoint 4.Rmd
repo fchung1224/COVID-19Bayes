@@ -88,7 +88,7 @@ ggplotly(d)
 ## From Alicia:: Start by thinking, take the four models from the sleep study and just think how we can go thorugh those four models in the context of our work. It's
 ```
 
-```{r}
+```{r, cahce=TRUE}
 set.seed(454)
 Finaldata<-
   Finaldata%>%
@@ -98,6 +98,10 @@ model_1 <- stan_glmer(
   ChinaVirusInterest ~ (1 | State), #Gives us random intercepts
   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
 )
+```
+
+```{r}
+head(data.frame(summary(model_1)),-2)
 ```
 
 ```{r}
@@ -126,7 +130,5 @@ model_2 <- stan_glmer(
 # 
 ```
 
-```{r}
-head(data.frame(summary(model_1)),-2)
-```
+
 
