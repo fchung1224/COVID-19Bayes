@@ -83,11 +83,15 @@ ggplotly(b)
 ggplotly(c) #Shows that Democrat states tend to have a higher interest in Googling China Virus 
 ggplotly(d)
 
+#################################### Notes!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 # What affects the China Interest search, is it demographic, policitical or COVID based? 
-## From Alicia:: Start by thinking, take the four models from the sleep study and just think how we can go thorugh those four models in the context of our work. It's
+## From Alicia:: Start by thinking, take the four models from the sleep study and just think how we can go thorugh those four models in the context of our work. 
+
+## Chosen variables: Number of COVID-19 cases, State color, percent black, percent white, income
 ```
 
+#Quinn making models
 ```{r, cahce=TRUE}
 set.seed(454)
 Finaldata<-
@@ -104,6 +108,7 @@ model_1 <- stan_glmer(
 head(data.frame(summary(model_1)),-2)
 ```
 
+#Quinn making models
 ```{r}
 model_2 <- stan_glmer(
   ChinaVirusInterest ~ Day + (Day | State),
@@ -113,6 +118,7 @@ model_2 <- stan_glmer(
 
 ```
 
+#Quinn makes models
 ```{r}
 # model_3 <- stan_glmer(
 #   ChinaVirusInterest ~ Day + StateColor + (Day | State),#Random intercepts and slopes when we put Day in
@@ -121,6 +127,7 @@ model_2 <- stan_glmer(
 # )
 ```
 
+#Quinn makes models
 ```{r}
 # model_4 <- stan_glm(
 #   Reaction ~ 1,
