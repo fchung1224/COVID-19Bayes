@@ -12,4 +12,29 @@ abstract: ""
 
 
 
+# Quinn plots stuff
+```{r}
+a<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
+  geom_density(alpha = 0.5)
 
+b<- ggplot(Finaldata, aes(x = Day, y = ChinaVirusInterest, color = factor(State))) + 
+    geom_point() + 
+    geom_smooth(method = "lm", se = FALSE) + 
+    facet_wrap(~ State) + 
+    theme(legend.position = "right")
+
+c<- ggplot(Finaldata, aes(x = ChinaVirusInterest, color = factor(StateColor))) + 
+    geom_histogram() + 
+    facet_wrap(~ Region) +
+    theme(legend.position = "right") + 
+    scale_colour_manual( values=c("red"= "red3", "blue"= "royalblue", "purple"="darkorchid3"))
+
+d <-  ggplot(Finaldata, aes(y=percent_asian, color = factor(Region))) + 
+      geom_boxplot() +
+      theme(legend.position = "right") 
+
+ggplotly(a)
+ggplotly(b)
+ggplotly(c)
+ggplotly(d)
+```
