@@ -9,7 +9,7 @@ output:
   html_document: default
 ---
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, include=FALSE}
 library(dplyr)
 library(usmap)
 library(maps)
@@ -28,15 +28,15 @@ require(rstanarm)
 require(bayesplot)
 ```
 
-# Quinn plots stuff
 
 ```{r}
 Finaldata<-read.csv("time_series_final_Data.csv")
-
 ```
+
 ```{r} 
 Finaldata <- Finaldata %>% select(-c(X)) 
 Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
+names(Finaldata)
 ```
 
 ```{r}
@@ -51,7 +51,7 @@ Finaldata%>%
   scale_colour_gradient2(low = "blue", mid = "lightblue", high = "red")
 ```
 
-
+# Quinn plots stuff
 ```{r}
 a<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
   geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State")
@@ -82,4 +82,51 @@ ggplotly(a)
 ggplotly(b)
 ggplotly(c) #Shows that Democrat states tend to have a higher interest in Googling China Virus 
 ggplotly(d)
+
+
+# What affects the China Interest search, is it demographic, policitical or COVID based? 
+## From Alicia:: Start by thinking, take the four models from the sleep study and just think how we can go thorugh those four models in the context of our work. It's
 ```
+
+```{r}
+set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+model_1 <- stan_glmer(
+  ChinaVirusInterest ~ (1 | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+)
+```
+
+```{r}
+model_2 <- stan_glmer(
+  ChinaVirusInterest ~ Day + (Day | State),
+  data = Finaldata, family = gaussian,
+  chains = 4, iter = 5000*2, refresh = 0
+)
+
+```
+
+```{r}
+# model_3 <- stan_glmer(
+#   ChinaVirusInterest ~ Day + StateColor + (Day | State),#Random intercepts and slopes when we put Day in
+#   data = Finaldata, family = gaussian,
+#   chains = 4, iter = 100, refresh = 0
+# )
+```
+
+```{r}
+# model_4 <- stan_glm(
+#   Reaction ~ 1,
+#   data = sleep, family = gaussian,
+#   chains = 4, iter = 5000*2
+# )
+# 
+```
+
+```{r}
+head(data.frame(summary(model_1)),-2)
+```
+
