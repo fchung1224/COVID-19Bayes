@@ -29,6 +29,29 @@ require(bayesplot)
 ```
 
 # Quinn plots stuff
+
+```{r}
+Finaldata<-read.csv("time_series_final_Data.csv")
+
+```
+```{r} 
+Finaldata <- Finaldata %>% select(-c(X)) 
+Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
+```
+
+```{r}
+Finaldata%>%
+  mutate(perc_population_positive = positive/total_population)%>%
+  group_by(State)%>%
+  mutate(mean_corona_interest = mean(ChinaVirusInterest),
+         max = max(ChinaVirusInterest),
+         median = median(ChinaVirusInterest))%>%
+  ggplot(aes(x = mean_corona_interest, y = perc_population_positive, color = percent_asian))+
+  geom_point()+
+  scale_colour_gradient2(low = "blue", mid = "lightblue", high = "red")
+```
+
+
 ```{r}
 a<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
   geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State")
