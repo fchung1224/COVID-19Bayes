@@ -36,7 +36,6 @@ Finaldata<-read.csv("time_series_final_Data.csv")
 ```{r} 
 Finaldata <- Finaldata %>% select(-c(X)) 
 Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
-names(Finaldata)
 ```
 
 ```{r}
@@ -109,32 +108,43 @@ head(data.frame(summary(model_1)),-2)
 ```
 
 #Quinn making models
-```{r}
+```{r, warning=FALSE, cache=TRUE}
 model_2 <- stan_glmer(
   ChinaVirusInterest ~ Day + (Day | State),
   data = Finaldata, family = gaussian,
-  chains = 4, iter = 5000*2, refresh = 0
+  chains = 4, iter = 100, refresh = 0
 )
 
 ```
 
-#Quinn makes models
 ```{r}
-# model_3 <- stan_glmer(
-#   ChinaVirusInterest ~ Day + StateColor + (Day | State),#Random intercepts and slopes when we put Day in
-#   data = Finaldata, family = gaussian,
-#   chains = 4, iter = 100, refresh = 0
-# )
+head(data.frame(summary(model_2)),-2)
 ```
 
 #Quinn makes models
+```{r, warning = FALSE, cache=TRUE}
+model_3 <- stan_glmer(
+  ChinaVirusInterest ~ Day + StateColor + (Day | State),#Random intercepts and slopes when we put Day in
+  data = Finaldata, family = gaussian,
+  chains = 4, iter = 100, refresh = 0
+)
+```
+
 ```{r}
-# model_4 <- stan_glm(
-#   Reaction ~ 1,
-#   data = sleep, family = gaussian,
-#   chains = 4, iter = 5000*2
-# )
-# 
+head(data.frame(summary(model_3)),-2)
+```
+
+#Quinn makes models
+```{r, warning = FALSE, cache=TRUE}
+model_4 <- stan_glmer(
+  ChinaVirusInterest ~ Day + totalTestResults + (Day | State),#Random intercepts and slopes when we put Day in
+  data = Finaldata, family = gaussian,
+  chains = 4, iter = 100, refresh = 0
+)
+```
+
+```{r}
+head(data.frame(summary(model_4)),-2)
 ```
 
 
