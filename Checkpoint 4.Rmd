@@ -148,4 +148,121 @@ head(data.frame(summary(model_4)),-2)
 ```
 
 
+\
+\
 
+
+
+#Sofia's Models: 
+
+Variables of Interest: 
+\
+• per_capita_income
+\
+•totalTestResults
+\
+• StateColor
+\
+• percent_asian
+\
+•percent_black
+
+
+##Model 5: 
+
+```{r, warning = FALSE, cache=TRUE}
+set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+model_1 <- stan_glmer(
+  ChinaVirusInterest ~ StateColor + (StateColor | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+)
+```
+
+```{r}
+head(data.frame(summary(model_1)),-2)
+```
+
+
+##Model 6: 
+StateColor + per_capita_income + (StateColor | State)
+```{r, warning = FALSE, cache=TRUE}
+set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+model_6 <- stan_glmer(
+  ChinaVirusInterest ~ StateColor + per_capita_income + (StateColor | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 3, iter = 3000*2
+)
+```
+
+
+```{r}
+head(data.frame(summary(model_6)),-2)
+```
+
+##Model 7: 
+StateColor + percent_asian + (StateColor | State)
+
+```{r, warning = FALSE, cache=TRUE}
+set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+model_7 <- stan_glmer(
+  ChinaVirusInterest ~ StateColor + percent_asian + (StateColor | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 3000*2
+)
+```
+
+
+```{r}
+head(data.frame(summary(model_7)),-2)
+```
+
+
+##Model 8: 
+
+
+StateColor + totalTestResults + (StateColor | State)
+
+```{r, warning = FALSE, cache=TRUE}
+set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+model_8 <- stan_glmer(
+  ChinaVirusInterest ~ StateColor + totalTestResults + (StateColor | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 3000*2
+)
+```
+```{r}
+head(data.frame(summary(model_8)),-2)
+```
+
+##Model 9: 
+
+StateColor +percent_asian + totalTestResults + (StateColor | State)
+
+```{r, warning = FALSE, cache=TRUE}
+set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+model_9 <- stan_glmer(
+  ChinaVirusInterest ~ StateColor +percent_asian + totalTestResults + (StateColor | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 3000*2
+)
+```
+
+```{r}
+head(data.frame(summary(model_9)),-2)
+```
