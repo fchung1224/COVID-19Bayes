@@ -7,34 +7,56 @@ header-includes:
 output:
   pdf_document: default
   html_document: default
-abstract: ""
 ---
 
-
+```{r, warning=FALSE}
+library(dplyr)
+library(usmap)
+library(maps)
+library(ggplot2)
+library(tidyverse)
+library(ggmap)
+library(viridis)
+library(rgdal)
+library(gridExtra)
+library(plotly)
+require(janitor)
+require(reshape2)
+require(tidyr)
+require(rstan)
+require(rstanarm)
+require(bayesplot)
+```
 
 # Quinn plots stuff
 ```{r}
 a<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
-  geom_density(alpha = 0.5)
+  geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State")
 
 b<- ggplot(Finaldata, aes(x = Day, y = ChinaVirusInterest, color = factor(State))) + 
     geom_point() + 
     geom_smooth(method = "lm", se = FALSE) + 
     facet_wrap(~ State) + 
-    theme(legend.position = "right")
+    theme(legend.position = "right")+
+    ggtitle("China Virus Interest by Day by State")
 
 c<- ggplot(Finaldata, aes(x = ChinaVirusInterest, color = factor(StateColor))) + 
     geom_histogram() + 
-    facet_wrap(~ Region) +
+    facet_wrap(~ Winner) +
     theme(legend.position = "right") + 
-    scale_colour_manual( values=c("red"= "red3", "blue"= "royalblue", "purple"="darkorchid3"))
+    scale_colour_manual( values=c("red"= "red3", "blue"= "royalblue", "purple"="darkorchid3")) +
+    ggtitle("China Virus Google by State Poltical Party Winner")   
 
-d <-  ggplot(Finaldata, aes(y=percent_asian, color = factor(Region))) + 
+d <-  ggplot(Finaldata, aes(y=positive, x=Winner, fill=(Winner)))+
       geom_boxplot() +
-      theme(legend.position = "right") 
+      facet_wrap(~Region)+
+      theme(legend.position = "none") +
+      scale_fill_manual(values = c("Democrat"="blue3", "Republican"= "red3"))+
+      lims(y= c(0,1000))+
+      ggtitle("Positive COVID-19 Cases by State Political Party Winner & Region")
 
 ggplotly(a)
 ggplotly(b)
-ggplotly(c)
+ggplotly(c) #Shows that Democrat states tend to have a higher interest in Googling China Virus 
 ggplotly(d)
 ```
