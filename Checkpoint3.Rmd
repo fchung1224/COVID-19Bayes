@@ -162,6 +162,12 @@ summary(Finaldata)
 |`Quarantine_Yes`        | An 0,1 indicator of whether states have enforced  |
 |                        | quarantine                                        |
 +------------------------+---------------------------------------------------+
+
+
+\
+\
+
+
 # Visualizations 
 
 ## Google Set
@@ -184,7 +190,6 @@ a<-google_ts %>%
 ggplotly(a)
 ```
 
-
 This plot shows the relationship of “China Virus” search interest over grouped by region. This plots shows that there are certainly key events that trigger an uptick in searches overall. In this plot it is not clear which region may search China Virus more or less often, but it does show a that the regions move together in search interest, which would imply federal level events like a Donald Trump tweet to trigger these interest spikes. 
 
 
@@ -202,6 +207,7 @@ plot.title = element_text(color="Black", size=14, face="bold")
 )
 
 ```
+
 Our first visualization is looking at the percent of residents that identify as white within the United States. As you can see, there is a higher percent of white identifying residents in the midwest and northeast states. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
 
 
@@ -213,6 +219,7 @@ plot_usmap(data = Finaldata, values = "percent_asian", color = "white") +
 plot.title = element_text(color="Black", size=14, face="bold")
 ) 
 ```
+
 The above visualization is looking at the percent of residents that identify as Asian within the United States. As you can see, there is a higher percent of residents that identify as Asian in places like California and Washington, but the most being in Hawaii. From this visualization we can also see that that Midwest and the South tend to have a small percentage of residents identifying as Asian. We are especially interested in the `percent_asian` variable as it plays a major role in our analysis. 
 
 
@@ -225,6 +232,7 @@ plot_usmap(data = Finaldata, values = "per_capita_income", color = "white") +
 plot.title = element_text(color="Black", size=14, face="bold")
 ) 
 ```
+
 We also wanted to take a look at the `per capita income` variable, as we believe it could be valuable within our analysis. Specifically, we are thinking that it could possibly be an indicator for the amount COVID Cases and or could really affect an individuals reaction to Trump's tweet. This visualization however, is just uni-variate as we wanted to understand the variable a bit more. As you can see, the Northeast and the West coast tend to have higher incomes per capita than places like the South for instance. 
 
 
@@ -235,6 +243,7 @@ g <- ggplot(Finaldata, aes(x = per_capita_income, fill = StateColor)) + geom_den
 
 g + scale_fill_manual(values=c("blue", "purple", "red"))
 ```
+
 After learning more about the `per capita income` variable we wanted to see how the variable would change when we added `State Color` into the mix. Where `State Color` signifies a state's political leaning during the election. What is interesting is that the states that were red had much lower incomes per capita than states that were blue. We see that the blue states had a much wider and higher spread of income per capita ranging all the way to $45,000. Purple states on the other hand tended to be in the middle. 
 
 
@@ -243,6 +252,7 @@ After learning more about the `per capita income` variable we wanted to see how 
 ggplot(Finaldata, aes(x = percent_republican2016)) + 
     geom_density()+ ggtitle("Trump Support During the 2016 Elections") + xlab("Percent of Trump Support") + ylab("Density") + facet_wrap(~Region)
 ```
+
 This visualization is looking at Trump Support during the 2016 elections across different U.S. regions. From these visualizations it seems as though each region had pretty varying support. The Northeast had this interesting peak at 0.4 but also has another slope at around 0. The Western and Mountain regions have a similar pattern happening where there are strong peaks but then those peaks start dipping down fairly drastically. The South and the Midwest tend to lean more towards higher Trump support and we don't see the "dipping" occur as much. This leads us to believe that during that election those regions had more states that favored Trump and the Republican party. 
 
 
@@ -253,6 +263,7 @@ ggplot(Finaldata, aes(x = percent_asian, y = percent_republican2016, color = Win
     geom_point(alpha = 0.8) + geom_text(aes(label=ifelse(percent_asian>.2,as.character(state),"")),hjust=1.2,vjust=0)+ geom_text(aes(label=ifelse(percent_republican2016<.2,as.character(state),"")),hjust=-.1,vjust=0) + ggtitle("Percent of Asians and Trump Support by Election Outcome") + xlab("Percent Asian") + ylab("Trump Support")
 
 ```
+
 This final demographic visualization is depicting Trump support across all states among those who identify as Asian, and is then classifying whether or not Trump won in that specific state. The two outliers are labeled as Hawaii and DC. These are interesting because we see that DC had a small percent of Asian residents and also had low Trump support this is kinda expected. However, we see that Hawaii had a much larger percentage of Asian identifying residents but also still had a decent amount of Trump support. All in all though, this visualization tells us that in a way the states that had lower Asian identifying residents tended to have higher Trump support. 
 
 
@@ -286,6 +297,7 @@ plot.title = element_text(color="Black", size=5)
 # The number of Positive Covid Cases, comparison before and after the China Virus announcement 
 grid.arrange(plot1, plot2, ncol=2)
 ```
+
 This visualization allows us to compare the raw count of positive COVID-19 cases among the US before and after March 17th (Trump says "China Virus"). The goal of this visualization is to show the number of positive COVID-19 cases as the time progresses. From the first plot we can see there are very few states that have positive cases above 0-100. However, we see states like Washington, Michigan, California and New York have higher numbers.  The second plot shows that while there are very few states above ~2,000 there overall a higher number of positive cases among the US. This intuitively makes sense given this is an infectious disease and we would only expect there to be more positive cases over time.
 
 ## Final Dataset
@@ -295,6 +307,7 @@ b<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) +
 
 ggplotly(b)
 ```
+
 We can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusal peaksaround the 25-50 range. It is is also interesitng interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states. 
 
 ```{r}
@@ -306,6 +319,7 @@ c<- ggplot(Finaldata, aes(x = Day, y = ChinaVirusInterest, color = factor(State)
 
 ggplotly(c)
 ```
+
 With this visualization we wanted to observe the different slopes of each slope of interest in the term China Virus over time. Arguably, the slopes of interest among the states are not significantly different. There are some interesting downward slopes in states like Wyoming but we would need to dig a bit deeper into this to fully understand what it means. However, a really interesting facet of this viusalization is that we can see a pattern among all states ofpeaks and valleys. In other words, from observation, the majority of states demonstrate a pattern correlated to the day. This would be interesting to explore further and see how it interacts with other aspects like number of COVID cases by state. 
 
 
@@ -315,7 +329,7 @@ With this visualization we wanted to observe the different slopes of each slope 
 
 
 
-# Building Models 
+# Building Model
 
 $$\begin{aligned}
 i = \text{region, } j = \text{date, } Y = \text{China Virus Interest}\\
@@ -372,3 +386,9 @@ head(data.frame(summary(model_1)),-2)
 
 # Next Steps
 The obvious improvements we need to make is exploring more models. We can see from our visualizations that are there are a wide variety of relationships we can dig into with our dataset. However, as a group, we need to decide what path(s) to take. Once we decide on which relationship(s) we want to analyze further, then this project can be enhanced with possibly animiated visualizations or even a shiny app.
+
+# Project Contributions
+- Quinn: Cleaned the COVID-19 data set, provided all visualizations and descriptions of COVID-19, provided the data description, ran analysis of the model, cleaned/formated checkpoint 3 document and knitted/turned in final checkpoint 3 product. 
+- Sofia: Cleaned the demographic data set, provided all visualizations and descriptions of demographic aspects, provided the data descriptions for the dataset and created variables of interest table.
+- Will:  Cleaned the Google Trend data set, provided all visualizations and descriptions of the CHina Virus and Kung Flu virus relationships and provided the data descriptions for the dataset.
+- Federico: Merged the datasets and provided brief descriptions of our building model section. 
