@@ -148,4 +148,15 @@ head(data.frame(summary(model_4)),-2)
 ```
 
 
+```{r, warning = FALSE, cache=TRUE}
+model_5 <- stan_glmer(
+  ChinaVirusInterest ~ Day + totalTestResults + positive + percent_white +  (Day | State),#Random intercepts and slopes when we put Day in
+  data = Finaldata, family = gaussian,
+  chains = 4, iter = 100, refresh = 0
+)
+```
+
+```{r}
+head(data.frame(summary(model_5),-2))
+```
 
