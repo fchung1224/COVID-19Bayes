@@ -30,6 +30,84 @@ require(bayesplot)
 
 
 ```{r}
+################################## To do before Alicia with your fave model ##########################################
+# mcmc_trace()
+# mcmc_dens_overlay()
+# pp_check()
+
+### For predicting one case 
+          # new_308 <- data.frame(Days = 9, Subject =308)
+          # 
+          # set.seed(454)
+          # pred_308 <- posterior_predict(
+          #   model_4, 
+          #   newdata = new_308)
+          # 
+          # pred_308 <- data.frame(y_new = pred_308[-1])
+          # 
+          # ggplot(pred_308, aes(x=y_new))+geom_density()
+          # 
+          # summary(pred_308)
+
+
+## For correlation check (type like model 2 from activity 19)
+          # Store the chains
+          # model_1_df <- as.array(model_1) %>% 
+          #   melt %>% 
+          #   pivot_wider(names_from = parameters, values_from = value)
+          # 
+          # # Wrangle the chains
+          # # Note the need for `...` around the sigma_sq_b
+          # model_1_df <- model_1_df %>% 
+          #   mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[Region:(Intercept),(Intercept)]`) %>% 
+          #   mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+          # 
+          # ggplot(model_1_df, aes(x = correlation)) + 
+          #   geom_density(alpha = 0.5)
+```
+
+```{r, include=FALSE}
+prediction_summary_data <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
+  # Calculate summary statistics of simulated 
+  # posterior predictive models for each case
+  l_outer <- function(x){quantile(x, (1-prob_outer) / 2)}
+  l_inner <- function(x){quantile(x, (1-prob_inner) / 2)}
+  u_inner <- function(x){quantile(x, 1 - (1-prob_inner) / 2)}
+  u_outer <- function(x){quantile(x, 1 - (1-prob_outer) / 2)}
+  df <- data.frame(yrep) %>% 
+    summarize_all(list(mean, sd, median, mad, l_outer, l_inner, u_inner, u_outer)) %>%
+    unlist() %>% 
+    matrix(., length(y), 8) %>% 
+    data.frame()
+  names(df) <- c("post_mean", "post_sd", "post_median", "post_mad", "l_outer", "l_inner", "u_inner", "u_outer")
+  data.frame(cbind(y, df))
+}
+
+
+prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
+  # This function summarizes the predictions across all cases
+  pred_data <- prediction_summary_data(y, yrep, prob_inner = prob_inner, prob_outer = prob_outer) %>% 
+    mutate(error = y - post_median) %>% 
+    mutate(error_scaled = error / post_mad) %>% 
+    mutate(within_inner = (y >= l_inner) & (y <= u_inner)) %>% 
+    mutate(within_outer = (y >= l_outer) & (y <= u_outer))
+  
+  
+  pred_summary <- pred_data %>% 
+    summarize(mae = median(abs(error)), 
+      mae_scaled = median(abs(error_scaled)),
+      within_inner = mean(within_inner),
+      within_outer = mean(within_outer)
+    )
+  names(pred_summary)[3] <- paste0("within_", prob_inner*100)
+  names(pred_summary)[4] <- paste0("within_", prob_outer*100)
+  
+  pred_summary
+}
+```
+
+
+```{r}
 Finaldata<-read_csv("time_series_final_Data.csv")
 ```
 
@@ -136,17 +214,16 @@ head(data.frame(summary(model_4)),-2)
 ```
 
 
-<<<<<<< HEAD
 ```{r, warning = FALSE, cache=TRUE}
 model_5 <- stan_glmer(
   ChinaVirusInterest ~ Day + totalTestResults + positive + percent_white +  (Day | State),#Random intercepts and slopes when we put Day in
   data = Finaldata, family = gaussian,
   chains = 4, iter = 100, refresh = 0
-=======
-\
-\
+)
 
 
+
+```
 
 #Sofia's Models: 
 
@@ -562,14 +639,14 @@ ggplot(model_16_df, aes(x = correlation)) +
 model_17<-stan_glmer(
   ChinaVirusInterest~ (Day|State) + percent_black + negative_rate, 
   data = mod_data, family = gaussian, chains = 4, iter = 2*5000
->>>>>>> 9c603cf8990ef70927a9e975a3ea3861661c2de6
+
 )
 ```
 
 ```{r}
-<<<<<<< HEAD
+
 head(data.frame(summary(model_5),-2))
-=======
+
 head(data.frame(summary(model_17)),-2)
 ```
 
@@ -586,6 +663,6 @@ model_17_df <- model_17_df %>%
 
 ggplot(model_17_df, aes(x = correlation)) + 
   geom_density(alpha = 0.5)
->>>>>>> 9c603cf8990ef70927a9e975a3ea3861661c2de6
+
 ```
 
