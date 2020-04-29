@@ -112,8 +112,12 @@ Finaldata<-read_csv("time_series_final_Data.csv")
 ```
 
 ```{r} 
-Finaldata <- Finaldata %>% select(-c(X)) 
 Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
+day_initial<- as.Date("2020-03-14")
+day_final<- as.Date("2020-03-21")
+Finaldata<- Finaldata%>%
+  filter(Day>=day_initial)%>%
+  filter(Day<=day_final)
 ```
 
 # Quinn plots stuff
