@@ -449,5 +449,131 @@ ggplot(model_13_df, aes(x = correlation)) +
 ```
  
 
+# Will's Models
 
+-Variables of Interest:
+*Pct Black
+*Pct Positive
+*Pct Negative
+
+```{r}
+mod_data<-Finaldata%>%
+  mutate(Date = as.numeric(Day))%>%
+  mutate(positive_rate = positive/ totalTestResults)%>%
+  mutate(negative_rate = 1-positive_rate) %>% 
+  select(State, ChinaVirusInterest, Day, percent_white, percent_black, positive_rate, negative_rate, KungFluInterest, Region, StateColor)
+model_data<- na.omit(model_data)
+```
+
+```{r}
+set.seed(454)
+#Neg Rate
+model_14 <- stan_glmer(
+  ChinaVirusInterest ~ Day + (1 | State) + negative_rate,
+  data = mod_data, family = gaussian, chains = 4, iter = 1000
+)
+```
+
+
+```{r}
+head(data.frame(summary(model_14)),-2)
+```
+
+```{r}
+# Store the chains
+model_14_df <- as.array(model_14) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_14_df <- model_14_df %>% 
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+
+ggplot(model_14_df, aes(x = correlation)) + 
+  geom_density(alpha = 0.5)
+```
+
+```{r}
+model_15<-stan_glmer(
+  ChinaVirusInterest ~ (Day|State) + negative_rate, 
+  data=mod_data, family=gaussian, chains =4, iter = 5000
+)
+```
+
+```{r}
+head(data.frame(summary(model_15)),-2)
+```
+
+```{r}
+# Store the chains
+model_15_df <- as.array(model_15) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_15_df <- model_15_df %>% 
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+
+ggplot(model_15_df, aes(x = correlation)) + 
+  geom_density(alpha = 0.5)
+```
+
+```{r}
+model_16<-stan_glmer(
+  ChinaVirusInterest~ (1|State) + percent_black + negative_rate, 
+  data = mod_data, family = gaussian, chains = 4, iter = 5000
+)
+```
+
+```{r}
+head(data.frame(summary(model_16)),-2)
+```
+
+
+```{r}
+# Store the chains
+model_16_df <- as.array(model_16) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_16_df <- model_16_df %>% 
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+
+ggplot(model_16_df, aes(x = correlation)) + 
+  geom_density(alpha = 0.5)
+```
+
+```{r}
+# Pct black, Neg Rate: Random effects
+model_17<-stan_glmer(
+  ChinaVirusInterest~ (Day|State) + percent_black + negative_rate, 
+  data = mod_data, family = gaussian, chains = 4, iter = 2*5000
+)
+```
+
+```{r}
+head(data.frame(summary(model_17)),-2)
+```
+
+```{r}
+model_17_df <- as.array(model_17) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_17_df <- model_17_df %>% 
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+
+ggplot(model_17_df, aes(x = correlation)) + 
+  geom_density(alpha = 0.5)
+```
 
