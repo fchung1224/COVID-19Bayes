@@ -1,0 +1,307 @@
+---
+title: "Draft Final Project"
+author: "Sofia Pozsonyiova"
+date: "4/30/2020"
+output: html_document
+---
+
+
+#Libraries 
+
+
+```{r, warning=FALSE, include=FALSE}
+library(dplyr)
+library(usmap)
+library(maps)
+library(ggplot2)
+library(tidyverse)
+library(ggmap)
+library(viridis)
+library(rgdal)
+library(gridExtra)
+library(plotly)
+require(janitor)
+require(reshape2)
+require(tidyr)
+require(rstan)
+require(rstanarm)
+require(bayesplot)
+```
+
+```{r, include=FALSE, warning=FALSE}
+prediction_summary_data <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
+  # Calculate summary statistics of simulated 
+  # posterior predictive models for each case
+  l_outer <- function(x){quantile(x, (1-prob_outer) / 2)}
+  l_inner <- function(x){quantile(x, (1-prob_inner) / 2)}
+  u_inner <- function(x){quantile(x, 1 - (1-prob_inner) / 2)}
+  u_outer <- function(x){quantile(x, 1 - (1-prob_outer) / 2)}
+  df <- data.frame(yrep) %>% 
+    summarize_all(list(mean, sd, median, mad, l_outer, l_inner, u_inner, u_outer)) %>%
+    unlist() %>% 
+    matrix(., length(y), 8) %>% 
+    data.frame()
+  names(df) <- c("post_mean", "post_sd", "post_median", "post_mad", "l_outer", "l_inner", "u_inner", "u_outer")
+  data.frame(cbind(y, df))
+}
+
+
+prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
+  # This function summarizes the predictions across all cases
+  pred_data <- prediction_summary_data(y, yrep, prob_inner = prob_inner, prob_outer = prob_outer) %>% 
+    mutate(error = y - post_median) %>% 
+    mutate(error_scaled = error / post_mad) %>% 
+    mutate(within_inner = (y >= l_inner) & (y <= u_inner)) %>% 
+    mutate(within_outer = (y >= l_outer) & (y <= u_outer))
+  
+  
+  pred_summary <- pred_data %>% 
+    summarize(mae = median(abs(error)), 
+      mae_scaled = median(abs(error_scaled)),
+      within_inner = mean(within_inner),
+      within_outer = mean(within_outer)
+    )
+  names(pred_summary)[3] <- paste0("within_", prob_inner*100)
+  names(pred_summary)[4] <- paste0("within_", prob_outer*100)
+  
+  pred_summary
+}
+```
+
+
+\
+\
+
+
+
+
+
+
+# 1. Introduction
+
+
+
+
+
+\
+\
+
+
+
+
+
+# 2 The Data Set
+
+```{r results = "hide", echo=FALSE, warning=FALSE}
+Finaldata<-read_csv("time_series_final_Data.csv")
+
+Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
+day_initial<- as.Date("2020-03-14")
+day_final<- as.Date("2020-03-21")
+Finaldata<- Finaldata%>%
+  filter(Day>=day_initial)%>%
+  filter(Day<=day_final)
+```
+
+
+
+## 2.1 Data Description 
+
+`Demographic:`
+Our dataset, `Demographic`, was created by merging three other datasets which all contained different demographic and election information. We obtained the main portion of our demographic data from the US Census Bureau’s American Community Survey (ACS) which is an ongoing survey administered by the U.S. Census Bureau. It  gathers information on income, employment, housing characteristics, etc, annually for all the 50 U.S. States on the county and state level. To access the county-level dataset we used the R package called Choroplethr which provides API connections to data sources like the ACS. The ACS County-Level dataset was then merged with a county-level election outcome dataset that was created by Tony McGoven. Tony’s dataset contained presidential election results for 2008,2012, and 2016 but we chose to focus solely on the most recent election,2016. That said, the 2016 election results at the county-level were scraped from results published by Townhall.com. However, the State of Alaska reports results at the precinct or state level so there was no county-level data available. Therefore, another dataset had to be created that contained the election results for Alaska and this was done using the official election results provided by the Alaska Division of Elections and was later merged in. The final dataset that was used came from Alicia Johnson and it contained information on a state’s political leaning. Meaning it categorizes each county as belonging to a blue/red/purple state based on the state categorizations at 279towin. 
+
+`COVID-19 Cases:`
+The COVID-19 data is provided by The COVID Tracking Project(CTP). All of the  data points come from state/district/territory public health authorities—or, occasionally, from trusted news reporting, official press conferences, or (very occasionally) tweets or Facebook updates from state public health authorities or governors. These numbers are updated daily at 4PM EST. The biggest weakness of this dataset is that there is no standardized methods for states to follow for data collection/report. For example, some states, like Oregon, provide the **full** set of numbers but others provide some or none of these numbers on an ongoing basis. Some crucial states in this outbreak, notably California, Washington, and New York, have not been regularly reporting their total number of people tested. The CTP aims to remedy this uncertainty in states by utilizing other reporting/measuring tools such as: "Directly asking state officials, watching news conferences, gleaning information from trusted news sources, and whatever else it takes to present reliable numbers." 
+
+`Google Search Interest:`
+This data set includes two search interest indexes over time, measuring how people in each of the state’s interest in searching either “Kung Flu” or “China Virus” based on the time frame selected in the search. This data is downloaded directly from Google Trends which uses the same technique to track the interest of all searches on the platform. The main downside to this data set is the method of the indexing which makes the comparison from state to state less meaningful since each state is guaranteed to have a 100-level interest on their peak day, and the actual unknown search values can vary greatly across different states. 
+
+
+## 2.2 Data Information
+
+```{r warning=FALSE}
+dim(Finaldata)
+
+names(Finaldata)
+
+head(Finaldata)
+
+summary(Finaldata)
+```
+
+
+## 2.3 Variables of Interest
+
++------------------------+---------------------------------------------------+
+| Variables:             | Description:                                      |
++========================+===================================================+
+| `polyname`             | State Name                                        |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `StateColor`           | Political Leaning                                 |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_hispanic`      | Percent of the Population that is Hispanic        |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_white`        | Percent of the Population that is White           |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_asian`        | Percent of the Population that is Asian           |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `percent_black`        | Percent of Population that is Black               |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`total_population`      | Total State Population                            | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`per_capita_income`     | Income per Capita                                 |
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_democrat2016`  | Percent of votes won by Democrat (Clinton)        |  
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`percent_republican2016`| Percent of votes won by Republican (Trump)        | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+| `Winner`               | Indicator for whether a Republican or Democrat Won| 
+|                        |                                                   |  
++------------------------+---------------------------------------------------+
+|`total_2016`            | Total Number of Votes                             | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`Positive`              | Number of reported positive COVID-19 cases        | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`Negative`              | Number of reported negative COVID-19 cases        | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`date`                  | Date of report                                    | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`death`                 | Total Number of reported deaths due to COVID-19   | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`hospitalized`          | Total Number of indivudals hopitalized due        |
+|                        | to COVID-19                                       |
++------------------------+---------------------------------------------------+
+|`totalTestResults`      | Total Number test results (Positive +Negative)    | 
+|                        |                                                   | 
++------------------------+---------------------------------------------------+
+|`FIPS`                  | A five-digit Federal Information Processing       |
+|                        | Standards code which uniquely identified counties |
+|                        | and county                                        | 
++------------------------+---------------------------------------------------+
+|`KungFluInterest`       | Interest index from google searches by state.     |
+|                        | Peak search day=100, all other days in set are    |
+|                        | based searches on relative to this peak day.      | 
++------------------------+---------------------------------------------------+
+|`ChinaVirusInterest`    | Interest index from google searches by state.     |
+|                        | Peak search day=100, all other days in set are    |
+|                        | based searches on relative to this peak day.      | 
++------------------------+---------------------------------------------------+
+|`Region`                | States divided into five different regions:       |
+|                        | West, South, Mountain, Northeast, Midwest         |
++------------------------+---------------------------------------------------+
+|`StayAtHome_date`       | The date states have enforced quarantine          |
++------------------------+---------------------------------------------------+
+|`Quarantine_Yes`        | An 0,1 indicator of whether states have enforced  |
+|                        | quarantine                                        |
++------------------------+---------------------------------------------------+
+
+
+##2.4 Visualizations
+
+
+
+###Demographic 
+```{r}
+#Demographic: Identification 
+Finaldata <- data.frame(Finaldata) %>% mutate(state = State)
+plot_usmap(data = Finaldata, values = "percent_white", color = "white") + 
+  scale_fill_continuous(name = "Percent White", label = scales::comma) + 
+  theme(legend.position = "right")+ ggtitle("Percent of Residents that Identify as White") + 
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+)
+
+```
+
+Our first visualization is looking at the percent of residents that identify as white within the United States. As you can see, there is a higher percent of white identifying residents in the midwest and northeast states. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
+
+
+```{r}
+plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
+  scale_fill_continuous(low = "sky blue", high = "black", name = "Percent Asian", label = scales::comma) + 
+  theme(legend.position = "right") + ggtitle("Percent of Residents that Identify as Asian") +
+  theme(
+plot.title = element_text(color="Black", size=14, face="bold")
+) 
+```
+
+The above visualization is looking at the percent of residents that identify as Asian within the United States. As you can see, there is a higher percent of residents that identify as Asian in places like California and Washington, but the most being in Hawaii. From this visualization we can also see that that Midwest and the South tend to have a small percentage of residents identifying as Asian. We are especially interested in the `percent_asian` variable as it plays a major role in our analysis. 
+
+
+MAKE VISUAL FOR STATE COLOR
+
+```{r}
+ggplot(data = Finaldata, x = StateColor) + stat_count()
+```
+
+
+###Google TS
+
+
+###COVID-19
+
+
+###Final Data Set
+
+
+
+
+\
+\
+
+
+
+
+# 3. Models 
+
+
+
+
+
+## Model(s) 
+
+
+
+
+
+
+## Model Evaluation
+
+
+
+
+
+
+\
+\
+
+
+
+
+# 4. Results 
+
+
+
+
+
+
+
+
+
+
+
