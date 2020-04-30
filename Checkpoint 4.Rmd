@@ -526,7 +526,8 @@ model_data<-Finaldata%>%
 model_data<- na.omit(model_data)
 
 colSums(is.na(model_data))
-
+```
+```{r}
 model_10 <- stan_glmer(
   ChinaVirusInterest ~ Day + (1 | State) + percent_white,
   data = model_data, family = gaussian, chains = 4, iter = 1000
@@ -654,19 +655,31 @@ mod_data<-Finaldata%>%
 model_data<- na.omit(model_data)
 ```
 
+
+Model 14
 ```{r}
 set.seed(454)
 #Neg Rate
 model_14 <- stan_glmer(
-  ChinaVirusInterest ~ Day + (1 | State) + negative_rate,
+  ChinaVirusInterest ~ (1 | State) + negative_rate,
   data = mod_data, family = gaussian, chains = 4, iter = 1000
 )
 ```
 
-
 ```{r}
 head(data.frame(summary(model_14)),-2)
 ```
+
+Checking Model 14
+```{r}
+mcmc_trace(model_14)
+mcmc_dens(model_14)
+```
+```{r}
+pp_check(model_14, nreps=50)
+```
+
+
 
 ```{r}
 # Store the chains
@@ -685,30 +698,48 @@ ggplot(model_14_df, aes(x = correlation)) +
 ```
 
 ```{r}
-model_15<-stan_glmer(
-  ChinaVirusInterest ~ (Day|State) + negative_rate, 
-  data=mod_data, family=gaussian, chains =4, iter = 5000
-)
+set.seed(454)
+my_data <- data.frame(negative_rate = .9, State = "IL", percent_black = .12)
+
+ # Simulate a set of predictions for each case in newdata
+my_prediction <- posterior_predict(
+   model_14,
+   newdata = my_data)
+
+my_prediction <- data.frame(y_new = my_prediction[,1])
+
+ggplot(my_prediction, aes(x = y_new)) +
+  geom_density()
+
+summary(my_prediction)
+```
+
+
+```{r}
+# model_15<-stan_glmer(
+#   ChinaVirusInterest ~ (Day|State) + negative_rate, 
+#   data=mod_data, family=gaussian, chains =4, iter = 5000
+# )
 ```
 
 ```{r}
-head(data.frame(summary(model_15)),-2)
+# head(data.frame(summary(model_15)),-2)
 ```
 
 ```{r}
-# Store the chains
-model_15_df <- as.array(model_15) %>% 
-  melt %>% 
-  pivot_wider(names_from = parameters, values_from = value)
-
-# Wrangle the chains
-# Note the need for `...` around the sigma_sq_b
-model_15_df <- model_15_df %>% 
-  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
-  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
-
-ggplot(model_15_df, aes(x = correlation)) + 
-  geom_density(alpha = 0.5)
+# # Store the chains
+# model_15_df <- as.array(model_15) %>% 
+#   melt %>% 
+#   pivot_wider(names_from = parameters, values_from = value)
+# 
+# # Wrangle the chains
+# # Note the need for `...` around the sigma_sq_b
+# model_15_df <- model_15_df %>% 
+#   mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+#   mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+# 
+# ggplot(model_15_df, aes(x = correlation)) + 
+#   geom_density(alpha = 0.5)
 ```
 
 ```{r}
@@ -720,6 +751,15 @@ model_16<-stan_glmer(
 
 ```{r}
 head(data.frame(summary(model_16)),-2)
+```
+
+```{r}
+mcmc_trace(model_16)
+mcmc_dens(model_16)
+```
+
+```{r}
+pp_check(model_16, iter=50)
 ```
 
 
@@ -740,34 +780,48 @@ ggplot(model_16_df, aes(x = correlation)) +
 ```
 
 ```{r}
-# Pct black, Neg Rate: Random effects
-model_17<-stan_glmer(
-  ChinaVirusInterest~ (Day|State) + percent_black + negative_rate, 
-  data = mod_data, family = gaussian, chains = 4, iter = 2*5000
+set.seed(454)
+my_data <- data.frame(negative_rate = .9, State = "IL", percent_black = .12)
 
-)
+ # Simulate a set of predictions for each case in newdata
+my_prediction <- posterior_predict(
+   model_16,
+   newdata = my_data)
+
+my_prediction <- data.frame(y_new = my_prediction[,1])
+
+ggplot(my_prediction, aes(x = y_new)) +
+  geom_density()
+
+summary(my_prediction)
+```
+
+
+```{r}
+# # Pct black, Neg Rate: Random effects
+# model_17<-stan_glmer(
+#   ChinaVirusInterest~ (Day|State) + percent_black + negative_rate, 
+#   data = mod_data, family = gaussian, chains = 4, iter = 2*5000
+# 
+# )
 ```
 
 ```{r}
-
-head(data.frame(summary(model_5),-2))
-
-head(data.frame(summary(model_17)),-2)
+# head(data.frame(summary(model_17)),-2)
 ```
 
 ```{r}
-model_17_df <- as.array(model_17) %>% 
-  melt %>% 
-  pivot_wider(names_from = parameters, values_from = value)
-
-# Wrangle the chains
-# Note the need for `...` around the sigma_sq_b
-model_17_df <- model_17_df %>% 
-  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
-  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
-
-ggplot(model_17_df, aes(x = correlation)) + 
-  geom_density(alpha = 0.5)
-
+# model_17_df <- as.array(model_17) %>% 
+#   melt %>% 
+#   pivot_wider(names_from = parameters, values_from = value)
+# 
+# # Wrangle the chains
+# # Note the need for `...` around the sigma_sq_b
+# model_17_df <- model_17_df %>% 
+#   mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+#   mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+# 
+# ggplot(model_17_df, aes(x = correlation)) + 
+#   geom_density(alpha = 0.5)
 ```
 
