@@ -254,15 +254,15 @@ prediction_summary(y = Finaldata$ChinaVirusInterest,
 
 ```{r}
 ### For predicting one case 
-new_FL <- Finaldata%>% 
-          filter(State=="FL") #filter the row of interest 
+new_CA <- Finaldata%>% 
+          filter(State=="CA") #filter the row of interest 
 
 set.seed(454)
-pred_FL <- posterior_predict(
+pred_CA <- posterior_predict(
   model_100,
-  newdata = new_FL)
+  newdata = new_CA)
 
-pred_2 <- data.frame(y_new = pred_FL[-1])
+pred_2 <- data.frame(y_new = pred_CA[-1])
 
 ggplot(pred_2, aes(x=y_new))+geom_density()
 
