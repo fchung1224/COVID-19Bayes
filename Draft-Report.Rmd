@@ -79,7 +79,7 @@ prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
 
 # 1. Introduction
 
-
+On March 17, 2020 President Trump referred to the Coronavirus as the "China Virus." Shortly after, the number of anti-Chinese incidents started to increase across the United States. One aspect of public health that is often thrown to the wayside is how influential public officials and leaders are in disseminating public health information. Moreover, not only can their words change the public's views on a health matter but it can also shift a nation's perspective on someone's identity. In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identies and states. Thus,our project aims to explore the relationship and variability of intrest in the term "China Virus" across states through  political, demographic and COVID-19 characteristics. This was done using _____. (Conclusion)
 
 
 
@@ -300,7 +300,18 @@ ggplot(data = Finaldata, x = StateColor) + stat_count()
 
 
 
+# 5. Contributions and progress
 
+## 5.1 Contributions 
+
+- Specify what each group member (including yourself) contributed to this checkpoint.
+- Quinn: 
+- Sofia:
+- Will:
+- Federico:
+
+## 5.2 Outline progress
+- Summarize what progress your group made between checkpoints 3 and 4.
 
 
 
