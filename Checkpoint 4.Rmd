@@ -248,35 +248,70 @@ Finaldata<-
   Finaldata%>%
   mutate(Day=as.numeric(Day))
 
-model_1 <- stan_glmer(
+model_5 <- stan_glmer(
   ChinaVirusInterest ~ StateColor + (StateColor | State), #Gives us random intercepts
   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
 )
 ```
 
 ```{r}
-head(data.frame(summary(model_1)),-2)
+head(data.frame(summary(model_5)),-2)
 ```
 
+Checks:
 
-##Model 6: 
-StateColor + per_capita_income + (StateColor | State)
-```{r, warning = FALSE, cache=TRUE}
+```{r}
+# Trace plots
+#mcmc_trace(model_5)
+
+# Density plots
+#mcmc_dens_overlay(model_5)
+```
+
+```{r}
+# y = original sample, yrep = MCMC simulation
 set.seed(454)
-Finaldata<-
-  Finaldata%>%
-  mutate(Day=as.numeric(Day))
-
-model_6 <- stan_glmer(
-  ChinaVirusInterest ~ StateColor + per_capita_income + (StateColor | State), #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 3, iter = 3000*2
-)
+pp_check(model_5, nreps = 50)
 ```
 
 
 ```{r}
-head(data.frame(summary(model_6)),-2)
+# Store the chains
+model_5_df <- as.array(model_5) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_5_df <- model_5_df %>% 
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = (sigma_sq_b/(sigma_sq_b+sigma_sq_w)))
+
+
+ggplot(model_5_df, aes(x = correlation)) + 
+  geom_density(alpha = 0.5)
+
 ```
+
+
+
+```{r}
+#set.seed(454)
+#my_data <- data.frame(StateColor = "red", State = "FL")
+
+# Simulate a set of predictions for each case in newdata
+#my_prediction <- posterior_predict(
+ # model_5, 
+  #newdata = my_data)
+
+#my_prediction <- data.frame(y_new = my_prediction[,1])
+
+#ggplot(my_prediction, aes(x = y_new)) + 
+ # geom_density()
+
+#summary(my_prediction)
+```
+
 
 ##Model 7: 
 StateColor + percent_asian + (StateColor | State)
@@ -299,24 +334,46 @@ head(data.frame(summary(model_7)),-2)
 ```
 
 
-##Model 8: 
-
-
-StateColor + totalTestResults + (StateColor | State)
-
-```{r, warning = FALSE, cache=TRUE}
-set.seed(454)
-Finaldata<-
-  Finaldata%>%
-  mutate(Day=as.numeric(Day))
-
-model_8 <- stan_glmer(
-  ChinaVirusInterest ~ StateColor + totalTestResults + (StateColor | State), #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 4, iter = 3000*2
-)
-```
 ```{r}
-head(data.frame(summary(model_8)),-2)
+# y = original sample, yrep = MCMC simulation
+set.seed(454)
+pp_check(model_7, nreps = 50)
+```
+
+
+```{r}
+# Store the chains
+model_7_df <- as.array(model_7) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_7_df <- model_7_df %>% 
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = (sigma_sq_b/(sigma_sq_b+sigma_sq_w)))
+
+
+ggplot(model_7_df, aes(x = correlation)) + 
+  geom_density(alpha = 0.5)
+
+```
+
+```{r}
+# set.seed(454)
+# my_data <- data.frame(StateColor = "blue", State = "IL", percent_asian = .12)
+# 
+# # Simulate a set of predictions for each case in newdata
+# my_prediction <- posterior_predict(
+#   model_7,
+#   newdata = my_data)
+
+#my_prediction <- data.frame(y_new = my_prediction[,1])
+
+#ggplot(my_prediction, aes(x = y_new)) +
+ # geom_density()
+
+#summary(my_prediction)
 ```
 
 ##Model 9: 
@@ -331,12 +388,56 @@ Finaldata<-
 
 model_9 <- stan_glmer(
   ChinaVirusInterest ~ StateColor +percent_asian + totalTestResults + (StateColor | State), #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 4, iter = 3000*2
+  data = Finaldata, family = gaussian, chains = 4, iter = 1000*2
 )
 ```
 
 ```{r}
 head(data.frame(summary(model_9)),-2)
+```
+
+
+
+```{r}
+# y = original sample, yrep = MCMC simulation
+set.seed(454)
+pp_check(model_9, nreps = 50)
+```
+
+
+```{r}
+# Store the chains
+model_9_df <- as.array(model_9) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_9_df <- model_9_df %>% 
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = (sigma_sq_b/(sigma_sq_b+sigma_sq_w)))
+
+
+ggplot(model_9_df, aes(x = correlation)) + 
+  geom_density(alpha = 0.5)
+
+```
+
+```{r}
+#set.seed(454)
+#my_data <- data.frame(StateColor = "red", State = "FL")
+
+# Simulate a set of predictions for each case in newdata
+#my_prediction <- posterior_predict(
+ # model_5, 
+  #newdata = my_data)
+
+#my_prediction <- data.frame(y_new = my_prediction[,1])
+
+#ggplot(my_prediction, aes(x = y_new)) + 
+ # geom_density()
+
+#summary(my_prediction)
 ```
 
 #Fed's visualizations:
