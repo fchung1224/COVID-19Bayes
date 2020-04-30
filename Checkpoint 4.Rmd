@@ -283,19 +283,6 @@ ggplot(model_100_df, aes(x = correlation)) +
 
 #Sofia's Models: 
 
-Variables of Interest: 
-\
-• per_capita_income
-\
-•totalTestResults
-\
-• StateColor
-\
-• percent_asian
-\
-•percent_black
-
-
 ##Model 5: 
 
 ```{r, warning = FALSE, cache=TRUE}
@@ -305,8 +292,8 @@ Finaldata<-
   mutate(Day=as.numeric(Day))
 
 model_5 <- stan_glmer(
-  ChinaVirusInterest ~ StateColor + (1 | State), #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 3, iter = 100*2
+  ChinaVirusInterest ~ Day + StateColor + (Day | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
 )
 ```
 
@@ -333,27 +320,26 @@ pp_check(model_5, nreps = 50)
 
 ```{r}
 # Store the chains
-model_5_df <- as.array(model_5) %>% 
-  melt %>% 
+model_5_df <- as.array(model_5) %>%
+  melt %>%
   pivot_wider(names_from = parameters, values_from = value)
 
 # Wrangle the chains
 # Note the need for `...` around the sigma_sq_b
-model_5_df <- model_5_df %>% 
-  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+model_5_df <- model_5_df %>%
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>%
   mutate(correlation = (sigma_sq_b/(sigma_sq_b+sigma_sq_w)))
 
 
-ggplot(model_5_df, aes(x = correlation)) + 
+ggplot(model_5_df, aes(x = correlation)) +
   geom_density(alpha = 0.5)
-
 ```
 
 
 
 ```{r}
 #set.seed(454)
-my_data <- data.frame(StateColor = "red", State = "FL")
+my_data <- data.frame(StateColor = "blue", State = "FL", Day = 18336)
 
 # Simulate a set of predictions for each case in newdata
 my_prediction <- posterior_predict(
@@ -369,68 +355,6 @@ summary(my_prediction)
 ```
 
 
-##Model 7: 
-StateColor + percent_asian + (StateColor | State)
-
-```{r, warning = FALSE, cache=TRUE}
-set.seed(454)
-Finaldata<-
-  Finaldata%>%
-  mutate(Day=as.numeric(Day))
-
-model_7 <- stan_glmer(
-  ChinaVirusInterest ~ StateColor + percent_asian + (StateColor | State), #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 4, iter = 3000*2
-)
-```
-
-
-```{r}
-head(data.frame(summary(model_7)),-2)
-```
-
-
-```{r}
-# y = original sample, yrep = MCMC simulation
-set.seed(454)
-pp_check(model_7, nreps = 50)
-```
-
-
-```{r}
-# Store the chains
-model_7_df <- as.array(model_7) %>% 
-  melt %>% 
-  pivot_wider(names_from = parameters, values_from = value)
-
-# Wrangle the chains
-# Note the need for `...` around the sigma_sq_b
-model_7_df <- model_7_df %>% 
-  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
-  mutate(correlation = (sigma_sq_b/(sigma_sq_b+sigma_sq_w)))
-
-
-ggplot(model_7_df, aes(x = correlation)) + 
-  geom_density(alpha = 0.5)
-
-```
-
-```{r}
-# set.seed(454)
-# my_data <- data.frame(StateColor = "blue", State = "IL", percent_asian = .12)
-# 
-# # Simulate a set of predictions for each case in newdata
-# my_prediction <- posterior_predict(
-#   model_7,
-#   newdata = my_data)
-
-#my_prediction <- data.frame(y_new = my_prediction[,1])
-
-#ggplot(my_prediction, aes(x = y_new)) +
- # geom_density()
-
-#summary(my_prediction)
-```
 
 ##Model 9: 
 
@@ -481,20 +405,56 @@ ggplot(model_9_df, aes(x = correlation)) +
 
 ```{r}
 #set.seed(454)
-#my_data <- data.frame(StateColor = "red", State = "FL")
+my_data <- data.frame(StateColor = "red", State = "FL")
 
 # Simulate a set of predictions for each case in newdata
-#my_prediction <- posterior_predict(
- # model_5, 
-  #newdata = my_data)
+my_prediction <- posterior_predict(
+  model_9,
+   newdata = my_data)
 
-#my_prediction <- data.frame(y_new = my_prediction[,1])
+my_prediction <- data.frame(y_new = my_prediction[,1])
 
-#ggplot(my_prediction, aes(x = y_new)) + 
- # geom_density()
+ggplot(my_prediction, aes(x = y_new)) +
+ geom_density()
 
-#summary(my_prediction)
+summary(my_prediction)
 ```
+
+
+
+
+ChinaVirusInterest ~ Day + StateColor + (Day | State)	mean	mcse	sd	X10.	X50.	X90.	n_eff	Rhat
+	(Intercept)	-1.94E+04	4.20E+01	6.48E+03	-2.77E+04	-1.94E+04	-1.11E+04	23821
+	Day	1.06E+00	2.29E-03	3.54E-01	6.06E-01	1.06E+00	1.51E+00	23821
+	StateColorpurple	-4.47E-01	3.93E-02	3.96E+00	-5.46E+00	-4.45E-01	4.57E+00	10177
+	StateColorred	-4.09E+00	3.24E-02	3.35E+00	-8.39E+00	-4.09E+00	1.79E-01	10690
+								
+								
+ChinaVirusInterest ~ StateColor + percent_asian + (Day | State)								
+	(Intercept)	4.36E+01	3.80E-02	3.16E+00	3.96E+01	4.35E+01	4.76E+01	6895
+	StateColorpurple	-8.65E-01	5.00E-02	4.23E+00	-6.28E+00	-8.61E-01	4.40E+00	7182
+	StateColorred	-4.48E+00	4.29E-02	3.68E+00	-9.18E+00	-4.50E+00	2.35E-01	7384
+	percent_asian	-8.57E+00	3.33E-01	3.10E+01	-4.82E+01	-8.11E+00	3.03E+01	8710
+								
+								
+								
+ChinaVirusInterest ~ StateColor +percent_asian + totalTestResults + (StateColor | State)								
+	(Intercept)	4.27E+01	7.19E-02	3.00E+00	3.90E+01	4.27E+01	4.65E+01	1741
+	StateColorpurple	-2.52E-01	9.18E-02	4.05E+00	-5.38E+00	-2.01E-01	4.85E+00	1949
+	StateColorred	-3.82E+00	9.17E-02	3.77E+00	-8.63E+00	-3.87E+00	8.40E-01	1685
+	percent_asian	-1.07E+01	5.48E-01	2.86E+01	-4.61E+01	-1.05E+01	2.60E+01	2720
+	totalTestResults	3.17E-04	4.75E-06	2.78E-04	-4.82E-05	3.19E-04	6.61E-04	3409
+
+
+
+
+
+
+
+
+
+
+
 
 #Fed's visualizations:
 ```{r}
