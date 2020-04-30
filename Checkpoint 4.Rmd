@@ -247,7 +247,7 @@ prediction_summary(y = Finaldata$ChinaVirusInterest,
 
 ```{r}
 ### For predicting one case 
-new_FL <- data.frame(Day = 7 , State = FL) #Doesn't recognize state
+new_FL <- data.frame(Day = 7 , State = "FL") #Doesn't recognize state
 
 set.seed(454)
 pred_FL <- posterior_predict(
@@ -569,12 +569,12 @@ Variables of interest:
 - postive rate (out of the tested)
 
 ```{r}
-set.seed(454)
 glimpse(Finaldata)
 model_data<-Finaldata%>%
   mutate(Date = as.numeric(Day))%>%
-  mutate(positive_rate = positive/ totalTestResults)%>%
-  select(State, ChinaVirusInterest, Day, percent_white,positive_rate)
+  mutate(positive_rate = positive/ totalTestResults,
+         ChinaVirusInterest_dec = ChinaVirusInterest/100)%>%
+  select(State, ChinaVirusInterest, Day, percent_white,positive_rate,ChinaVirusInterest_dec)
 model_data<- na.omit(model_data)
 
 colSums(is.na(model_data))
@@ -662,16 +662,22 @@ ggplot(model_12_df, aes(x = correlation)) +
 
 
 ```{r}
+model_data<-model_data%>%
+  select(-c(ChinaVirusInterest))
 set.seed(454)
 #random intercept and random slope, percent white and positive rate = positive/ total tests
 #iterations might be low need to sample up if we want to make the models better
 model_13 <- stan_glmer(
-  ChinaVirusInterest ~ (Day | State) + percent_white +positive_rate,
+  ChinaVirusInterest_dec ~ (Day | State) + percent_white + positive_rate,
   data = model_data, family = gaussian, chains = 4, iter = 3000
 )
 ```
 ```{r}
 head(data.frame(summary(model_13)),-2)
+```
+
+```{r}
+pp_check(model_13)
 ```
 
 ```{r}
@@ -689,6 +695,32 @@ model_13_df <- model_13_df %>%
 ggplot(model_13_df, aes(x = correlation)) + 
   geom_density(alpha = 0.5)
 ```
+```{r}
+set.seed(454)
+pred_13 <- posterior_predict(
+  model_13,
+  newdata = model_data, transform = TRUE)
+
+prediction_summary(y = model_data$ChinaVirusInterest,
+  yrep = pred_13)
+```
+#Final model Fed
+```{r}
+### For predicting one case 
+
+new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive_rate = 0.11) #Doesn't recognize state
+set.seed(454)
+pred_FL <- posterior_predict(
+  model_13,
+  newdata = new_FL)
+
+pred_FL <- data.frame(y_new = pred_FL[-1])
+
+ggplot(pred_FL, aes(x=y_new))+geom_density()
+
+summary(pred_FL)
+```
+
  
 
 # Will's Models
