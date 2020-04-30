@@ -767,30 +767,30 @@ summary(my_prediction)
 
 
 ```{r}
-# model_15<-stan_glmer(
-#   ChinaVirusInterest ~ (Day|State) + negative_rate, 
-#   data=mod_data, family=gaussian, chains =4, iter = 5000
-# )
+model_15<-stan_glmer(
+  ChinaVirusInterest ~ (Day|State) + negative_rate,
+  data=mod_data, family=gaussian, chains =4, iter = 5000
+)
 ```
 
 ```{r}
-# head(data.frame(summary(model_15)),-2)
+head(data.frame(summary(model_15)),-2)
 ```
 
 ```{r}
-# # Store the chains
-# model_15_df <- as.array(model_15) %>% 
-#   melt %>% 
-#   pivot_wider(names_from = parameters, values_from = value)
-# 
-# # Wrangle the chains
-# # Note the need for `...` around the sigma_sq_b
-# model_15_df <- model_15_df %>% 
-#   mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
-#   mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
-# 
-# ggplot(model_15_df, aes(x = correlation)) + 
-#   geom_density(alpha = 0.5)
+# Store the chains
+model_15_df <- as.array(model_15) %>%
+  melt %>%
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_15_df <- model_15_df %>%
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>%
+  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+
+ggplot(model_15_df, aes(x = correlation)) +
+  geom_density(alpha = 0.5)
 ```
 
 ```{r}
@@ -828,6 +828,7 @@ model_16_df <- model_16_df %>%
 
 ggplot(model_16_df, aes(x = correlation)) + 
   geom_density(alpha = 0.5)
+
 ```
 
 ```{r}
@@ -875,4 +876,26 @@ summary(my_prediction)
 # ggplot(model_17_df, aes(x = correlation)) + 
 #   geom_density(alpha = 0.5)
 ```
+
+
+Model Outputs:
+
+Model 14: 
+ChinaVirusInterest~ (1|State) + negative_rate
+
+mean	mcse	sd	X10.	X50.	X90.	n_eff	Rhat
+
+44.38040197	0.11616343	4.2066034	39.0747590	44.36959567	49.6577069	1311	1.0010474
+-4.03732266	0.13077873	4.8298203	-10.2151294	-4.12905314	2.2624868	1364	1.0007950
+
+
+Model 16: 
+ChinaVirusInterest~ (1|State) + percent_black + negative_rate
+
+mean	mcse	sd	X10.	X50.	X90.	n_eff	Rhat
+
+(intercept) 45.38818892	0.059114913	4.851982	39.1598750	45.42176405	51.6208513	6737	1.0001366
+percent black -4.81756453	0.218542483	14.099591	-22.6838613	-5.02290077	13.1161595	4162	1.0008973
+negative_rate -4.48821663	0.053252003	4.937795	-10.7851047	-4.47175240	1.7764630	8598	1.0002747
+
 
