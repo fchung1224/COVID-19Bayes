@@ -107,7 +107,7 @@ prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
 ```
 
 
-```{r}
+```{r, warning=FALSE}
 Finaldata<-read_csv("time_series_final_Data.csv")
 ```
 
@@ -162,72 +162,124 @@ ggplotly(d)
 
 #Quinn making models
 ```{r, cahce=TRUE}
-set.seed(454)
-Finaldata<-
-  Finaldata%>%
-  mutate(Day=as.numeric(Day))
-
-model_1 <- stan_glmer(
-  ChinaVirusInterest ~ (1 | State), #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
-)
+# 
+# model_1 <- stan_glmer(
+#   ChinaVirusInterest ~ (1 | State), #Gives us random intercepts
+#   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+# )
 ```
 
 ```{r}
-head(data.frame(summary(model_1)),-2)
+# head(data.frame(summary(model_1)),-2)
 ```
 
 #Quinn making models
 ```{r, warning=FALSE, cache=TRUE}
-model_2 <- stan_glmer(
-  ChinaVirusInterest ~ Day + (Day | State),
-  data = Finaldata, family = gaussian,
-  chains = 4, iter = 100, refresh = 0
-)
+# model_2 <- stan_glmer(
+#   ChinaVirusInterest ~ Day + (Day | State),
+#   data = Finaldata, family = gaussian,
+#   chains = 4, iter = 100, refresh = 0
+# )
 
 ```
 
 ```{r}
-head(data.frame(summary(model_2)),-2)
+# head(data.frame(summary(model_2)),-2)
 ```
 
 #Quinn makes models
 ```{r, warning = FALSE, cache=TRUE}
-model_3 <- stan_glmer(
-  ChinaVirusInterest ~ Day + StateColor + (Day | State),#Random intercepts and slopes when we put Day in
-  data = Finaldata, family = gaussian,
-  chains = 4, iter = 100, refresh = 0
-)
+# model_3 <- stan_glmer(
+#   ChinaVirusInterest ~ Day + StateColor + (Day | State),#Random intercepts and slopes when we put Day in
+#   data = Finaldata, family = gaussian,
+#   chains = 4, iter = 100, refresh = 0
+# )
 ```
 
 ```{r}
-head(data.frame(summary(model_3)),-2)
+# head(data.frame(summary(model_3)),-2)
 ```
 
 #Quinn makes models
 ```{r, warning = FALSE, cache=TRUE}
-model_4 <- stan_glmer(
-  ChinaVirusInterest ~ Day + totalTestResults + (Day | State),#Random intercepts and slopes when we put Day in
-  data = Finaldata, family = gaussian,
-  chains = 4, iter = 100, refresh = 0
-)
+# model_4 <- stan_glmer(
+#   ChinaVirusInterest ~ Day + totalTestResults + (Day | State),#Random intercepts and slopes when we put Day in
+#   data = Finaldata, family = gaussian,
+#   chains = 4, iter = 100, refresh = 0
+# )
 ```
 
 ```{r}
-head(data.frame(summary(model_4)),-2)
+# head(data.frame(summary(model_4)),-2)
 ```
 
 
 ```{r, warning = FALSE, cache=TRUE}
-model_5 <- stan_glmer(
+model_100 <- stan_glmer(
   ChinaVirusInterest ~ Day + totalTestResults + positive + percent_white +  (Day | State),#Random intercepts and slopes when we put Day in
   data = Finaldata, family = gaussian,
-  chains = 4, iter = 100, refresh = 0
+  chains = 4, iter = 5000*2, refresh = 0
 )
 
+```
 
+```{r}
+head(data.frame(summary(model_100)),-2)
+```
+```{r}
+mcmc_trace(model_100)
+mcmc_dens_overlay(model_100) #How can we just get a snapshot of our model evals?
+```
+
+```{r}
+pp_check(model_100)
+```
+
+```{r}
+set.seed(454)
+pred_1 <- posterior_predict(
+  model_100,
+  newdata = Finaldata, transform = TRUE)
+
+prediction_summary(y = Finaldata$ChinaVirusInterest,
+  yrep = pred_1)
+```
+
+```{r}
+### For predicting one case 
+new_FL <- data.frame(Day = 7 , State = FL) #Doesn't recognize state
+
+set.seed(454)
+pred_FL <- posterior_predict(
+  model_100,
+  newdata = new_FL)
+
+pred_100 <- data.frame(y_new = pred_100[-1])
+
+ggplot(pred_100, aes(x=y_new))+geom_density()
+
+summary(pred_100)
 
 ```
+
+```{r}
+# For correlation check (type like model 2 from activity 19)
+# Store the chains
+model_100_df <- as.array(model_100) %>%
+  melt %>%
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+# Note the need for `...` around the sigma_sq_b
+model_100_df <- model_100_df %>%
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>%
+  mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
+
+ggplot(model_100_df, aes(x = correlation)) +
+  geom_density(alpha = 0.5)
+```
+
+
 
 #Sofia's Models: 
 
