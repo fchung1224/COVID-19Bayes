@@ -305,8 +305,8 @@ Finaldata<-
   mutate(Day=as.numeric(Day))
 
 model_5 <- stan_glmer(
-  ChinaVirusInterest ~ StateColor + (StateColor | State), #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+  ChinaVirusInterest ~ StateColor + (1 | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 3, iter = 100*2
 )
 ```
 
@@ -353,19 +353,19 @@ ggplot(model_5_df, aes(x = correlation)) +
 
 ```{r}
 #set.seed(454)
-#my_data <- data.frame(StateColor = "red", State = "FL")
+my_data <- data.frame(StateColor = "red", State = "FL")
 
 # Simulate a set of predictions for each case in newdata
-#my_prediction <- posterior_predict(
- # model_5, 
-  #newdata = my_data)
+my_prediction <- posterior_predict(
+ model_5,
+  newdata = my_data)
 
-#my_prediction <- data.frame(y_new = my_prediction[,1])
+my_prediction <- data.frame(y_new = my_prediction[,1])
 
-#ggplot(my_prediction, aes(x = y_new)) + 
- # geom_density()
+ggplot(my_prediction, aes(x = y_new)) +
+ geom_density()
 
-#summary(my_prediction)
+summary(my_prediction)
 ```
 
 
