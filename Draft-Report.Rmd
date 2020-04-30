@@ -270,11 +270,24 @@ ggplot(data = Finaldata, x = StateColor) + stat_count()
 # 3. Models 
 
 
-
-
-
 ## Model(s) 
 
+```{r}
+model_1 <- stan_glmer(
+  ChinaVirusInterest ~ StateColor + positive + percent_white +State, #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+)
+
+model_2 <- stan_glmer(
+  ChinaVirusInterest ~ StateColor + positive + percent_white + (1 | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+)
+
+model_3<- stan_glmer(
+  ChinaVirusInterest ~ Day + StateColor + positive + percent_white + (Day | State), #Gives us random intercepts
+  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+)
+```
 
 
 
