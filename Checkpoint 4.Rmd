@@ -228,7 +228,7 @@ head(data.frame(summary(model_100)),-2)
 ```
 ```{r}
 mcmc_trace(model_100)
-mcmc_dens_overlay(model_100) #How can we just get a snapshot of our model evals?
+mcmc_dens_overlay(model_100) 
 ```
 
 ```{r}
@@ -241,41 +241,49 @@ pred_1 <- posterior_predict(
   model_100,
   newdata = Finaldata, transform = TRUE)
 
+# pred_5 <- posterior_predict(
+#   model_5,
+#   newdata = Finaldata, transform = TRUE)
+
 prediction_summary(y = Finaldata$ChinaVirusInterest,
   yrep = pred_1)
+
+# prediction_summary(y = Finaldata$ChinaVirusInterest,
+#   yrep = pred_5)
 ```
 
 ```{r}
 ### For predicting one case 
-new_FL <- data.frame(Day = 7 , State = "FL") #Doesn't recognize state
+new_CA <- Finaldata%>% 
+          filter(State=="CA") #filter the row of interest 
 
 set.seed(454)
-pred_FL <- posterior_predict(
+pred_CA <- posterior_predict(
   model_100,
-  newdata = new_FL)
+  newdata = new_CA)
 
-pred_100 <- data.frame(y_new = pred_100[-1])
+pred_2 <- data.frame(y_new = pred_CA[-1])
 
-ggplot(pred_100, aes(x=y_new))+geom_density()
+ggplot(pred_2, aes(x=y_new))+geom_density()
 
-summary(pred_100)
+summary(pred_2)
 
 ```
 
 ```{r}
 # For correlation check (type like model 2 from activity 19)
 # Store the chains
-model_100_df <- as.array(model_100) %>%
+model_2_df <- as.array(model_2) %>%
   melt %>%
   pivot_wider(names_from = parameters, values_from = value)
 
 # Wrangle the chains
 # Note the need for `...` around the sigma_sq_b
-model_100_df <- model_100_df %>%
+model_2_df <- model_2_df %>%
   mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>%
   mutate(correlation = (sigma_sq_b/(sigma_sq_w+sigma_sq_b)))
 
-ggplot(model_100_df, aes(x = correlation)) +
+ggplot(model_2_df, aes(x = correlation)) +
   geom_density(alpha = 0.5)
 ```
 
@@ -340,18 +348,17 @@ ggplot(model_5_df, aes(x = correlation)) +
 ```{r}
 #set.seed(454)
 my_data <- data.frame(StateColor = "blue", State = "FL", Day = 18336)
-
 # Simulate a set of predictions for each case in newdata
-my_prediction <- posterior_predict(
- model_5,
-  newdata = my_data)
+#my_prediction <- posterior_predict(
+ # model_5, 
+  #newdata = my_data)
 
-my_prediction <- data.frame(y_new = my_prediction[,1])
+#my_prediction <- data.frame(y_new = my_prediction[,1])
 
-ggplot(my_prediction, aes(x = y_new)) +
- geom_density()
+#ggplot(my_prediction, aes(x = y_new)) + 
+ # geom_density()
 
-summary(my_prediction)
+#summary(my_prediction)
 ```
 
 
