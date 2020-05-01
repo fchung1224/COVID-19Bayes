@@ -282,7 +282,7 @@ We can see that the variability in Google interest in the term China Virus is ha
 
 ###COVID-19
 
-```{r}
+```{r, include=FALSE, warning=FALSE}
 c <-  ggplot(Finaldata, aes(y=positive, x=Winner, fill=(Winner)))+
       geom_boxplot() +
       facet_wrap(~Region)+
@@ -290,10 +290,12 @@ c <-  ggplot(Finaldata, aes(y=positive, x=Winner, fill=(Winner)))+
       scale_fill_manual(values = c("Democrat"="blue3", "Republican"= "red3"))+
       lims(y= c(0,1000))+
       ggtitle("Positive COVID-19 Cases by State Political Party Winner & Region")
-ggplotly(c)
 ```
 
-(PUT DESCRIPTION)
+```{r, warning=FALSE}
+ggplotly(c)
+```
+This visualisation depicts the distribution of positive COVID-19 cases by region and by which political party won in the 2016 elections. We can see that Democrat states in the Midwest, Mountain, and West have a larger range and higher quantile metrics for positive cases overall. For the Northeast and South regions the mean of positive COVID-19 cases are higher but not significantly. This is an interesting pattern considering that poltical party affiliation appears to interact with the number of postive cases by region. 
 \
 \
 
@@ -609,6 +611,8 @@ Federico did the "Normal Regression Model", and evaluated the model. Provided so
 
 Sofia created the draft report document and organized it so that it would be easier to follow. Along with creating and organizing the document, I helped Quinn and Will write the Introduction. In addition, Quinn and I worked on making the complex model. After we created the model I focused on the model evaluation section for that model, and was able to get our MCMC plots to show. 
 
+
+Quinn helped by running and organing the models for members to run. She also helped Sofia and Will draft the introduction summary. Sofia and Quinn both worked on the complex model's interpretations, code runs, and analyses. My main contribution was the model description and the predictions for the complex model.
 
 
 
