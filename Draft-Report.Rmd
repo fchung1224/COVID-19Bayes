@@ -278,8 +278,83 @@ ggplot(data = Finaldata, x = StateColor) + stat_count()
 ## 3.1 Model(s) 
 
 
+```{r}
+Finaldata%>%
+  ggplot(aes(x = ChinaVirusInterest))+
+  geom_density()
+```
+During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement labeled the Corona Virus as "China Virus" and we wanted to see how his comments affected search patterns accross states.
+
+As we can see from the density plot of the China Virus Interest during our time period 2020-03-14 - 2020-03-21, it behaves relativelly normal with a small bump at 0. As a group we believe this bump occurs as 0 is the lowest value it can take and because of that limitation of the China Virus Interest we see a small bump around 0. One could argue against a normal distribution as it kinda looks a bit right skewed. But our team believes that a normal distribution is the best at describing the density.  
+
+When China Virus Interest equals 0 it means that no one in the state looked up the term in Google and this is prevalent at the 14 of March where there are 5 occurrences and the 21 of March where there are 4 occurences. And in states such as DC, ND, SD, and VT.
+
+```{r}
+Finaldata%>%
+  filter(ChinaVirusInterest ==0)%>%
+  group_by(Day)%>%
+  summarize(n = n())
+```
 
 
+Because our density plot showed a fairly normal distribution, we decided to use a Normal-Normal model to plot our most simple model. As a team we decided to also include 3 variable specifications, to explain the differences in demographic variables we decided to use `percent_white` as it was one of the best variables when we used lasso for variable selection, and it made sense as higher white percentage populations tend to have lower diversity and potentially it can lead to the search of more derrogatory terms such as "China Virus". To explain the differences in political factors in the state we decided to use `StateColor`. The variable was inspired by a study conducted by Pew Research Center that concluded that Liberal Democrats are more likely to use social media and look up information in the internet. By dividing states by their color we could use the color as a proxy to understand which ones had more democrats in their state. And finally, we believed that states more affected by COVID-19 would be more inclined to search terms like China Virus, as the virus has had a bigger impact on them which is why we decided to use `positive` (# of positive cases). 
+
+
+
+
+```{r}
+model_data<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day)-as.numeric(min(Day)))%>%
+  select(ChinaVirusInterest, Day, percent_white, StateColor, positive)
+
+model_data<- na.omit(model_data)
+```
+
+
+For our first model we decided to use a simple Normal regression model. 
+
+In this model i= the nth observation
+
+$$\begin{aligned}
+Y_{i}|\beta_0, \beta_1, \beta_2,\beta_3 \overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3,\sigma^2)\\
+\beta_0,\beta_1, \beta_2,\beta_3 \sim N(...,...)\\
+\sigma,\sigma \sim Exp(...)\\
+\end{aligned}$$
+
+```{r}
+set.seed(454)
+model_1 <- stan_glm(
+  ChinaVirusInterest ~ Day + percent_white+StateColor+positive,
+  data = model_data, family = gaussian,
+  chains = 4, iter = 1000, refresh = 0
+)
+model_1
+```
+As we can see in our summary table, we see that the higher the percent_white we see a higher median of China Virus Interest states with higher percent_white populations tend to have higher searches for "China Virus". And we also see that compared to State Color Blue state Color Red tends to have -3.2% less searches. We also see that the positive number of cases did not change the mean value for China Virus Interest which we found interesting. Basically telling us that maybe COVID-related variables do not have a big effect on how much people search for these terms.
+
+```{r}
+head(data.frame(summary(model_1)),-2)
+```
+
+```{r}
+pp_check(model_1)
+```
+Overall, we can see that our simple model it tells us that the structure of our model is fairly reasonable, In other words, the assumption of using a normal model is fairly reasonable outside of the fact that the tails are a bit thicker than we would want them to be.
+
+
+```{r}
+set.seed(454)
+pred_1 <- posterior_predict(
+  model_1,
+  newdata = model_data, transform = TRUE)
+
+prediction_summary(y = model_data$ChinaVirusInterest,
+  yrep = pred_1)
+```
+In this simple model, we see that the mae value is 10.5, and 55% of the datapoints are within the 50% confidence interval, and 92% are within the 95% confidence interval. To be a simple model, it does a fairly good job at capturing the trends. 
+
+##Repeated Measures + Normal Regression (WILL) (1|State)**
 
 
 ###Complex Model 
@@ -382,7 +457,9 @@ summary(my_pred)
 
 
 
+# Contributions
 
+Federico did the "Normal Regression Model", and evaluated the model. Provided some visualization help by allowing for mcmc_dens plots to be seen without being clustered. And I have also evaluated the density plot and why a normal distribution is a good idea. 
 
 
 
