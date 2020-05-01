@@ -80,6 +80,8 @@ prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
 
 
 
+
+
 # 1. Introduction
 
 On March 17, 2020 President Trump referred to the Coronavirus as the "China Virus." Shortly after, the number of anti-Chinese incidents started to increase across the United States. One aspect of public health that is often thrown to the wayside is how influential public officials and leaders are in disseminating public health information. Moreover, not only can their words change the public's views on a health matter but it can also shift a nation's perspective on someone's identity. In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identies and states. Thus,our project aims to explore the relationship and variability of intrest in the term "China Virus" across states through  political, demographic and COVID-19 characteristics. This was done using _____. (Conclusion)
@@ -440,6 +442,7 @@ Finallly in our analysis of the model we see that the MAE of this model is 8.98 
 
 *White, StateColor, Day, Total Test Results, State
 
+Our data set includes not only repeated measures on our response variable $Y$ for each state, it also includes corresponding observations for our preditor variables as well. In order to increase the complexity of our model to include these aspects we will use the model strcuture below as a fundamental start point:
 
 $$
 \begin{split}
@@ -453,9 +456,10 @@ b_{1i} | \beta_1, \sigma_{1b} & \stackrel{ind}{\sim} N(\beta_1, \sigma_{1b}^2) \
 \sigma_{1b} & \sim Exp(...) \\
 \end{split}
 $$
+With this structure our model will be able to account for the differing intercepts based on the day and also the differing slopes we expect to see by state. 
 
 ```{r results = "hide", include = FALSE}
-View(Finaldata)
+
 set.seed(454)
 Finaldata<-
   Finaldata%>%
@@ -470,7 +474,7 @@ complexmod <- stan_glmer(
 ```{r}
 head(data.frame(summary(complexmod)),-2)
 ```
-
+The output from the table above shows that within our timeframe as day increases, the interest in the China Virus term also increases. State color=blue is the default intercept of the model and having state color=purple decreases the interept by 1.02 while in a red state the intercept decreases by 3.6 in the interest index. Two other variables fo interest show that percent white and the positive rate both increase interest on average yet neither variable is specifically significant in this model. 
 
 ## 3.2 Model Evaluation
 
@@ -524,23 +528,48 @@ ggplot(model_complex_df, aes(x = correlation)) +
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ###Complex Model 
 ```{r}
 set.seed(454)
 pred_complex <- posterior_predict(
-  complexmodel,
+  complexmod,
   newdata = Finaldata, transform = TRUE)
 
-prediction_summary(y = model_data$ChinaVirusInterest,
-  yrep = pred_13)
+prediction_summary(y = Finaldata$ChinaVirusInterest,
+  yrep = pred_complex)
 ```
+Finallly in our analysis of the model we see that the MAE of this model is 9.01. Our within-50 rate is 0.60 which means that 60%  of the predictions that fall within our middle 50% of our predictive model. Our within our 95 rate is .97 which means that 97% of our predictions fall within the middle 95% of our predictive model.
+
 
 ```{r}
 set.seed(454)
 
 new_data <- Finaldata %>% filter(State == "FL")
 new_pred <- posterior_predict(
-  complexmodel,
+  complexmod,
   newdata = new_data)
 
 my_pred <- data.frame(y_new = new_pred[-1])
@@ -548,8 +577,13 @@ my_pred <- data.frame(y_new = new_pred[-1])
 ggplot(my_pred, aes(x=y_new))+geom_density()
 
 summary(my_pred)
-```
 
+actual_FL_pred<-Finaldata %>% select(c(State, ChinaVirusInterest)) %>% filter(State =="FL") %>% summarise(mean=mean(ChinaVirusInterest))
+
+actual_FL_pred
+```
+To test the accuracy of the complex model we decided to test our prediction on one case too. We chose Florida as our test state and as you can see from the summaries above our predictions are
+relatively close. The actual mean of interest in the term China Virus in Florida is 47.625 and our model predicted 46.10, this is only a 1.5 difference! 
 
 
 \
