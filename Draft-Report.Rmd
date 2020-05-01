@@ -379,12 +379,15 @@ prediction_summary(y = model_data$ChinaVirusInterest,
 ```
 In this simple model, we see that the mae value is 10.5, and 55% of the datapoints are within the 50% confidence interval, and 92% are within the 95% confidence interval. To be a simple model, it does a fairly good job at capturing the trends. 
 
+
+################ FEDDY PREDICT FOR FLORIDA TOO please. ALSO MOVE YOUR STUFF TO THE RIGHT PLACES ############
+
 ##Repeated Measures + Normal Regression (WILL) (1|State)**
 
 
 ###Complex Model 
 
-*White, StateColor, Day, Positive Cases, State
+*White, StateColor, Day, Total test Results, State
 
 
 ```{r results = "hide", include = FALSE}
@@ -395,7 +398,7 @@ Finaldata<-
   mutate(Day=as.numeric(Day))
 
 complexmod <- stan_glmer(
-  ChinaVirusInterest ~ Day + StateColor + percent_white + positive + (Day | State), 
+  ChinaVirusInterest ~ Day + StateColor + percent_white + totalTestResults + (Day | State), 
   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
 )
 ```
@@ -429,6 +432,7 @@ mcmc_dens_overlay(complexmod)
 ```{r}
 pp_check(complexmod, nreps = 50)
 ```
+The assumption of using a Normal model is fairly reasonable besides the fact that we observe two bumps on both sides of the tails. We can assume these to be outliars. 
 
 ```{r}
 # Store the chains
@@ -458,7 +462,7 @@ ggplot(model_complex_df, aes(x = correlation)) +
 ```{r}
 set.seed(454)
 
-new_data <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive_rate = 0.11) 
+new_data <- Finaldata %>% filter(State == "FL")
 new_pred <- posterior_predict(
   complexmodel,
   newdata = new_data)
