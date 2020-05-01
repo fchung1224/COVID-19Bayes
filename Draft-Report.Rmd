@@ -84,7 +84,7 @@ prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
 
 # 1. Introduction
 
-On March 17, 2020 President Trump referred to the Coronavirus as the "China Virus." Shortly after, the number of anti-Chinese incidents started to increase across the United States. One aspect of public health that is often thrown to the wayside is how influential public officials and leaders are in disseminating public health information. Moreover, not only can their words change the public's views on a health matter but it can also shift a nation's perspective on someone's identity. In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identies and states. Thus,our project aims to explore the relationship and variability of intrest in the term "China Virus" across states through  political, demographic and COVID-19 characteristics. This was done using _____. (Conclusion)
+On March 17, 2020 President Trump referred to the Coronavirus as the "China Virus." Shortly after, the number of anti-Chinese incidents started to increase across the United States. One aspect of public health that is often thrown to the wayside is how influential public officials and leaders are in disseminating public health information. Moreover, not only can their words change the public's views on a health matter but it can also shift a nation's perspective on someone's identity. In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identities and states. Thus,our project aims to explore the relationship and variability of interest in the term "China Virus" across states through  political, demographic and COVID-19 characteristics. This was done using _____. (Conclusion)
 
 
 \
@@ -189,7 +189,7 @@ summary(Finaldata)
 |`death`                 | Total Number of reported deaths due to COVID-19   | 
 |                        |                                                   | 
 +------------------------+---------------------------------------------------+
-|`hospitalized`          | Total Number of indivudals hopitalized due        |
+|`hospitalized`          | Total Number of individuals hospitalized due        |
 |                        | to COVID-19                                       |
 +------------------------+---------------------------------------------------+
 |`totalTestResults`      | Total Number test results (Positive +Negative)    | 
@@ -199,11 +199,11 @@ summary(Finaldata)
 |                        | Standards code which uniquely identified counties |
 |                        | and county                                        | 
 +------------------------+---------------------------------------------------+
-|`KungFluInterest`       | Interest index from google searches by state.     |
+|`KungFluInterest`       | Interest index from Google searches by state.     |
 |                        | Peak search day=100, all other days in set are    |
 |                        | based searches on relative to this peak day.      | 
 +------------------------+---------------------------------------------------+
-|`ChinaVirusInterest`    | Interest index from google searches by state.     |
+|`ChinaVirusInterest`    | Interest index from Google searches by state.     |
 |                        | Peak search day=100, all other days in set are    |
 |                        | based searches on relative to this peak day.      | 
 +------------------------+---------------------------------------------------+
@@ -234,7 +234,7 @@ plot.title = element_text(color="Black", size=14, face="bold")
 
 ```
 
-Our first visualization is looking at the percent of residents that identify as white within the United States. As you can see, there is a higher percent of white identifying residents in the midwest and northeast states. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
+Our first visualization is looking at the percent of residents that identify as white within the United States. As you can see, there is a higher percent of white identifying residents in the Midwest and northeast states. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
 
 
 ```{r}
@@ -278,7 +278,7 @@ b<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) +
 ggplotly(b)
 ```
 
-We can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusal peaksaround the 25-50 range. It is is also interesitng interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states. 
+We can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusual peaks around the 25-50 range. It is is also interesting interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states. 
 
 ###COVID-19
 
@@ -311,11 +311,11 @@ Finaldata%>%
   ggplot(aes(x = ChinaVirusInterest))+
   geom_density()
 ```
-During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement labeled the Corona Virus as "China Virus" and we wanted to see how his comments affected search patterns accross states.
+During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement labeled the Corona Virus as "China Virus" and we wanted to see how his comments affected search patterns across states.
 
-As we can see from the density plot of the China Virus Interest during our time period 2020-03-14 - 2020-03-21, it behaves relativelly normal with a small bump at 0. As a group we believe this bump occurs as 0 is the lowest value it can take and because of that limitation of the China Virus Interest we see a small bump around 0. One could argue against a normal distribution as it kinda looks a bit right skewed. But our team believes that a normal distribution is the best at describing the density.  
+As we can see from the density plot of the China Virus Interest during our time period 2020-03-14 - 2020-03-21, it behaves relatively normal with a small bump at 0. As a group we believe this bump occurs as 0 is the lowest value it can take and because of that limitation of the China Virus Interest we see a small bump around 0. One could argue against a normal distribution as it kinda looks a bit right skewed. But our team believes that a normal distribution is the best at describing the density.  
 
-When China Virus Interest equals 0 it means that no one in the state looked up the term in Google and this is prevalent at the 14 of March where there are 5 occurrences and the 21 of March where there are 4 occurences. And in states such as DC, ND, SD, and VT.
+When China Virus Interest equals 0 it means that no one in the state looked up the term in Google and this is prevalent at the 14 of March where there are 5 occurrences and the 21 of March where there are 4 occurrences. And in states such as DC, ND, SD, and VT.
 
 ```{r}
 Finaldata%>%
@@ -325,7 +325,7 @@ Finaldata%>%
 ```
 
 
-Because our density plot showed a fairly normal distribution, we decided to use a Normal-Normal model to plot our most simple model. As a team we decided to also include 3 variable specifications, to explain the differences in demographic variables we decided to use `percent_white` as it was one of the best variables when we used lasso for variable selection, and it made sense as higher white percentage populations tend to have lower diversity and potentially it can lead to the search of more derrogatory terms such as "China Virus". To explain the differences in political factors in the state we decided to use `StateColor`. The variable was inspired by a study conducted by Pew Research Center that concluded that Liberal Democrats are more likely to use social media and look up information in the internet. By dividing states by their color we could use the color as a proxy to understand which ones had more democrats in their state. And finally, we believed that states more affected by COVID-19 would be more inclined to search terms like China Virus, as the virus has had a bigger impact on them which is why we decided to use `positive` (# of positive cases). 
+Because our density plot showed a fairly normal distribution, we decided to use a Normal-Normal model to plot our most simple model. As a team we decided to also include 3 variable specifications, to explain the differences in demographic variables we decided to use `percent_white` as it was one of the best variables when we used lasso for variable selection, and it made sense as higher white percentage populations tend to have lower diversity and potentially it can lead to the search of more derogatory terms such as "China Virus". To explain the differences in political factors in the state we decided to use `StateColor`. The variable was inspired by a study conducted by Pew Research Center that concluded that Liberal Democrats are more likely to use social media and look up information in the internet. By dividing states by their color we could use the color as a proxy to understand which ones had more democrats in their state. And finally, we believed that states more affected by COVID-19 would be more inclined to search terms like China Virus, as the virus has had a bigger impact on them which is why we decided to use `positive` (# of positive cases). 
 
 
 ```{r}
@@ -380,7 +380,7 @@ pred_1 <- posterior_predict(
 prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_1)
 ```
-In this simple model, we see that the mae value is 10.5, and 55% of the datapoints are within the 50% confidence interval, and 92% are within the 95% confidence interval. To be a simple model, it does a fairly good job at capturing the trends. 
+In this simple model, we see that the Mae value is 10.5, and 55% of the data points are within the 50% confidence interval, and 92% are within the 95% confidence interval. To be a simple model, it does a fairly good job at capturing the trends. 
 
 
 ################ FEDDY PREDICT FOR FLORIDA TOO please. ALSO MOVE YOUR STUFF TO THE RIGHT PLACES ############
@@ -418,7 +418,7 @@ model_2 <- stan_glmer(
 head(data.frame(summary(model_2)),-2)
 ```
 
-The output from the table above shows that within our timeframe as day increases, the interest in the coronavirus also increases. State color=blue is the default intercept of the model and having state color=purple decreases the interept by 1.89 while in a red state the intercept decreases by 3.7 in the interest index. Two other variables fo interest show that percent white and the positive rate both increase interest on average yet neither variable is specifically significant in this model. 
+The output from the table above shows that within our time-frame as day increases, the interest in the coronavirus also increases. State color=blue is the default intercept of the model and having state color=purple decreases the interpret by 1.89 while in a red state the intercept decreases by 3.7 in the interest index. Two other variables of interest show that percent white and the positive rate both increase interest on average yet neither variable is specifically significant in this model. 
 
 ```{r}
 pp_check(model_2)
@@ -436,7 +436,7 @@ prediction_summary(y = Finaldata$ChinaVirusInterest,
   yrep = pred_2)
 ```
 
-Finallly in our analysis of the model we see that the MAE of this model is 8.98 with a within-50 rate of 0.59 and within-95 ratet of 0.965 showing some relaive gains from the first model.
+Finally in our analysis of the model we see that the MAE of this model is 8.98 with a within-50 rate of 0.59 and within-95 rate of 0.965 showing some relieve gains from the first model.
 
 
 
@@ -446,7 +446,7 @@ Finallly in our analysis of the model we see that the MAE of this model is 8.98 
 Variables of Interest: `White`, `StateColor`, `Day`, `Total Test Results`, `State`
 
 
-**Comment:** Our data set includes not only repeated measures on our response variable $Y$ for each state, it also includes corresponding observations for our preditor variables as well. In order to increase the complexity of our model to include these aspects we will use the model strcuture below as a fundamental start point:
+**Comment:** Our data set includes not only repeated measures on our response variable $Y$ for each state, it also includes corresponding observations for our predictor variables as well. In order to increase the complexity of our model to include these aspects we will use the model structure below as a fundamental start point:
 
 $$
 \begin{split}
@@ -479,7 +479,7 @@ complexmod <- stan_glmer(
 ```{r}
 head(data.frame(summary(complexmod)),-2)
 ```
-The output from the table above shows that within our timeframe as day increases, the interest in the China Virus term also increases. State color=blue is the default intercept of the model and having state color=purple decreases the interept by 1.02 while in a red state the intercept decreases by 3.6 in the interest index. Two other variables fo interest show that percent white and the positive rate both increase interest on average yet neither variable is specifically significant in this model. 
+The output from the table above shows that within our time frame as day increases, the interest in the China Virus term also increases. State color=blue is the default intercept of the model and having state color=purple decreases the intercept by 1.02 while in a red state the intercept decreases by 3.6 in the interest index. Two other variables of interest show that percent white and the positive rate both increase interest on average yet neither variable is specifically significant in this model. 
 
 ## 3.2 Model Evaluation
 
@@ -510,7 +510,7 @@ mcmc_dens_overlay(complexmod, pars = c("sigma","(Intercept)","percent_white","St
 ```{r}
 pp_check(complexmod, nreps = 50)
 ```
-**Comment:** The assumption of using a Normal model is fairly reasonable besides the fact that we observe two bumps on both sides of the tails. We can assume these to be outliars. 
+**Comment:** The assumption of using a Normal model is fairly reasonable besides the fact that we observe two bumps on both sides of the tails. We can assume these to be outliers. 
 
 ```{r}
 # Store the chains
@@ -550,7 +550,7 @@ pred_complex <- posterior_predict(
 prediction_summary(y = Finaldata$ChinaVirusInterest,
   yrep = pred_complex)
 ```
-**Comment:** Finallly in our analysis of the model we see that the MAE of this model is 9.01. Our within-50 rate is 0.60 which means that 60%  of the predictions that fall within our middle 50% of our predictive model. Our within our 95 rate is .97 which means that 97% of our predictions fall within the middle 95% of our predictive model.
+**Comment:** Finally in our analysis of the model we see that the MAE of this model is 9.01. Our within-50 rate is 0.60 which means that 60%  of the predictions that fall within our middle 50% of our predictive model. Our within our 95 rate is .97 which means that 97% of our predictions fall within the middle 95% of our predictive model.
 
 
 ```{r}
