@@ -301,9 +301,6 @@ ggplotly(c)
 # 3. Models 
 
 
-
-
-
 ## 3.1 Model(s) 
 
 
@@ -327,8 +324,6 @@ Finaldata%>%
 
 
 Because our density plot showed a fairly normal distribution, we decided to use a Normal-Normal model to plot our most simple model. As a team we decided to also include 3 variable specifications, to explain the differences in demographic variables we decided to use `percent_white` as it was one of the best variables when we used lasso for variable selection, and it made sense as higher white percentage populations tend to have lower diversity and potentially it can lead to the search of more derrogatory terms such as "China Virus". To explain the differences in political factors in the state we decided to use `StateColor`. The variable was inspired by a study conducted by Pew Research Center that concluded that Liberal Democrats are more likely to use social media and look up information in the internet. By dividing states by their color we could use the color as a proxy to understand which ones had more democrats in their state. And finally, we believed that states more affected by COVID-19 would be more inclined to search terms like China Virus, as the virus has had a bigger impact on them which is why we decided to use `positive` (# of positive cases). 
-
-
 
 
 ```{r}
@@ -360,6 +355,7 @@ model_1 <- stan_glm(
 )
 model_1
 ```
+
 As we can see in our summary table, we see that the higher the percent_white we see a higher median of China Virus Interest states with higher percent_white populations tend to have higher searches for "China Virus". And we also see that compared to State Color Blue state Color Red tends to have -3.2% less searches. We also see that the positive number of cases did not change the mean value for China Virus Interest which we found interesting. Basically telling us that maybe COVID-related variables do not have a big effect on how much people search for these terms.
 
 ```{r}
