@@ -438,9 +438,12 @@ prediction_summary(y = Finaldata$ChinaVirusInterest,
 
 Finallly in our analysis of the model we see that the MAE of this model is 8.98 with a within-50 rate of 0.59 and within-95 ratet of 0.965 showing some relaive gains from the first model.
 
+
+
+
 ###Complex Model 
 
-*White, StateColor, Day, Total Test Results, State
+Variables of Interest: `White`, `StateColor`, `Day`, `Total Test Results`, `State`
 
 Our data set includes not only repeated measures on our response variable $Y$ for each state, it also includes corresponding observations for our preditor variables as well. In order to increase the complexity of our model to include these aspects we will use the model strcuture below as a fundamental start point:
 
@@ -493,23 +496,26 @@ The output from the table above shows that within our timeframe as day increases
 
 ```{r}
 # Trace plots
-mcmc_trace(complexmod)
+mcmc_trace(complexmod,pars = c("sigma","(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day","b[Day State:AK]","b[Day State:WA]"),facet_args = list(ncol = 3, strip.position = "left")) 
 
 # Density plots
-mcmc_dens_overlay(complexmod)
+mcmc_dens_overlay(complexmod, pars = c("sigma","(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day","b[Day State:AK]","b[Day State:WA]"),facet_args = list(ncol = 3, strip.position = "left"))
 ```
-The trace and 
+
+**Comment:** For our MCMCs graphs we chose to just look at our predictors, intercept, and sigma value. We sadly cannot visualize all of our random slopes given that we would have over 50. However, we did visualize at least a couple of the random slopes as seen above. From the MCMC Dens and Trace we see that our chains are all close to each other meaning that our simulation was stable, which is great!
+
 
 ```{r}
 pp_check(complexmod, nreps = 50)
 ```
-The assumption of using a Normal model is fairly reasonable besides the fact that we observe two bumps on both sides of the tails. We can assume these to be outliars. 
+**Comment:** The assumption of using a Normal model is fairly reasonable besides the fact that we observe two bumps on both sides of the tails. We can assume these to be outliars. 
 
 ```{r}
 # Store the chains
 model_complex_df <- as.array(complexmod) %>%
   melt %>%
   pivot_wider(names_from = parameters, values_from = value)
+model_complex_df
 
 # Wrangle the chains
 model_complex_df <- model_complex_df %>%
@@ -521,7 +527,7 @@ ggplot(model_complex_df, aes(x = correlation)) +
   geom_density(alpha = 0.5)
 ```
 
-
+**Comment:** Unfortunately, when we plot the correlation within our dataset we see that it comes out as empty. This can be attributed to the complexity of our model. What we found through our initial visualization exploration is that when we add additional parameters the correlation tends to decrease. This makes sense as a lot of our parameters are specific to each state. 
 
 ## 3.3 Model Predictions
 
@@ -601,7 +607,7 @@ relatively close. The actual mean of interest in the term China Virus in Florida
 Federico did the "Normal Regression Model", and evaluated the model. Provided some visualization help by allowing for mcmc_dens plots to be seen without being clustered. And I have also evaluated the density plot and why a normal distribution is a good idea. 
 
 
-
+Sofia created the draft report document and organized it so that it would be easier to follow. Along with creating and organizing the document, I helped Quinn and Will write the Introduction. In addition, Quinn and I worked on making the complex model. After we created the model I focused on the model evaluation section for that model, and was able to get our MCMC plots to show. 
 
 
 
