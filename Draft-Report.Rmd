@@ -351,9 +351,10 @@ set.seed(454)
 model_1 <- stan_glm(
   ChinaVirusInterest ~ Day + percent_white+StateColor+positive,
   data = model_data, family = gaussian,
-  chains = 4, iter = 1000, refresh = 0
+  chains = 4, iter = 10000, refresh = 0
 )
 model_1
+
 ```
 
 As we can see in our summary table, we see that the higher the percent_white we see a higher median of China Virus Interest states with higher percent_white populations tend to have higher searches for "China Virus". And we also see that compared to State Color Blue state Color Red tends to have -3.2% less searches. We also see that the positive number of cases did not change the mean value for China Virus Interest which we found interesting. Basically telling us that maybe COVID-related variables do not have a big effect on how much people search for these terms.
@@ -386,6 +387,7 @@ In this simple model, we see that the mae value is 10.5, and 55% of the datapoin
 
 *White, StateColor, Day, Positive Cases, State
 
+#### FIX 
 $$
 Y_{ij}|\theta_i, \mu_, \beta_2,\beta_3 \overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3,\sigma^2) \\
 \theta|\mu, \sigma_b   \sim N(\mu,\sigma_b) \\
@@ -436,8 +438,21 @@ Finallly in our analysis of the model we see that the MAE of this model is 8.98 
 
 ###Complex Model 
 
-*White, StateColor, Day, Total test Results, State
+*White, StateColor, Day, Total Test Results, State
 
+
+$$
+\begin{split}
+Y_{ij} | b_0, b_1, \beta_0, \beta_1, \sigma_w, \sigma_{0b}, \sigma_{1b} & \sim N(b_{0i} + b_{1i} X_{ij}, \; \sigma_w^2) \\
+b_{0i} | \beta_0, \sigma_{0b} & \stackrel{ind}{\sim} N(\beta_0, \sigma_{0b}^2) \\
+b_{1i} | \beta_1, \sigma_{1b} & \stackrel{ind}{\sim} N(\beta_1, \sigma_{1b}^2) \\
+\beta_0 & \sim N(..., ...) \\
+\beta_1 & \sim N(..., ...) \\
+\sigma_w & \sim Exp(...) \\
+\sigma_{0b} & \sim Exp(...) \\
+\sigma_{1b} & \sim Exp(...) \\
+\end{split}
+$$
 
 ```{r results = "hide", include = FALSE}
 View(Finaldata)
@@ -447,7 +462,7 @@ Finaldata<-
   mutate(Day=as.numeric(Day))
 
 complexmod <- stan_glmer(
-  ChinaVirusInterest ~ Day + StateColor + percent_white + totalTestResults + (Day | State), 
+  ChinaVirusInterest ~ Day + StateColor + percent_white + positive + (Day | State), 
   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
 )
 ```
@@ -461,7 +476,10 @@ head(data.frame(summary(complexmod)),-2)
 
 
 
+### Feddy model eval (model 1)
 
+
+###Will model eval (model 2)
 
 
 
@@ -476,6 +494,7 @@ mcmc_trace(complexmod)
 # Density plots
 mcmc_dens_overlay(complexmod)
 ```
+The trace and 
 
 ```{r}
 pp_check(complexmod, nreps = 50)
@@ -506,6 +525,15 @@ ggplot(model_complex_df, aes(x = correlation)) +
 
 
 ###Complex Model 
+```{r}
+set.seed(454)
+pred_complex <- posterior_predict(
+  complexmodel,
+  newdata = Finaldata, transform = TRUE)
+
+prediction_summary(y = model_data$ChinaVirusInterest,
+  yrep = pred_13)
+```
 
 ```{r}
 set.seed(454)
