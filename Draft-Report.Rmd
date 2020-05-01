@@ -445,7 +445,8 @@ Finallly in our analysis of the model we see that the MAE of this model is 8.98 
 
 Variables of Interest: `White`, `StateColor`, `Day`, `Total Test Results`, `State`
 
-Our data set includes not only repeated measures on our response variable $Y$ for each state, it also includes corresponding observations for our preditor variables as well. In order to increase the complexity of our model to include these aspects we will use the model strcuture below as a fundamental start point:
+
+**Comment:** Our data set includes not only repeated measures on our response variable $Y$ for each state, it also includes corresponding observations for our preditor variables as well. In order to increase the complexity of our model to include these aspects we will use the model strcuture below as a fundamental start point:
 
 $$
 \begin{split}
@@ -459,7 +460,8 @@ b_{1i} | \beta_1, \sigma_{1b} & \stackrel{ind}{\sim} N(\beta_1, \sigma_{1b}^2) \
 \sigma_{1b} & \sim Exp(...) \\
 \end{split}
 $$
-With this structure our model will be able to account for the differing intercepts based on the day and also the differing slopes we expect to see by state. 
+
+**Comment:** With this structure our model will be able to account for the differing intercepts based on the day and also the differing slopes we expect to see by state. 
 
 ```{r results = "hide", include = FALSE}
 
@@ -529,28 +531,9 @@ ggplot(model_complex_df, aes(x = correlation)) +
 
 **Comment:** Unfortunately, when we plot the correlation within our dataset we see that it comes out as empty. This can be attributed to the complexity of our model. What we found through our initial visualization exploration is that when we add additional parameters the correlation tends to decrease. This makes sense as a lot of our parameters are specific to each state. 
 
+
+
 ## 3.3 Model Predictions
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -567,7 +550,7 @@ pred_complex <- posterior_predict(
 prediction_summary(y = Finaldata$ChinaVirusInterest,
   yrep = pred_complex)
 ```
-Finallly in our analysis of the model we see that the MAE of this model is 9.01. Our within-50 rate is 0.60 which means that 60%  of the predictions that fall within our middle 50% of our predictive model. Our within our 95 rate is .97 which means that 97% of our predictions fall within the middle 95% of our predictive model.
+**Comment:** Finallly in our analysis of the model we see that the MAE of this model is 9.01. Our within-50 rate is 0.60 which means that 60%  of the predictions that fall within our middle 50% of our predictive model. Our within our 95 rate is .97 which means that 97% of our predictions fall within the middle 95% of our predictive model.
 
 
 ```{r}
@@ -588,8 +571,7 @@ actual_FL_pred<-Finaldata %>% select(c(State, ChinaVirusInterest)) %>% filter(St
 
 actual_FL_pred
 ```
-To test the accuracy of the complex model we decided to test our prediction on one case too. We chose Florida as our test state and as you can see from the summaries above our predictions are
-relatively close. The actual mean of interest in the term China Virus in Florida is 47.625 and our model predicted 46.10, this is only a 1.5 difference! 
+**Comment:**To test the accuracy of the complex model we decided to test our prediction on one case too. We chose Florida as our test state and as you can see from the summaries above our predictions are relatively close. The actual mean of interest in the term China Virus in Florida is 47.625 and our model predicted 46.10, this is only a 1.5 difference! 
 
 
 \
@@ -603,6 +585,7 @@ relatively close. The actual mean of interest in the term China Virus in Florida
 
 
 # Contributions
+
 
 Federico did the "Normal Regression Model", and evaluated the model. Provided some visualization help by allowing for mcmc_dens plots to be seen without being clustered. And I have also evaluated the density plot and why a normal distribution is a good idea. 
 
