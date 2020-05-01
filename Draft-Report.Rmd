@@ -79,12 +79,13 @@ prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
 
 # 1. Introduction
 
-On March 17, 2020 President Trump referred to the Coronavirus as the "China Virus." Shortly after, the number of anti-Chinese incidents started to increase across the United States. One aspect of public health that is often thrown to the wayside is how influential public officials and leaders are in disseminating public health information. Moreover, not only can their words change the public's views on a health matter but it can also shift a nation's perspective on someone's identity. In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identies and states. Thus,our project aims to explore the relationship and variability of intrest in the term "China Virus" across states through  political, demographic and COVID-19 characteristics. This was done using _____. (Conclusion)
+
 
 
 
 \
 \
+
 
 
 
@@ -93,6 +94,7 @@ On March 17, 2020 President Trump referred to the Coronavirus as the "China Viru
 # 2 The Data Set
 
 ```{r results = "hide", echo=FALSE, warning=FALSE}
+
 Finaldata<-read_csv("time_series_final_Data.csv")
 
 Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
@@ -270,33 +272,103 @@ ggplot(data = Finaldata, x = StateColor) + stat_count()
 # 3. Models 
 
 
-## Model(s) 
 
-```{r}
-model_1 <- stan_glmer(
-  ChinaVirusInterest ~ StateColor + positive + percent_white +State, #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
-)
 
-model_2 <- stan_glmer(
-  ChinaVirusInterest ~ StateColor + positive + percent_white + (1 | State), #Gives us random intercepts
-  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
-)
 
-model_3<- stan_glmer(
-  ChinaVirusInterest ~ Day + StateColor + positive + percent_white + (Day | State), #Gives us random intercepts
+## 3.1 Model(s) 
+
+
+
+
+
+
+###Complex Model 
+
+*White, StateColor, Day, Positive Cases, State
+
+
+```{r results = "hide", include = FALSE}
+View(Finaldata)
+set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+complexmod <- stan_glmer(
+  ChinaVirusInterest ~ Day + StateColor + percent_white + positive + (Day | State), 
   data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
 )
 ```
 
+```{r}
+head(data.frame(summary(complexmod)),-2)
+```
+
+
+
+## 3.2 Model Evaluation
 
 
 
 
-## Model Evaluation
 
 
 
+
+###Complex Model 
+
+
+```{r}
+# Trace plots
+mcmc_trace(complexmod)
+
+# Density plots
+mcmc_dens_overlay(complexmod)
+```
+
+```{r}
+pp_check(complexmod, nreps = 50)
+```
+
+```{r}
+# Store the chains
+model_complex_df <- as.array(complexmod) %>%
+  melt %>%
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+model_complex_df <- model_complex_df %>%
+  mutate(sigma_sq_w = `sigma`, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>%
+  mutate(correlation = (sigma_sq_b/(sigma_sq_b+sigma_sq_w)))
+
+#Correlation Plot
+ggplot(model_complex_df, aes(x = correlation)) +
+  geom_density(alpha = 0.5)
+```
+
+
+
+## 3.3 Model Predictions
+
+
+
+
+###Complex Model 
+
+```{r}
+set.seed(454)
+
+new_data <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive_rate = 0.11) 
+new_pred <- posterior_predict(
+  complexmodel,
+  newdata = new_data)
+
+my_pred <- data.frame(y_new = new_pred[-1])
+
+ggplot(my_pred, aes(x=y_new))+geom_density()
+
+summary(my_pred)
+```
 
 
 
@@ -313,18 +385,7 @@ model_3<- stan_glmer(
 
 
 
-# 5. Contributions and progress
 
-## 5.1 Contributions 
-
-- Specify what each group member (including yourself) contributed to this checkpoint.
-- Quinn: 
-- Sofia:
-- Will:
-- Federico:
-
-## 5.2 Outline progress
-- Summarize what progress your group made between checkpoints 3 and 4.
 
 
 
