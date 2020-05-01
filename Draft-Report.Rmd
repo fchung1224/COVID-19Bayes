@@ -384,6 +384,55 @@ In this simple model, we see that the mae value is 10.5, and 55% of the datapoin
 
 ##Repeated Measures + Normal Regression (WILL) (1|State)**
 
+*White, StateColor, Day, Positive Cases, State
+
+$$
+Y_{ij}|\theta_i, \mu_, \beta_2,\beta_3 \overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3,\sigma^2) \\
+\theta|\mu, \sigma_b   \sim N(\mu,\sigma_b) \\
+\mu \sim N(..., ...) \\ 
+\beta_2 \sim N(..., ...) \\
+\beta_3 \sim N(..., ...) \\
+\beta_4 \sim N(..., ...) \\
+$$
+
+In this model using repeated measures the outcome of $Y_{ij}$ is the interest in China Virus on a given day within a state. $\mu$ represents the mean value of the interest on Day 0 of the study and how much we would expect. The $\theta_{i}$ represents the change from the intercept that each of the states experiences. $\beta_2$ represents the variable for the percent of the population that is white and $\beta_3$ represents the variable that corresponds with state color. Finally, $\beta_4$ represents the proportion of the population that tests positive for the coronavirus.
+
+```{r}
+View(Finaldata)
+set.seed(454)
+Finaldata<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day))
+
+model_2 <- stan_glmer(
+  ChinaVirusInterest ~ Day + StateColor + percent_white + positive + (1 | State), 
+  data = Finaldata, family = gaussian, chains = 4, iter = 5000*2
+)
+```
+
+```{r}
+head(data.frame(summary(model_2)),-2)
+```
+
+The output from the table above shows that within our timeframe as day increases, the interest in the coronavirus also increases. State color=blue is the default intercept of the model and having state color=purple decreases the interept by 1.89 while in a red state the intercept decreases by 3.7 in the interest index. Two other variables fo interest show that percent white and the positive rate both increase interest on average yet neither variable is specifically significant in this model. 
+
+```{r}
+pp_check(model_2)
+```
+
+This pp-check is similar to our other models showing a following of the trend with a specific hump around 0. This is due to 0 receiving extra weight in our data set than other values we would expect to see. 
+
+```{r}
+set.seed(454)
+pred_2 <- posterior_predict(
+  model_2,
+  newdata = Finaldata, transform = TRUE)
+
+prediction_summary(y = Finaldata$ChinaVirusInterest,
+  yrep = pred_2)
+```
+
+Finallly in our analysis of the model we see that the MAE of this model is 8.98 with a within-50 rate of 0.59 and within-95 ratet of 0.965 showing some relaive gains from the first model.
 
 ###Complex Model 
 
@@ -406,7 +455,6 @@ complexmod <- stan_glmer(
 ```{r}
 head(data.frame(summary(complexmod)),-2)
 ```
-
 
 
 ## 3.2 Model Evaluation
