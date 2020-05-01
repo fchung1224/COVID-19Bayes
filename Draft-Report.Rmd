@@ -1,8 +1,11 @@
 ---
-title: "Draft Final Project"
-author: "Sofia Pozsonyiova"
-date: "4/30/2020"
-output: html_document
+title: "Checkpoint 4"
+author: "Quinn Rafferty, Sofia Pozsonyiova, Will Madairy, Federico Chung"
+date: "4/24/2020"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 
@@ -245,24 +248,51 @@ plot.title = element_text(color="Black", size=14, face="bold")
 The above visualization is looking at the percent of residents that identify as Asian within the United States. As you can see, there is a higher percent of residents that identify as Asian in places like California and Washington, but the most being in Hawaii. From this visualization we can also see that that Midwest and the South tend to have a small percentage of residents identifying as Asian. We are especially interested in the `percent_asian` variable as it plays a major role in our analysis. 
 
 
-MAKE VISUAL FOR STATE COLOR
-
+###Google TS
 ```{r}
-ggplot(data = Finaldata, x = StateColor) + stat_count()
+Trump<- as.Date("03/16/2020", format = "%m/%d/%Y")
+day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
+day2<-as.Date("03/24/2020",format = "%m/%d/%Y")
+
+google_ts<-google%>%
+  mutate(Day = as.Date(as.character(Day)))
+
+a<-google_ts %>% 
+  #filter(Day<=day2)%>%
+  #filter(Day>=day1)%>%
+  group_by(Region, Day) %>% 
+  summarize(ChinaVirusSearch = median(ChinaVirusInterest)) %>% 
+  ggplot(aes(x=Day, y=ChinaVirusSearch, color=Region))+
+  geom_point()
+
+ggplotly(a)
 ```
 
+This plot shows the relationship of “China Virus” search interest over grouped by region. This plots shows that there are certainly key events that trigger an uptick in searches overall. In this plot it is not clear which region may search China Virus more or less often, but it does show a that the regions move together in search interest, which would imply federal level events like a Donald Trump tweet to trigger these interest spikes. 
 
-###Google TS
+```{r}
+b<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
+  geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State")
 
+ggplotly(b)
+```
+
+We can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusal peaksaround the 25-50 range. It is is also interesitng interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states. 
 
 ###COVID-19
 
+```{r}
+c <-  ggplot(Finaldata, aes(y=positive, x=Winner, fill=(Winner)))+
+      geom_boxplot() +
+      facet_wrap(~Region)+
+      theme(legend.position = "none") +
+      scale_fill_manual(values = c("Democrat"="blue3", "Republican"= "red3"))+
+      lims(y= c(0,1000))+
+      ggtitle("Positive COVID-19 Cases by State Political Party Winner & Region")
+ggplotly(c)
+```
 
-###Final Data Set
-
-
-
-
+(PUT DESCRIPTION)
 \
 \
 
