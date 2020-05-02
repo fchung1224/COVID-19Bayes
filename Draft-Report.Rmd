@@ -391,20 +391,21 @@ In this simple model, we see that the Mae value is 10.5, and 55% of the data poi
 
 *White, StateColor, Day, Positive Cases, State
 
-#### FIX 
+
 $$
-Y_{ij}|\theta_i, \mu_, \beta_2,\beta_3 \overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3,\sigma^2) \\
+Y_{ij}|\theta_i, \mu_, \beta_2,\beta_3 \overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3 + \beta_3X_3,\sigma_w^2) \\
 \theta|\mu, \sigma_b   \sim N(\mu,\sigma_b) \\
 \mu \sim N(..., ...) \\ 
 \beta_2 \sim N(..., ...) \\
 \beta_3 \sim N(..., ...) \\
 \beta_4 \sim N(..., ...) \\
+\sigma_w \sim Exp(...)\\
+\sigma_b \sim Exp(...)\\
 $$
 
 In this model using repeated measures the outcome of $Y_{ij}$ is the interest in China Virus on a given day within a state. $\mu$ represents the mean value of the interest on Day 0 of the study and how much we would expect. The $\theta_{i}$ represents the change from the intercept that each of the states experiences. $\beta_2$ represents the variable for the percent of the population that is white and $\beta_3$ represents the variable that corresponds with state color. Finally, $\beta_4$ represents the proportion of the population that tests positive for the coronavirus.
 
 ```{r}
-View(Finaldata)
 set.seed(454)
 Finaldata<-
   Finaldata%>%
@@ -420,25 +421,7 @@ model_2 <- stan_glmer(
 head(data.frame(summary(model_2)),-2)
 ```
 
-The output from the table above shows that within our time-frame as day increases, the interest in the coronavirus also increases. State color=blue is the default intercept of the model and having state color=purple decreases the interpret by 1.89 while in a red state the intercept decreases by 3.7 in the interest index. Two other variables of interest show that percent white and the positive rate both increase interest on average yet neither variable is specifically significant in this model. 
-
-```{r}
-pp_check(model_2)
-```
-
-This pp-check is similar to our other models showing a following of the trend with a specific hump around 0. This is due to 0 receiving extra weight in our data set than other values we would expect to see. 
-
-```{r}
-set.seed(454)
-pred_2 <- posterior_predict(
-  model_2,
-  newdata = Finaldata, transform = TRUE)
-
-prediction_summary(y = Finaldata$ChinaVirusInterest,
-  yrep = pred_2)
-```
-
-Finally in our analysis of the model we see that the MAE of this model is 8.98 with a within-50 rate of 0.59 and within-95 rate of 0.965 showing some relieve gains from the first model.
+**Comment:**The output from the table above shows that within our time-frame as day increases, the interest in the coronavirus also increases. State color=blue is the default intercept of the model and having state color=purple decreases the interpret by 1.89 while in a red state the intercept decreases by 3.7 in the interest index. Two other variables of interest show that percent white and the positive rate both increase interest on average yet neither variable is specifically significant in this model. 
 
 
 
@@ -490,9 +473,39 @@ The output from the table above shows that within our time frame as day increase
 ### Feddy model eval (model 1)
 
 
-###Will model eval (model 2)
+### Will model eval (model 2)
+
+```{r}
+mcmc_trace(model_2, pars=c("sigma","(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day","b[(Intercept) State:AK]","b[(Intercept) State:WA]"),facet_args = list(ncol = 3, strip.position = "left"))
+mcmc_dens_overlay(model_2, pars = c("sigma","(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day","b[(Intercept) State:AK]","b[(Intercept) State:WA]"),facet_args = list(ncol = 3, strip.position = "left"))
+```
+**Comment:** This table shows the how the differing parameters appear across different chains. While not gaining necessary inference from the graphs, we do see that the chains do stay compact and close together across all of the different parameters which is a good sign. 
 
 
+```{r}
+pp_check(model_2)
+```
+
+**Comment:**This pp-check is similar to our other models showing a following of the trend with a specific hump around 0. This is due to 0 receiving extra weight in our data set than other values we would expect to see. 
+
+```{r}
+# Store the chains
+model_2_df <- as.array(model_2) %>%
+  melt %>%
+  pivot_wider(names_from = parameters, values_from = value)
+model_2_df
+
+# Wrangle the chains
+model_2_df <- model_2_df %>%
+  mutate(sigma_sq_w = sigma^2, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>%
+  mutate(correlation = (sigma_sq_b/(sigma_sq_b+sigma_sq_w)))
+
+#Correlation Plot
+ggplot(model_2_df, aes(x = correlation)) +
+  geom_density(alpha = 0.5)
+```
+
+**Comment:**The correlation table above shows that the mean correlation in these models is around 0.2, this decreasing correlation is due to adding complexity in the model through the addition of state fixed effects. 
 
 
 ###Complex Model 
@@ -537,10 +550,41 @@ ggplot(model_complex_df, aes(x = correlation)) +
 
 ## 3.3 Model Predictions
 
+### Repeated Measures Model
 
 
+```{r}
+set.seed(454)
+pred_2 <- posterior_predict(
+  model_2,
+  newdata = Finaldata, transform = TRUE)
+
+prediction_summary(y = Finaldata$ChinaVirusInterest,
+  yrep = pred_2)
+```
+
+**Comment:**Finally in our analysis of the model we see that the MAE of this model is 8.98 with a within-50 rate of 0.59 and within-95 rate of 0.965 showing some relieve gains from the first model.
 
 
+```{r}
+set.seed(454)
+
+new_data <- Finaldata %>% filter(State == "FL")
+new_pred <- posterior_predict(
+  model_2,
+  newdata = new_data)
+
+my_pred <- data.frame(y_new = new_pred[-1])
+
+ggplot(my_pred, aes(x=y_new))+geom_density()
+
+summary(my_pred)
+
+actual_FL_pred<-Finaldata %>% select(c(State, ChinaVirusInterest)) %>% filter(State =="FL") %>% summarise(mean=mean(ChinaVirusInterest))
+
+actual_FL_pred
+```
+**Comment:** To test our model we use Florida as a prediction state and test the outcome. The mean value in our test is an interest of 46.08 in searching China Virus while the real value of Florida is 47.625 for a difference slightly greater than 1.5 in interest. 
 
 ###Complex Model 
 ```{r}
@@ -597,5 +641,7 @@ Sofia created the draft report document and organized it so that it would be eas
 
 Quinn helped by running and organing the models for members to run. She also helped Sofia and Will draft the introduction summary. Sofia and Quinn both worked on the complex model's interpretations, code runs, and analyses. My main contribution was the model description and the predictions for the complex model.
 
+Will built the Repeated Measures model in this report as well as doing the evaluations and predictions for the model as well. 
+In addition to doing all work for Model 2 I also assisted in the writing of the Introduction.
 
 
