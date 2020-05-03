@@ -9,6 +9,15 @@ output:
 ---
 
 
+
+
+\
+\
+
+
+
+
+
 #Libraries 
 
 
@@ -362,7 +371,7 @@ model_1 <- stan_glm(
 
 ```
 
-##Repeated Measures + Normal Regression (WILL) (1|State)**
+## Repeated Measures + Normal Regression (WILL) (1|State)**
 
 *White, StateColor, Day, Positive Cases, State
 
@@ -401,7 +410,7 @@ head(data.frame(summary(model_2)),-2)
 
 
 
-###Complex Model 
+### Complex Model 
 
 Variables of Interest: `White`, `StateColor`, `Day`, `Total Test Results`, `State`
 
@@ -541,7 +550,7 @@ ggplot(model_2_df, aes(x = correlation)) +
 **Comment:**The correlation table above shows that the mean correlation in these models is around 0.2, this decreasing correlation is due to adding complexity in the model through the addition of state fixed effects. 
 
 
-###Complex Model 
+### Complex Model 
 
 
 ```{r}
@@ -641,7 +650,7 @@ actual_FL_pred
 ```
 **Comment:** To test our model we use Florida as a prediction state and test the outcome. The mean value in our test is an interest of 46.08 in searching China Virus while the real value of Florida is 47.625 for a difference slightly greater than 1.5 in interest. 
 
-###Complex Model 
+### Complex Model 
 ```{r}
 set.seed(454)
 pred_complex <- posterior_predict(
