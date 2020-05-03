@@ -329,6 +329,9 @@ When China Virus Interest equals 0 it means that no one in the state looked up t
 ## 3.1 Model(s) 
 
 
+
+
+
 Because our density plot showed a fairly normal distribution, we decided to use a Normal-Normal model to plot our most simple model. As a team we decided to also include 3 variable specifications, to explain the differences in demographic variables we decided to use `percent_white` as it was one of the best variables when we used lasso for variable selection, and it made sense as higher white percentage populations tend to have lower diversity and potentially it can lead to the search of more derogatory terms such as "China Virus". To explain the differences in political factors in the state we decided to use `StateColor`. The variable was inspired by a study conducted by Pew Research Center that concluded that Liberal Democrats are more likely to use social media and look up information in the internet. By dividing states by their color we could use the color as a proxy to understand which ones had more democrats in their state. And finally, we believed that states more affected by COVID-19 would be more inclined to search terms like China Virus, as the virus has had a bigger impact on them which is why we decided to use `positive` (# of positive cases). 
 
 
@@ -341,15 +344,33 @@ model_data<-
 model_data<- na.omit(model_data)
 ```
 
+For our first model we decided to use a simple Repeated Measures regression model
 
-For our first model we decided to use a simple Normal regression model. 
+$$\begin{aligned}
+Y_{ij}|\theta, \mu, \sigma_w, \sigma_b \sim N(\theta_i,\theta_w^2)\\
+\theta|\mu,\sigma_b \overset{ind}{\sim} N(\mu, \sigma_b^2)\\
+\sigma_b,\sigma_w \sim Exp(...)
+\end{aligned}$$
+
+```{r}
+set.seed(454)
+model_0 <- stan_glmer(
+  ChinaVirusInterest ~ (1 | State),
+  data = model_data, family = gaussian,
+)
+```
+
+
+
+For this model we decided to use a simple Normal regression model. 
 
 In this model i= the nth observation
 
 $$\begin{aligned}
-Y_{i}|\beta_0, \beta_1, \beta_2,\beta_3 \overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3,\sigma^2)\\
+i = state, j = \text{days since "2020-03-14"} \\
+Y_{i}|\beta_0, \beta_1, \beta_2,\beta_3,\beta_4 \overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3+ \beta_4X_4,\sigma^2)\\
 \beta_0,\beta_1, \beta_2,\beta_3 \sim N(...,...)\\
-\sigma,\sigma \sim Exp(...)\\
+\sigma \sim Exp(...)\\
 \end{aligned}$$
 
 ```{r results = "hide", include = FALSE}
@@ -365,18 +386,14 @@ model_1 <- stan_glm(
 ##Repeated Measures + Normal Regression (WILL) (1|State)**
 
 *White, StateColor, Day, Positive Cases, State
+$$\begin{aligned}
+i = state, j = \text{days since "2020-03-14"}
+Y_{ij}|\theta,\mu,\beta_0, \beta_1, \beta_2,\beta_3,\beta_4,\sigma_w,\sigma_b \sim N(\theta_i +\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3+ \beta_4X_4, \sigma_w^2)\\
+\theta_i|\mu, \sigma_b \overset{ind}{\sim}N (\mu, \sigma_b^2)\\
+\beta_0,\beta_1, \beta_2,\beta_3 \sim N(...,...)\\
+\sigma_w,\sigma_b \sim Exp(...)\\
+\end{aligned}$$
 
-
-$$
-Y_{ij}|\theta_i, \mu_, \beta_2,\beta_3 \overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3 + \beta_3X_3,\sigma_w^2) \\
-\theta|\mu, \sigma_b   \sim N(\mu,\sigma_b) \\
-\mu \sim N(..., ...) \\ 
-\beta_2 \sim N(..., ...) \\
-\beta_3 \sim N(..., ...) \\
-\beta_4 \sim N(..., ...) \\
-\sigma_w \sim Exp(...)\\
-\sigma_b \sim Exp(...)\\
-$$
 
 In this model using repeated measures the outcome of $Y_{ij}$ is the interest in China Virus on a given day within a state. $\mu$ represents the mean value of the interest on Day 0 of the study and how much we would expect. The $\theta_{i}$ represents the change from the intercept that each of the states experiences. $\beta_2$ represents the variable for the percent of the population that is white and $\beta_3$ represents the variable that corresponds with state color. Finally, $\beta_4$ represents the proportion of the population that tests positive for the coronavirus.
 
@@ -403,18 +420,19 @@ head(data.frame(summary(model_2)),-2)
 
 ###Complex Model 
 
-Variables of Interest: `White`, `StateColor`, `Day`, `Total Test Results`, `State`
+Variables of Interest: `percent_white`, `StateColor`, `Day`, `Total Test Results`, `State`
 
 
 **Comment:** Our data set includes not only repeated measures on our response variable $Y$ for each state, it also includes corresponding observations for our predictor variables as well. In order to increase the complexity of our model to include these aspects we will use the model structure below as a fundamental start point:
 
 $$
 \begin{split}
-Y_{ij} | b_0, b_1, \beta_0, \beta_1, \sigma_w, \sigma_{0b}, \sigma_{1b} & \sim N(b_{0i} + b_{1i} X_{ij}, \; \sigma_w^2) \\
+Y = \text{ChinaVirusInterest},i = state, j = \text{days since "2020-03-14"}, X_{ij} = \text{Days}\\
+X_2 = \text{percent_white},,X_3 =\text{StateColor},  X_4 =\text{Total Test Results} \\
+Y_{ij} | b_0, b_1, \beta_0, \beta_1, \sigma_w, \sigma_{0b}, \sigma_{1b} & \sim N( b_{0i} + b_{1i} X_{ij}+ \beta_2X_2 + \beta_3X_3 +\beta_4X_4, \; \sigma_w^2) \\
 b_{0i} | \beta_0, \sigma_{0b} & \stackrel{ind}{\sim} N(\beta_0, \sigma_{0b}^2) \\
 b_{1i} | \beta_1, \sigma_{1b} & \stackrel{ind}{\sim} N(\beta_1, \sigma_{1b}^2) \\
-\beta_0 & \sim N(..., ...) \\
-\beta_1 & \sim N(..., ...) \\
+\beta_0,\beta_1,\beta_2,\beta_3,\beta_4 & \sim N(..., ...) \\
 \sigma_w & \sim Exp(...) \\
 \sigma_{0b} & \sim Exp(...) \\
 \sigma_{1b} & \sim Exp(...) \\
