@@ -73,10 +73,11 @@ prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
 
 # 1. Introduction
 
-On March 17, 2020 President Trump referred to the Coronavirus as the "China Virus." Shortly after, the number of anti-Chinese incidents started to increase across the United States. One aspect of public health that is often thrown to the wayside is how influential public officials and leaders are in disseminating public health information. Moreover, not only can their words change the public's views on a health matter but it can also shift a nation's perspective on someone's identity. _[ADD SOME BACKGROUND LITERATURE THAT BACKS THIS CLAIM UP]_ In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identities and states. _[ADD BACKGROUND LITERATURE + IDENTIFY SUBJECTS OF INTEREST]_. There are fewer studies devoted to analyzing these aspects of the pandemic. 
+On March 17, 2020 President Trump referred to the Coronavirus as the "China Virus." Shortly after, there was an uptick in verbal and physical attacks against Asian-Americans. One aspect of public health that is often thrown to the wayside is how influential public officials and leaders are in disseminating public health information. Moreover, not only can their words change the public's views on a health matter but it can also shift a nation's perspective on someone's identity. The Asian Pacific Policy and Planning Council reported that in their first four weeks of receiving reports on COVID-19 anti-Asian discirimnation, they recieved more than 1,500 incidents [CITE]. This abrupt spasm of racism mimics the kind faced by American Muslims, Arabs and South Asians in the United States after the terrorist attacks of 9/11. However, when President George W. Bush urged tolerance of American Muslims, this time President Trump is using language that Asian-Americans say is inciting racist attacks.
 
+In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identities and states.The Pew Reserach Center discovered that nearly three-quarters of Repbulicans and Republican-leaning indepdents view China unfavoriably[CITE]. But the majority of reports to the AAPI were from Democrat leaning states like California, Washington and Illinois [CITE]. Moreover, states that have a higher number of reported positive cases tend to have a higher interest in Googling the term "China Virus" [CITE].  Thus, this begs the question: What factors of the poltiical, demographic and COVID-19 spheres best predicts the level of interest a state will have in the term "China Virus?" 
 
-Thus,our project aims to explore the relationship and variability of interest in the term "China Virus" across states through  political, demographic and COVID-19 characteristics. We ask the question, _[INSERT OUR RESERACH QUESTION]_ ?  In order to answer this question, we look to gain a better understanding of _[INSERT NAME OF BAYESIAN METHODOLOGY]_. Ultimately, we hope our research inspires others to explore and better understand the impact langauge and words have on the public during times of crisis. 
+In order to answer this question, we utilized Monte Carlo Markov Chains to build four predictive models that included some of the variables mentioned above. Model 1 is our simplest model while Model 4 is our most complex model. We then ran several different diagnostic tests such as MCMC and PP checks to evaluate the quality and structures of our models. While all the models had some different levels of predictive strength, our best model was ___________. This model proved to provide the best balance between complexity and quality. 
 
 \
 
@@ -108,7 +109,7 @@ Finaldata<- Finaldata%>%
 
 ### 2.3a Demographic 
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, fig.align=center}
 Finaldata$hover <- with(Finaldata, paste(polyname, "<br>","Positive Cases:", positive, "<br>","Negative Cases:", negative,"<br>",
                            "Total Cases:", totalTestResults,"<br>", "% White:", percent_white,"<br>",
                             "% Asian:", percent_asian, "<br>", "State Color:", StateColor,
@@ -152,14 +153,11 @@ asianfig <- asianfig %>% add_trace(
   )
 asianfig <- asianfig %>% colorbar(title = "% Asian")
 asianfig <- asianfig %>% layout(
-    title = 'Percent Asian Identifying by State', geo=g
+    title = 'Comparison of Percent Asian and White Identifying by State',geo=g
   )
 
 fig
-
-whitefig
-
-asianfig
+subplot(whitefig,asianfig)
 
 
 ```
@@ -242,7 +240,7 @@ $\theta_i = $ State i's unique mean value
 $\sigma_w = $ within state variation
 $\sigma_b = $ between state variation
 
-```{r}
+```{r, message=FALSE, include=FALSE}
 model_data<-
   Finaldata%>%
   mutate(Day=as.numeric(Day)-as.numeric(min(Day)))%>%
@@ -252,7 +250,7 @@ model_data<- na.omit(model_data)
 ```
 
 
-```{r}
+```{r, message=FALSE, include=FALSE}
 #Repeated Measures Model
 set.seed(454)
 RM_model <- stan_glmer(
@@ -272,7 +270,7 @@ RM_model <- stan_glmer(
 
 ## 4.1 Model 1 Evaluation (Repeated measures)
 
-```{r}
+```{r, message=FALSE, include=FALSE}
 g1 <- mcmc_dens(RM_model, pars = "sigma") + 
   labs(x = expression(sigma[w])) +
   lims(x=c(5, 25))
@@ -285,7 +283,7 @@ grid.arrange(g1,g2,ncol=2)
 
 In the output above we see that the within deviation is much narrow than the between deviation. This matches our intuition in the model that utilizing the repeated measures, fixed effects model will be able to explain a greater amount of the variation. 
 
-```{r}
+```{r, message=FALSE, include=FALSE}
 # Store the chains
 rm_df <- as.array(RM_model) %>% 
   melt %>% 
