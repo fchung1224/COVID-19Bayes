@@ -78,6 +78,12 @@ time_series_final_Data<-google_timeseries%>%
 write.csv(time_series_final_Data,"time_series_final_Data.csv")
 ```
 
+```{r}
+colnames(lat_long)[2] <- "State"
+time_series_final_Data <- merge(time_series_final_Data,lat_long,by="State")
+colnames(time_series_final_Data)
+```
+
 
 ```{r}
 Trump<- as.Date("03/16/2020", format = "%m/%d/%Y")
