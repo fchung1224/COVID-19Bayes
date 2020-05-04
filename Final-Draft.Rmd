@@ -221,19 +221,86 @@ This visualisation depicts the distribution of positive COVID-19 cases by region
 
 # 3. Methods & Models (Feddy and Will)
 
-## 3.1 Markov Chain Algorithm 
+## Model 1 Repeated Measures Model
 
-## 3.2 Models of Interest
+  For our simplest model we decided to use a repeated measures model. Our team decided that the repeated measures model was necessary component because of how our data is set up. As we can see in our dataset, each state has a value for their `ChinaVirusInterest` for each day in our target period (2020-03-14 - 2020-03-21). Given the ability to use repeated measures and our prior understanding of the varying characteristics (demographic,political,covid-impact) within different states, the repeated measures model allows us to capture these differences in `ChinaVirusInterest` with the $\theta_i$ value which represents each state's mean value.
+  
 
-## 3.3 Model Descriptions
+
+### Model Structure
+
+
+$$\begin{aligned}
+Y_{ij}|\theta_i, \mu, \sigma_w, \sigma_b \sim N(\theta_i,\sigma_w^2)\\
+\theta_i|\mu,\sigma_b \overset{ind}{\sim} N(\mu, \sigma_b^2)\\
+\sigma_b,\sigma_w \sim Exp(...)
+\end{aligned}$$
+
+
+$Y_{ij} = $ `ChinaVirusInterest` per $i=State$, and $j= Day$
+$\theta_i = $ State i's unique mean value
+$\sigma_w = $ within state variation
+$\sigma_b = $ between state variation
+
+```{r}
+model_data<-
+  Finaldata%>%
+  mutate(Day=as.numeric(Day)-as.numeric(min(Day)))%>%
+  select(ChinaVirusInterest, Day, percent_white, StateColor, positive, State)
+
+model_data<- na.omit(model_data)
+```
+
+
+```{r}
+#Repeated Measures Model
+set.seed(454)
+RM_model <- stan_glmer(
+  ChinaVirusInterest ~ (1 | State),
+  data = model_data, family = gaussian,
+)
+```
+
+
+### 3.2 Model Descriptions
 
 \
 \
 
 
-# 4. Model Evaluation
+# 4. Model Evaluation (RESULTS)
 
-## 4.1 Model 1 Evaluation( Repeated measures)
+## 4.1 Model 1 Evaluation (Repeated measures)
+
+```{r}
+g1 <- mcmc_dens(RM_model, pars = "sigma") + 
+  labs(x = expression(sigma[w])) +
+  lims(x=c(5, 25))
+g2 <- mcmc_dens(RM_model, 
+  pars = "Sigma[State:(Intercept),(Intercept)]", transformations = sqrt) + 
+  labs(x = expression(sigma[b])) +
+   lims(x=c(5, 25))
+grid.arrange(g1,g2,ncol=2)
+```
+
+In the output above we see that the within deviation is much narrow than the between deviation. This matches our intuition in the model that utilizing the repeated measures, fixed effects model will be able to explain a greater amount of the variation. 
+
+```{r}
+# Store the chains
+rm_df <- as.array(RM_model) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+rm_df <- rm_df %>% 
+  mutate(sigma_sq_w = sigma^2, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = sigma_sq_b / (sigma_sq_b + sigma_sq_w))
+
+ggplot(rm_df, aes(x = correlation)) + 
+    geom_density()
+```
+
+This correlation table shows us that there is relatively strong correlation within each given daily observation within a state. Therefore, it is correct for us to utilize a fixed effects model in order to account for these inherent differences between states.
 
 ## 4.2 Model 2 Evaluation (Normal Regression)
 
