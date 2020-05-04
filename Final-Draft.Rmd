@@ -87,17 +87,16 @@ Thus,our project aims to explore the relationship and variability of interest in
 Finaldata<-read_csv("time_series_final_Data.csv")
 google<-read.csv("Google/googlefinal.csv")
 
+Finaldata <- Finaldata %>% mutate(Day= as.Date(Day, tryFormats = "%m/%d/%Y"))
 
-Finaldata <- Finaldata %>% mutate(Day= as.Date(Day))
-day_initial<- as.Date("03/14/2020")
-day_final<- as.Date("03/21/2020")
+day_initial<- as.Date("03/14/2020",tryFormats = "%m/%d/%Y")
+day_final<- as.Date("03/21/2020",tryFormats = "%m/%d/%Y")
 
 
 Finaldata<- Finaldata%>%
   filter(Day>=day_initial)%>%
   filter(Day<=day_final)
 
-View(Finaldata)
 ```
 
 ## 2.1 Data Descriptions
