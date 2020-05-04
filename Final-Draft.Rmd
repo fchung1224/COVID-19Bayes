@@ -82,7 +82,7 @@ Thus,our project aims to explore the relationship and variability of interest in
 
 
 # 2. Data
-```{r}
+```{r, message=FALSE, include=FALSE}
 
 Finaldata<-read_csv("time_series_final_Data.csv")
 google<-read.csv("Google/googlefinal.csv")
@@ -108,9 +108,10 @@ Finaldata<- Finaldata%>%
 ### 2.3a Demographic 
 
 ```{r}
-Finaldata$hover <- with(Finaldata, paste(State, '<br>', "Positive Cases:", positive, "<br>","Positive Negative:", negative,"<br>",
+Finaldata$hover <- with(Finaldata, paste(polyname, "<br>","Positive Cases:", positive, "<br>","Negative Cases:", negative,"<br>",
                            "Total Cases:", totalTestResults,"<br>", "% White:", percent_white,"<br>",
-                            "% Asian:", percent_asian, "<br>", "State Color:", StateColor))
+                            "% Asian:", percent_asian, "<br>", "State Color:", StateColor,
+                        "<br>", "Total Population", total_population))
 # give state boundaries a white border
 l <- list(color = toRGB("white"), width = 2)
 # specify some map projection/options
@@ -124,54 +125,53 @@ g <- list(
 fig <- plot_geo(Finaldata, locationmode = 'USA-states')
 fig <- fig %>% add_trace(
     z = ~ChinaVirusInterest, text = ~hover, locations = ~State,
-    color = ~ChinaVirusInterest, colors = 'Purples'
+    color = ~ChinaVirusInterest, colors = 'Oranges'
   )
 fig <- fig %>% colorbar(title = "Interest")
 fig <- fig %>% layout(
-    title = '2020 COVID-19 Cases, Demographics, & Politics by State<br>(Hover for breakdown)', geo=g
+    title = '2020 Google Search Interest of "China Virus" by State <br>(Hover for additional information)', geo=g
   )
 
 fig
 ```
+```{r}
+Finaldata$hover <- with(Finaldata, paste(polyname, "<br>","Positive Cases:", positive, "<br>","Negative Cases:", negative,"<br>",
+                           "Total Cases:", totalTestResults,"<br>", "% White:", percent_white,"<br>",
+                            "% Asian:", percent_asian, "<br>", "State Color:", StateColor,
+                        "<br>", "Total Population", total_population))
+# give state boundaries a white border
+l <- list(color = toRGB("white"), width = 2)
+# specify some map projection/options
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
 
-```{r, warning=FALSE, message= FALSE, echo=FALSE}
-#Demographic: Identification 
-Finaldata <- data.frame(Finaldata) %>% mutate(state = State)
+fig <- plot_geo(Finaldata, locationmode = 'USA-states')
+fig <- fig %>% add_trace(
+    z = ~percent_white, text = ~hover, locations = ~State,
+    color = ~percent_white, colors = 'Blues'
+  )
+fig <- fig %>% colorbar(title = "Interest")
+fig <- fig %>% layout(
+    title = '2020 Percent White by State <br>(Hover for additional information)', geo=g
+  )
 
-plot_usmap(data = Finaldata, values = "percent_white", color = "white") + 
-  scale_fill_continuous(name = "Percent White", label = scales::comma) + 
-  theme(legend.position = "right")+ ggtitle("Percent of Residents that Identify as White") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_fill_viridis_c(option = "plasma") + theme(plot.title = element_text(size=11))+ labs(fill = "% White")
-p1
-
-
-p2<- plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
-  scale_fill_continuous(name = "Percent Asian", label = scales::comma) + 
-  theme(legend.position = "right")+ ggtitle("Percent of Residents that Identify as Asian") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_fill_viridis_c(option = "plasma") + theme(plot.title = element_text(size=11))+ labs(fill = "% Asian")
-
+fig
+```
+```{r}
 
 ```
+
 
 Our first visualization is looking at the percent of residents that identify as white within the United States compared to those whom identify as asian. As you can see, there is a higher percent of white identifying residents overall but most specifically in the Midwest and northeast states. In regards to Asian-Americans, there is practically less than .1% per state with the exception of California and New York. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
 
 ### 2.3b Google China Virus
 
-```{r, warning=FALSE, message= FALSE, echo=FALSE}
-e <- Finaldata%>%
-  ggplot(aes(x = ChinaVirusInterest))+
-  geom_density()
-
-ggplotly(e)
-```
 
 During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement labeled the Corona Virus as "China Virus" and we wanted to see how his comments affected search patterns across states.
-
-As we can see from the density plot of the China Virus Interest during our time period 2020-03-14 - 2020-03-21, it behaves relatively normal with a small bump at 0. As a group we believe this bump occurs as 0 is the lowest value it can take and because of that limitation of the China Virus Interest we see a small bump around 0. One could argue against a normal distribution as it kinda looks a bit right skewed. But our team believes that a normal distribution is the best at describing the density.  
-
-When China Virus Interest equals 0 it means that no one in the state looked up the term in Google and this is prevalent at the 14 of March where there are 5 occurrences and the 21 of March where there are 4 occurrences. And in states such as DC, ND, SD, and VT.
 
 ```{r, warning=FALSE, message= FALSE, echo=FALSE}
 Trump<- as.Date("03/16/2020", format = "%m/%d/%Y")
@@ -191,16 +191,19 @@ a<-google_ts %>%
 
 ggplotly(a)
 ```
+
 This plot shows the relationship of “China Virus” search interest over grouped by region. This plots shows that there are certainly key events that trigger an uptick in searches overall. In this plot it is not clear which region may search China Virus more or less often, but it does show a that the regions move together in search interest, which would imply federal level events like a Donald Trump tweet to trigger these interest spikes. 
 
 ```{r, warning=FALSE, message= FALSE, echo=FALSE}
 b<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
-  geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State")
+  geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State") + labs(fill="State")
 
 ggplotly(b)
 ```
+As we can see from the density plot of the China Virus Interest during our time period 2020-03-14 - 2020-03-21, it behaves relatively normal with a small bump at 0. As a group we believe this bump occurs as 0 is the lowest value it can take and because of that limitation of the China Virus Interest we see a small bump around 0. One could argue against a normal distribution as it kinda looks a bit right skewed. But our team believes that a normal distribution is the best at describing the density.  
 
 We can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusual peaks around the 25-50 range. It is is also interesting interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states. 
+
 
 ### 2.3c COVID-19
 
