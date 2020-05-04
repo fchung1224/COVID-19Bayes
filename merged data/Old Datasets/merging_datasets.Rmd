@@ -85,6 +85,8 @@ names(lat_long)
 
 ```{r}
 time_series_final_Data <- merge(time_series_final_Data,lat_long, by="State")
+write_csv(time_series_final_Data,"time_series_final_Data.csv")
+View(time_series_final_Data)
 ```
 
 
