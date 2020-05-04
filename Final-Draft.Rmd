@@ -10,6 +10,7 @@ output:
 
 ```{r, warning=FALSE, include=FALSE, message=FALSE}
 library(dplyr)
+library(ggrepel)
 library(usmap)
 library(maps)
 library(ggplot2)
@@ -107,7 +108,7 @@ Finaldata<- Finaldata%>%
 
 ### 2.3a Demographic 
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 Finaldata$hover <- with(Finaldata, paste(polyname, "<br>","Positive Cases:", positive, "<br>","Negative Cases:", negative,"<br>",
                            "Total Cases:", totalTestResults,"<br>", "% White:", percent_white,"<br>",
                             "% Asian:", percent_asian, "<br>", "State Color:", StateColor,
@@ -132,38 +133,37 @@ fig <- fig %>% layout(
     title = '2020 Google Search Interest of "China Virus" by State <br>(Hover for additional information)', geo=g
   )
 
-fig
-```
-```{r}
-Finaldata$hover <- with(Finaldata, paste(polyname, "<br>","Positive Cases:", positive, "<br>","Negative Cases:", negative,"<br>",
-                           "Total Cases:", totalTestResults,"<br>", "% White:", percent_white,"<br>",
-                            "% Asian:", percent_asian, "<br>", "State Color:", StateColor,
-                        "<br>", "Total Population", total_population))
-# give state boundaries a white border
-l <- list(color = toRGB("white"), width = 2)
-# specify some map projection/options
-g <- list(
-  scope = 'usa',
-  projection = list(type = 'albers usa'),
-  showlakes = TRUE,
-  lakecolor = toRGB('white')
-)
-
-fig <- plot_geo(Finaldata, locationmode = 'USA-states')
-fig <- fig %>% add_trace(
-    z = ~percent_white, text = ~hover, locations = ~State,
+#########white fig
+whitefig <- plot_geo(Finaldata, locationmode = 'USA-states')
+whitefig <- whitefig %>% add_trace(
+    z = ~percent_white, locations = ~State,
     color = ~percent_white, colors = 'Blues'
   )
-fig <- fig %>% colorbar(title = "Interest")
-fig <- fig %>% layout(
-    title = '2020 Percent White by State <br>(Hover for additional information)', geo=g
+whitefig <- whitefig %>% colorbar(title = "% White")
+whitefig <- whitefig %>% layout(
+    title = 'Percent White Identifying by State', geo=g
+  )
+
+#### Asian fig
+asianfig <- plot_geo(Finaldata, locationmode = 'USA-states')
+asianfig <- asianfig %>% add_trace(
+    z = ~percent_asian, locations = ~State,
+    color = ~percent_asian, colors = 'Greens'
+  )
+asianfig <- asianfig %>% colorbar(title = "% Asian")
+asianfig <- asianfig %>% layout(
+    title = 'Percent Asian Identifying by State', geo=g
   )
 
 fig
-```
-```{r}
+
+whitefig
+
+asianfig
+
 
 ```
+
 
 
 Our first visualization is looking at the percent of residents that identify as white within the United States compared to those whom identify as asian. As you can see, there is a higher percent of white identifying residents overall but most specifically in the Midwest and northeast states. In regards to Asian-Americans, there is practically less than .1% per state with the exception of California and New York. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
@@ -174,20 +174,14 @@ Our first visualization is looking at the percent of residents that identify as 
 During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement labeled the Corona Virus as "China Virus" and we wanted to see how his comments affected search patterns across states.
 
 ```{r, warning=FALSE, message= FALSE, echo=FALSE}
-Trump<- as.Date("03/16/2020", format = "%m/%d/%Y")
-day1<-as.Date("03/10/2020",format = "%m/%d/%Y")
-day2<-as.Date("03/24/2020",format = "%m/%d/%Y")
 
-google_ts<-google%>%
-  mutate(Day = as.Date(as.character(Day)))
-
-a<-google_ts %>% 
+a<-Finaldata %>% 
   #filter(Day<=day2)%>%
   #filter(Day>=day1)%>%
   group_by(Region, Day) %>% 
   summarize(ChinaVirusSearch = median(ChinaVirusInterest)) %>% 
   ggplot(aes(x=Day, y=ChinaVirusSearch, color=Region))+
-  geom_point()
+  geom_point()+ geom_line()
 
 ggplotly(a)
 ```
@@ -215,9 +209,6 @@ c <-  ggplot(Finaldata, aes(y=positive, x=Winner, fill=(Winner)))+
       scale_fill_manual(values = c("Democrat"="blue3", "Republican"= "red3"))+
       lims(y= c(0,1000))+
       ggtitle("Positive COVID-19 Cases by State Political Party Winner & Region")
-```
-
-```{r, warning=FALSE}
 ggplotly(c)
 ```
 This visualisation depicts the distribution of positive COVID-19 cases by region and by which political party won in the 2016 elections. We can see that Democrat states in the Midwest, Mountain, and West have a larger range and higher quantile metrics for positive cases overall. For the Northeast and South regions the mean of positive COVID-19 cases are higher but not significantly. This is an interesting pattern considering that poltical party affiliation appears to interact with the number of postive cases by region. 
