@@ -1,15 +1,14 @@
 ---
-title: ""
+title: "Predicting Which States are Most Interested in the term *China Virus* Based off Identity Politics, Demography and COVID-19 Statistics "
 author: "Federico Chung, Will Madairy, Sofia Pozsonyiova, Quinn Rafferty"
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
+date: 'May 8,2020'
 output:
   html_document:
     toc: true
     toc_float: true
-bibliography: Library.bib
 ---
 
-```{r, warning=FALSE, include=FALSE}
+```{r, warning=FALSE, include=FALSE, message=FALSE}
 library(dplyr)
 library(usmap)
 library(maps)
@@ -69,57 +68,51 @@ prediction_summary <- function(y, yrep, prob_inner = 0.5, prob_outer = 0.95){
 ```
 
 
-\
-\
+# 1. Introduction
+
+On March 17, 2020 President Trump referred to the Coronavirus as the "China Virus." Shortly after, the number of anti-Chinese incidents started to increase across the United States. One aspect of public health that is often thrown to the wayside is how influential public officials and leaders are in disseminating public health information. Moreover, not only can their words change the public's views on a health matter but it can also shift a nation's perspective on someone's identity. _[ADD SOME BACKGROUND LITERATURE THAT BACKS THIS CLAIM UP]_ In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identities and states. _[ADD BACKGROUND LITERATURE + IDENTIFY SUBJECTS OF INTEREST]_. There are fewer studies devoted to analyzing these aspects of the pandemic. 
 
 
-# Introduction
-
-Make sure to discuss the time period of interest 
-## Project Motivations
-
-## Project Goals
-
+Thus,our project aims to explore the relationship and variability of interest in the term "China Virus" across states through  political, demographic and COVID-19 characteristics. We ask the question, _[INSERT OUR RESERACH QUESTION]_ ?  In order to answer this question, we look to gain a better understanding of _[INSERT NAME OF BAYESIAN METHODOLOGY]_. Ultimately, we hope our research inspires others to explore and better understand the impact langauge and words have on the public during times of crisis. 
 
 \
-\
 
 
 
-# Data
+# 2. Data
 
-## Data Descriptions
+## 2.1 Data Descriptions
 
-## Variables of interest
+## 2.2 Variables of interest
 
-## Visualizations (Quinn)
+## 2.3 Visualizations (Quinn)
 
 \
 \
 
 
 
-# Methods & Models (Feddy and Will)
+# 3. Methods & Models (Feddy and Will)
 
-## Markov Chain Algorithm 
+## 3.1 Markov Chain Algorithm 
 
-## Models of Interest
+## 3.2 Models of Interest
 
-## Model Descriptions
+## 3.3 Model Descriptions
 
 \
 \
 
 
-# Model Evaluation
+# 4. Model Evaluation
 
-## Model 1 Evaluation( Repeated measures)
+## 4.1 Model 1 Evaluation( Repeated measures)
 
-## Model 2 Evaluation (Normal Regression)
+## 4.2 Model 2 Evaluation (Normal Regression)
 
-## Model 3 Evaluation(Repeated Reg + Normal)
+## 4.3 Model 3 Evaluation(Repeated Reg + Normal)
 
-## Model 4 Evaluation (Longitudinal)
+## 4.4 Model 4 Evaluation (Longitudinal)
 
 
 \
@@ -127,31 +120,32 @@ Make sure to discuss the time period of interest
 
 
 
-# Results (Will)
+# 5. Results (Will)
 
-## Posterior Predctions All States 
+## 5.1 Posterior Predctions All States 
 
-### Table 
+### 5.1.a Table 
 
-## Posterior Prediction One State
+## 5.2 Posterior Prediction One State
 
-## Final Model 
+## 5.3 Final Model 
 
 
 \
 \
 
-# Conclusion 
 
-## Limitations
+# 6.Conclusion 
 
-## Future Work
+## 6.1 Limitations
+
+## 6.2 Future Work
 
 \
 \
 
 
-# Acknowledgments and References 
+# 7. Acknowledgments and References 
 
 
 
