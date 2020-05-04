@@ -396,8 +396,8 @@ model_1 <- stan_glm(
 
 *White, StateColor, Day, Positive Cases, State
 $$\begin{aligned}
-i = state, j = \text{days since "2020-03-14"}
-Y_{ij}|\theta,\mu,\beta_0, \beta_1, \beta_2,\beta_3,\beta_4,\sigma_w,\sigma_b \sim N(\theta_i +\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3+ \beta_4X_4, \sigma_w^2)\\
+i = state, j = \text{days since "2020-03-14"}\\
+Y_{ij}|\theta,\mu,\beta_0, \beta_1, \beta_2,\beta_3,\beta_4,\sigma_w,\sigma_b \sim N(\theta_i +\beta_1X_1 + \beta_2X_2 + \beta_3X_3+ \beta_4X_4, \sigma_w^2)\\
 \theta_i|\mu, \sigma_b \overset{ind}{\sim}N (\mu, \sigma_b^2)\\
 \beta_0,\beta_1, \beta_2,\beta_3 \sim N(...,...)\\
 \sigma_w,\sigma_b \sim Exp(...)\\
@@ -438,7 +438,7 @@ $$
 \begin{split}
 Y = \text{ChinaVirusInterest},i = state, j = \text{days since "2020-03-14"}, X_{ij} = \text{Days}\\
 X_2 = \text{percent_white},,X_3 =\text{StateColor},  X_4 =\text{Total Test Results} \\
-Y_{ij} | b_0, b_1, \beta_0, \beta_1, \sigma_w, \sigma_{0b}, \sigma_{1b} & \sim N( b_{0i} + b_{1i} X_{ij}+ \beta_2X_2 + \beta_3X_3 +\beta_4X_4, \; \sigma_w^2) \\
+Y_{ij} | b_0, b_1, \beta_0, \beta_1,\beta_2,\beta_3,\beta_4 \sigma_w, \sigma_{0b}, \sigma_{1b} & \sim N( b_{0i} + b_{1i} X_{ij}+ \beta_2X_2 + \beta_3X_3 +\beta_4X_4, \; \sigma_w^2) \\
 b_{0i} | \beta_0, \sigma_{0b} & \stackrel{ind}{\sim} N(\beta_0, \sigma_{0b}^2) \\
 b_{1i} | \beta_1, \sigma_{1b} & \stackrel{ind}{\sim} N(\beta_1, \sigma_{1b}^2) \\
 \beta_0,\beta_1,\beta_2,\beta_3,\beta_4 & \sim N(..., ...) \\
