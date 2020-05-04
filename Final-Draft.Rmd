@@ -231,7 +231,7 @@ This visualisation depicts the distribution of positive COVID-19 cases by region
 # 3. Methods & Models (Feddy and Will)
 
 ## Model 1 Repeated Measures Model
-
+ 
   For our simplest model we decided to use a repeated measures model. Our team decided that the repeated measures model was necessary component because of how our data is set up. As we can see in our dataset, each state has a value for their `ChinaVirusInterest` for each day in our target period (2020-03-14 - 2020-03-21). Given the ability to use repeated measures and our prior understanding of the varying characteristics (demographic,political,covid-impact) within different states, the repeated measures model allows us to capture these differences in `ChinaVirusInterest` with the $\theta_i$ value which represents each state's mean value.
   
 
@@ -245,11 +245,20 @@ Y_{ij}|\theta_i, \mu, \sigma_w, \sigma_b \sim N(\theta_i,\sigma_w^2)\\
 \sigma_b,\sigma_w \sim Exp(...)
 \end{aligned}$$
 
+\
+$Y_{ij} =$ `ChinaVirusInterest` per:
+\
+$i=State$
+\
+and $j= Day$ 
+\
+$\theta_i =$ State i's unique mean value
+\
+$\sigma_w =$ within state variation
+\
+$\sigma_b =$ between state variation
 
-$Y_{ij} = $ `ChinaVirusInterest` per $i=State$, and $j= Day$
-$\theta_i = $ State i's unique mean value
-$\sigma_w = $ within state variation
-$\sigma_b = $ between state variation
+ We decided that our MCMC model should take in values from a normal distribution because ChinaVirusInterest's distribution is fairly normal. Although the tails are not as flat as we would want them to be, we can decided that a normal distribution was best to model ChinaVirusInterest. 
 
 ```{r}
 model_data<-
@@ -261,7 +270,7 @@ model_data<- na.omit(model_data)
 ```
 
 
-```{r}
+```{r results = "hide", include = FALSE, cache=TRUE}
 #Repeated Measures Model
 set.seed(454)
 RM_model <- stan_glmer(
@@ -270,14 +279,145 @@ RM_model <- stan_glmer(
 )
 ```
 
+## Model2: Normal Regression
 
-### 3.2 Model Descriptions
+For our second model, we decided that we wanted to understand what made some states more responsive to ChinaVirusInterest than others. As you saw in our research motivation section, we wanted to explore what explained the differences in interest for the “China Virus” term. Was it a political difference, a demographic or a covid-impact related difference? To do this we used a simple Normal Regression model with the following specifications. For our demographic specification we used `percent_white`, for our political specification we used `StateColor` and for our Covid-impact specification we used `positive` (#of positive cases). 
+
+### Model Structure
+$$\begin{aligned}
+Y_{i}|\beta_0, \beta_1, \beta_2,\beta_3,\beta_4 &\overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3+ \beta_4X_4,\sigma^2)\\
+\beta_0,\beta_1, \beta_2,\beta_3 &\sim N(...,...)\\
+\sigma &\sim Exp(...)\\
+\end{aligned}$$
+
+
+$Y = ChinaVirusInterest\\$
+\
+$i = state\\$
+\
+$j = Days\\$
+\
+$X_{ij} = \text{Days}\\$
+\
+$X_2 = \text{percent_white}\; X_3 =\text{StateColor}\;   X_4 =\text{Total Test Results}\\$
+\
+$\sigma = \text{Variance in }$ `ChinaVirusInterest`
+\
+
+```{r results = "hide", include = FALSE, cache=TRUE}
+#Normal Regression Model
+set.seed(454)
+NR_model <- stan_glm(
+  ChinaVirusInterest ~ Day + percent_white+StateColor+positive,
+  data = model_data, family = gaussian,
+  chains = 4, iter = 10000, refresh = 0
+)
+```
+
+## Model 3: Normal Regression + Repeated Measures
+
+For our third model, we decided to combine the first two models to first understand variations in political, demographic, covid-related variables and also be able to capture variation that we could not explain in model 2. Additionally, we kept the correlation structure that we saw in model 1, but we included the variables in model 2 so that we could explain why some states had a larger `ChinaVirusInterest` than others. Similar to model 1, model 3 allows us to capture differences in `ChinaVirusInterest` with the $\theta_i$ value which represents each state's mean value.
+### Model Structure
+
+$$\begin{aligned}
+Y_{ij}|\theta,\mu,\beta_0, \beta_1, \beta_2,\beta_3,\beta_4,\sigma_w,\sigma_b &\sim N(\theta_i +\beta_1X_1 + \beta_2X_2 + \beta_3X_3+ \beta_4X_4, \sigma_w^2)\\
+\theta_i|\mu, \sigma_b &\overset{ind}{\sim}N (\mu, \sigma_b^2)\\
+\beta_0,\beta_1, \beta_2,\beta_3 &\sim N(...,...)\\
+\sigma_w,\sigma_b &\sim Exp(...)\\
+\end{aligned}$$
+
+$Y = ChinaVirusInterest\\$
+\
+$i = state\\$
+\
+$j = Days\\$
+\
+$X_{ij} = \text{Days}\\$
+\
+$X_2 = \text{percent_white}\; X_3 =\text{StateColor}\;   X_4 =\text{Total Test Results}\\$
+\
+$\sigma_w = \text{within state variation} \\$
+\
+$\sigma_b =  \text{between state variation}\\$
+\
+
+```{r results = "hide", include = FALSE, cache=TRUE}
+set.seed(454)
+
+model_2 <- stan_glmer(
+  ChinaVirusInterest ~ Day + StateColor + percent_white + positive + (1 | State), 
+  data = model_data, family = gaussian, chains = 4, iter = 5000*2
+)
+```
+
+
+## Model 4: Longitudinal Model (state-specific slopes)
+
+Because of the structure of our data, we are also able to create a longitudinal model as we have repeated measures for `ChinaVirusInterest` and corresponding observations for `Day`. In this more complex model we allow for state-specific slopes and intercepts to predict their behavior of `ChinaVirusInterest`. As the Days increase we get closer to when Trump addressed the Corona Virus as "China Virus". Thus if we see increasing slopes we might conclude that in that state, the effect of Trump addressing the Corona Virus as "China Virus" created an increase in the interest of the term and viceversa. 
+
+
+
+### Model Structure
+
+$$
+\begin{split}
+Y_{ij} | b_0, b_1, \beta_0, \beta_1,\beta_2,\beta_3,\beta_4 \sigma_w, \sigma_{0b}, \sigma_{1b} & \sim N( b_{0i} + b_{1i} X_{ij}+ \beta_2X_2 + \beta_3X_3 +\beta_4X_4, \; \sigma_w^2) \\
+b_{0i} | \beta_0, \sigma_{0b} & \stackrel{ind}{\sim} N(\beta_0, \sigma_{0b}^2) \\
+b_{1i} | \beta_1, \sigma_{1b} & \stackrel{ind}{\sim} N(\beta_1, \sigma_{1b}^2) \\
+\beta_0,\beta_1,\beta_2,\beta_3,\beta_4 & \sim N(..., ...) \\
+\sigma_w & \sim Exp(...) \\
+\sigma_{0b} & \sim Exp(...) \\
+\sigma_{1b} & \sim Exp(...) \\
+\end{split}
+$$
+In this hierarchical model each state receives a specific slope and intercept. The first step is determined through determining the $\beta_{0} - \beta_{4}$ values which represent the intercept, slope, and our three demographic interactions that we bring in from model 3. The $\beta_{0}$ represents the intercept value for all states. From this value each state derives its individual $b_{0i}$ which represents that state’s individual intercept value. In the diagram below we see that the $b_{0i}$ values are normally distributed around the $\beta_{0}$ and are distributed by $\sigma_{0b}$. This same process occurs for determining state specific slopes however we use $\beta_{1}$ and $b_{1i}$. 
+
+The main purpose of this model is to find the magnitude of $\sigma_{1b}$ since this deviation is what determines the significance of their truly being state level unique slopes or not, and therefore determines if we need to use this more flexible model to predict `ChinaVirusInterest`. 
+
+
+\
+$Y = ChinaVirusInterest\\$
+\
+$i = state\\$
+\
+$j = Days\\$
+\
+$X_{ij} = \text{Days}\\$
+\
+$X_2 = \text{percent_white}\; X_3 =\text{StateColor}\;   X_4 =\text{Total Test Results}\\$
+\
+$\sigma_w = \text{within state variation} \\$
+\
+$\sigma_{0b} =  \text{between state variation for intercept}\\$
+\
+$\sigma_{1b} = \text{between state variation for slopes}\\$
+\
+$X_{ij} = \text{Days}$
+\
+$b_{0i} = \text{State-Specific-Intercept}$
+\
+$\beta_0 = \text{Population-wide-Intercept}$
+\
+$b_{1i} = \text{State-Specific-Slope}$
+\
+$\beta_1 = \text{Population-wide-Slope}$
+
+
+```{r results = "hide", include = FALSE, cache=TRUE}
+set.seed(454)
+complexmod <- stan_glmer(
+  ChinaVirusInterest ~ Day + StateColor + percent_white + positive + (Day | State), 
+  data = model_data, family = gaussian, chains = 4, iter = 5000*2
+)
+```
+
+
 
 \
 \
-
 
 # 4. Model Evaluation (RESULTS)
+
 
 ## 4.1 Model 1 Evaluation (Repeated measures)
 
@@ -309,14 +449,84 @@ ggplot(rm_df, aes(x = correlation)) +
     geom_density()
 ```
 
-This correlation table shows us that there is relatively strong correlation within each given daily observation within a state. Therefore, it is correct for us to utilize a fixed effects model in order to account for these inherent differences between states.
+This correlation table shows us that there is relatively weak correlation within each given daily observation within a state. Although there is not a strong correlation, it is correct for us to utilize a repeated measuress model in order to account for the correlation within states. 
+
+##mcmc_ stable
+
+##ppcheck
+
 
 ## 4.2 Model 2 Evaluation (Normal Regression)
 
+##mcmc_ stable
+
+##ppcheck
+
+
 ## 4.3 Model 3 Evaluation(Repeated Reg + Normal)
+
+##mcmc_ stable
+
+##ppcheck
 
 ## 4.4 Model 4 Evaluation (Longitudinal)
 
+##mcmc_ stable
+
+##ppcheck
+
+## Are our models strong?: Prediction & classification summaries
+
+```{r}
+#Repeated Measures
+set.seed(454)
+pred_1 <- posterior_predict(
+  RM_model,
+  newdata = model_data, transform = TRUE)
+
+sum1<-prediction_summary(y = model_data$ChinaVirusInterest,
+  yrep = pred_1)
+```
+
+
+```{r}
+#Normal Regression
+set.seed(454)
+pred_2 <- posterior_predict(
+  NR_model,
+  newdata = model_data, transform = TRUE)
+
+sum2<-prediction_summary(y = model_data$ChinaVirusInterest,
+  yrep = pred_2)
+```
+
+```{r}
+#Repeated Measures + Normal Regression
+set.seed(454)
+pred_3 <- posterior_predict(
+  model_2,
+  newdata = model_data, transform = TRUE)
+
+sum3<-prediction_summary(y = model_data$ChinaVirusInterest,
+  yrep = pred_3)
+```
+
+```{r}
+#Longitudinal Model
+set.seed(454)
+pred_4 <- posterior_predict(
+  complexmod,
+  newdata = model_data, transform = TRUE)
+
+sum4<-prediction_summary(y = model_data$ChinaVirusInterest,
+  yrep = pred_4)
+```
+
+```{r}
+all_summ<-rbind(sum1,sum2,sum3,sum4)
+rownames(all_summ)<- c("Model 1","Model 2","Model 3","Model 4")
+all_summ
+```
 
 \
 \
