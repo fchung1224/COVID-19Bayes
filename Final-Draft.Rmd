@@ -271,7 +271,6 @@ RM_model <- stan_glmer(
 ```
 
 
-
 ### 3.2 Model Descriptions
 
 \
@@ -281,6 +280,36 @@ RM_model <- stan_glmer(
 # 4. Model Evaluation (RESULTS)
 
 ## 4.1 Model 1 Evaluation (Repeated measures)
+
+```{r}
+g1 <- mcmc_dens(RM_model, pars = "sigma") + 
+  labs(x = expression(sigma[w])) +
+  lims(x=c(5, 25))
+g2 <- mcmc_dens(RM_model, 
+  pars = "Sigma[State:(Intercept),(Intercept)]", transformations = sqrt) + 
+  labs(x = expression(sigma[b])) +
+   lims(x=c(5, 25))
+grid.arrange(g1,g2,ncol=2)
+```
+
+In the output above we see that the within deviation is much narrow than the between deviation. This matches our intuition in the model that utilizing the repeated measures, fixed effects model will be able to explain a greater amount of the variation. 
+
+```{r}
+# Store the chains
+rm_df <- as.array(RM_model) %>% 
+  melt %>% 
+  pivot_wider(names_from = parameters, values_from = value)
+
+# Wrangle the chains
+rm_df <- rm_df %>% 
+  mutate(sigma_sq_w = sigma^2, sigma_sq_b = `Sigma[State:(Intercept),(Intercept)]`) %>% 
+  mutate(correlation = sigma_sq_b / (sigma_sq_b + sigma_sq_w))
+
+ggplot(rm_df, aes(x = correlation)) + 
+    geom_density()
+```
+
+This correlation table shows us that there is relatively strong correlation within each given daily observation within a state. Therefore, it is correct for us to utilize a fixed effects model in order to account for these inherent differences between states.
 
 ## 4.2 Model 2 Evaluation (Normal Regression)
 
