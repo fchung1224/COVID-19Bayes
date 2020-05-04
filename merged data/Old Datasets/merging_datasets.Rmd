@@ -78,6 +78,15 @@ time_series_final_Data<-google_timeseries%>%
 write.csv(time_series_final_Data,"time_series_final_Data.csv")
 ```
 
+```{r}
+colnames(lat_long)[2] <- "latitude"
+names(lat_long)
+```
+
+```{r}
+time_series_final_Data <- merge(time_series_final_Data,lat_long, by="State")
+```
+
 
 ```{r}
 Trump<- as.Date("03/16/2020", format = "%m/%d/%Y")
@@ -91,9 +100,6 @@ time_series_final_Data%>%
   geom_vline(xintercept = Trump)+
   geom_text(aes(Trump , 30, label = "Trump Tweets China Virus", vjust = -1), size = 3, color = "black")+
   scale_color_manual(values = c("#0000FF", "#800080", "#FF0000"))
-
-time_series_final_Data%>%
-  
 
 ```
 
