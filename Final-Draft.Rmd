@@ -93,6 +93,10 @@ day_final<- as.Date("2020-03-21")
 Finaldata<- Finaldata%>%
   filter(Day>=day_initial)%>%
   filter(Day<=day_final)
+
+
+
+names(Finaldata)
 ```
 
 ## 2.1 Data Descriptions
@@ -112,6 +116,7 @@ p1<- plot_usmap(data = Finaldata, values = "percent_white", color = "white") +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_fill_viridis_c(option = "plasma") + theme(plot.title = element_text(size=11))+ labs(fill = "% White")
 
+ggplotly(p1)
 
 
 p2<- plot_usmap(data = Finaldata, values = "percent_asian", color = "white") + 
@@ -120,11 +125,11 @@ p2<- plot_usmap(data = Finaldata, values = "percent_asian", color = "white") +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_fill_viridis_c(option = "plasma") + theme(plot.title = element_text(size=11))+ labs(fill = "% Asian")
 
-
-grid.arrange(p1,p2)
+ggplotly(p2)
 
 
 ```
+
 Our first visualization is looking at the percent of residents that identify as white within the United States compared to those whom identify as asian. As you can see, there is a higher percent of white identifying residents overall but most specifically in the Midwest and northeast states. In regards to Asian-Americans, there is practically less than .1% per state with the exception of California and New York. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
 
 ### 2.3b Google China Virus
@@ -134,8 +139,9 @@ e <- Finaldata%>%
   ggplot(aes(x = ChinaVirusInterest))+
   geom_density()
 
-ggplotly(e)
+e
 ```
+
 During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement labeled the Corona Virus as "China Virus" and we wanted to see how his comments affected search patterns across states.
 
 As we can see from the density plot of the China Virus Interest during our time period 2020-03-14 - 2020-03-21, it behaves relatively normal with a small bump at 0. As a group we believe this bump occurs as 0 is the lowest value it can take and because of that limitation of the China Virus Interest we see a small bump around 0. One could argue against a normal distribution as it kinda looks a bit right skewed. But our team believes that a normal distribution is the best at describing the density.  
