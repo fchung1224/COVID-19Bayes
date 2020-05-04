@@ -337,7 +337,7 @@ $\sigma_b =  \text{between state variation}\\$
 ```{r results = "hide", include = FALSE, cache=TRUE}
 set.seed(454)
 
-model_2 <- stan_glmer(
+model_3 <- stan_glmer(
   ChinaVirusInterest ~ Day + StateColor + percent_white + positive + (1 | State), 
   data = model_data, family = gaussian, chains = 4, iter = 5000*2
 )
@@ -445,14 +445,28 @@ ggplot(rm_df, aes(x = correlation)) +
 This correlation table shows us that there is relatively weak correlation within each given daily observation within a state. Although there is not a strong correlation, it is correct for us to utilize a repeated measuress model in order to account for the correlation within states. 
 
 ##mcmc_ stable
+```{r}
+mcmc_trace(RM_model)
+mcmc_dens_overlay(RM_model) 
+```
+
+
 
 ##ppcheck
+
+```{r}
+pp_check(RM_model)
+```
 
 
 ## 4.2 Model 2 Evaluation (Normal Regression)
 
 ##mcmc_ stable
 
+```{r}
+mcmc_trace(NR_model)
+mcmc_dens_overlay(NR_model) 
+```
 ##ppcheck
 
 
@@ -460,13 +474,30 @@ This correlation table shows us that there is relatively weak correlation within
 
 ##mcmc_ stable
 
+```{r}
+mcmc_trace(model_3)
+mcmc_dens_overlay(model_3) 
+```
+
 ##ppcheck
+```{r}
+pp_check(model_3)
+```
 
 ## 4.4 Model 4 Evaluation (Longitudinal)
 
 ##mcmc_ stable
 
+```{r}
+mcmc_trace(complexmod)
+mcmc_dens_overlay(complexmod) 
+```
+
 ##ppcheck
+
+```{r}
+pp_check(complexmod)
+```
 
 ## Are our models strong?: Prediction & classification summaries
 
