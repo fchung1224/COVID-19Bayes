@@ -278,7 +278,7 @@ For our second model, we decided that we wanted to understand what made some sta
 
 ### Model Structure
 $$\begin{aligned}
-Y_{i}|\beta_0, \beta_1, \beta_2,\beta_3,\beta_4 &\overset{ind}{\sim} N(\beta_0+ \beta_1X_1 + \beta_2X_2 + \beta_3X_3+ \beta_4X_4,\sigma^2)\\
+Y_{i}|\beta_0, \beta_1, \beta_2,\beta_3,\beta_4 &\overset{ind}{\sim} N(\beta_0+ \beta_1X_{1i} + \beta_2X_{2i} + \beta_3X_{3i}+ \beta_4X_{4i},\sigma^2)\\
 \beta_0,\beta_1, \beta_2,\beta_3 &\sim N(...,...)\\
 \sigma &\sim Exp(...)\\
 \end{aligned}$$
@@ -313,7 +313,7 @@ For our third model, we decided to combine the first two models to first underst
 ### Model Structure
 
 $$\begin{aligned}
-Y_{ij}|\theta,\mu,\beta_0, \beta_1, \beta_2,\beta_3,\beta_4,\sigma_w,\sigma_b &\sim N(\theta_i +\beta_1X_1 + \beta_2X_2 + \beta_3X_3+ \beta_4X_4, \sigma_w^2)\\
+Y_{ij}|\theta,\mu,\beta_0, \beta_1, \beta_2,\beta_3,\beta_4,\sigma_w,\sigma_b &\sim N(\theta_i +\beta_1X_1 + \beta_2X_{2i} + \beta_3X_{3i}+ \beta_4X_{4i}, \sigma_w^2)\\
 \theta_i|\mu, \sigma_b &\overset{ind}{\sim}N (\mu, \sigma_b^2)\\
 \beta_0,\beta_1, \beta_2,\beta_3 &\sim N(...,...)\\
 \sigma_w,\sigma_b &\sim Exp(...)\\
@@ -354,7 +354,7 @@ Because of the structure of our data, we are also able to create a longitudinal 
 
 $$
 \begin{split}
-Y_{ij} | b_0, b_1, \beta_0, \beta_1,\beta_2,\beta_3,\beta_4 \sigma_w, \sigma_{0b}, \sigma_{1b} & \sim N( b_{0i} + b_{1i} X_{ij}+ \beta_2X_2 + \beta_3X_3 +\beta_4X_4, \; \sigma_w^2) \\
+Y_{ij} | b_0, b_1, \beta_0, \beta_1,\beta_2,\beta_3,\beta_4 ,\sigma_w, \sigma_{0b}, \sigma_{1b} & \sim N( b_{0i} + b_{1i} X_{ij}+ \beta_2X_{2i} + \beta_3X_{3i} +\beta_4X_{4i}, \; \sigma_w^2) \\
 b_{0i} | \beta_0, \sigma_{0b} & \stackrel{ind}{\sim} N(\beta_0, \sigma_{0b}^2) \\
 b_{1i} | \beta_1, \sigma_{1b} & \stackrel{ind}{\sim} N(\beta_1, \sigma_{1b}^2) \\
 \beta_0,\beta_1,\beta_2,\beta_3,\beta_4 & \sim N(..., ...) \\
@@ -516,7 +516,7 @@ mcmc_dens_overlay(complexmod, pars = c("(Intercept)","percent_white","StateColor
 mcmc_dens_overlay(complexmod, pars = c("sigma"),regex_pars = "Sigma",facet_args = list(ncol = 2, strip.position = "left"))
 ```
 
-In the dens overlay we can see that our value for $\sigma_{1b}^2$ is close to zero we could argue that random slopes are not necessary, but the mean of  $\sigma_{1b}^2$ is around 2-2.5. Similar to our previous dens overlay checks our value of $\sigma_b^2$ is almost always above zero and its mean is around 75, which means that random intercepts are necessary. 
+In the dens overlay we can see that our value for $\sigma_{1b}^2$ is close to zero but we could argue that random slopes are necessary, as the mean of  $\sigma_{1b}^2$ is around 2-2.5 and given that we are talking about slopes with not a very high range 2-2.5 is pretty good range for differing slopes. Similar to our previous dens overlay checks our value of $\sigma_b^2$ is almost always above zero and its mean is around 75, which means that random intercepts are necessary. 
 
 ##ppcheck
 
@@ -597,7 +597,7 @@ As we can see in the table above, the lowest mae was achieved by our most comple
 
 ### Why we chose Model 3 as our best model?
 
-We believe that the decreases in mae and increases of the proporiton of values observed within 50% of the posterior predictive interval do not justify increasing the complexity. Which is why we argue that Model 3 is the best model because it acchieves similar results to model 4 without making it computationally expensive. But if we want a more precise model we would use Model 4. 
+We believe that the decreases in mae and increases of the proporiton of values observed within 50% of the posterior predictive interval do not justify increasing the complexity. Which is why we argue that Model 3 is the best model because it acchieves similar results to model 4 without making it computationally expensive. But if we want a more precise model we would use Model 4. But out mcmc_dens and our visualizations showed that there are different slopes across states and thus a more reasonable approach would be to use Model 4. 
 
 ## 5.2 Posterior Prediction One State
 
@@ -675,7 +675,7 @@ modelevalFL<-read_csv("MODELEVAL.csv")
 modelevalFL
 ```
 
-In this table each model's prediction of Florida on the final day of our target window compared with how the actual value in the set. We find that the predictions, especially with our more complex Models 3 & 4 are not particularly close, especially with Model 4 having an error of close to 6. However, we are aware that our MAEs have improved with the more sophisticated models. 
+In this table each model's prediction of Florida on the final day of our target window compared with how the actual value in the set. We find that the predictions, especially with our more complex Models 3 & 4 are not particularly close, especially with Model 4 having an error of close to 6. However, we are aware that our MAEs are smaller in Models 3 and 4. 
 
 
 
@@ -690,7 +690,7 @@ In this table each model's prediction of Florida on the final day of our target 
 
 ## 6.1 Limitations
 
-
+Truncated Normal Model** (0-100), really wide guesses. 
 
 ## 6.2 Future Work
 
