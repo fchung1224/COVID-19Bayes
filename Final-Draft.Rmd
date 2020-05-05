@@ -444,64 +444,92 @@ ggplot(rm_df, aes(x = correlation)) +
 
 This correlation table shows us that there is relatively weak correlation within each given daily observation within a state. Although there is not a strong correlation, it is correct for us to utilize a repeated measuress model in order to account for the correlation within states. 
 
-##mcmc_ stable
+##mcmc plots
 ```{r}
-mcmc_trace(RM_model)
-mcmc_dens_overlay(RM_model) 
+mcmc_trace(RM_model, pars = c("(Intercept)","Sigma[State:(Intercept),(Intercept)]"))
+mcmc_dens_overlay(RM_model, pars = c("(Intercept)","Sigma[State:(Intercept),(Intercept)]")) 
 ```
 
-
+As we can see in this mcmc trace plot, it looks like our MCMC is fairly stable but could do with a bit more stability as we see that the peaks are spread around the 40-42.5 range. We also see that our values for $\sigma_b^2$ is greater than 0, our value of sigma is around 75 meaning that we must include random intercepts in our final model
 
 ##ppcheck
 
 ```{r}
-pp_check(RM_model)
+pp_check(RM_model, nreps=50)
 ```
 
+Overall, we can see that our repeated measures model it tells us that the structure of our model is fairly reasonable, In other words, the assumption of using a normal model is fairly reasonable outside of the fact that the tails are a bit thicker than we would want them to be. This is because we are expecting a lot of states that will have multiple days with zero value, if no one in the state looks up the term. This is why our tails are a bit thicker than we would want them to be, specially around 0. 
 
 ## 4.2 Model 2 Evaluation (Normal Regression)
 
-##mcmc_ stable
+##mcmc plots
 
 ```{r}
-mcmc_trace(NR_model)
-mcmc_dens_overlay(NR_model) 
+# Trace plots
+mcmc_trace(NR_model,pars = c("sigma","(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day"),facet_args = list(ncol = 3, strip.position = "left")) 
+
+# Density plots
+mcmc_dens_overlay(NR_model, pars = c("sigma","(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day"),facet_args = list(ncol = 3, strip.position = "left"))
 ```
+Compared to the previous model, it looks that our chains are more stable and they have closer peaks. 
+
 ##ppcheck
 
+```{r}
+pp_check(NR_model, nreps = 50)
+```
+
+Although our posterior predictive check is pretty similar to our previous model, we see that the peaks are a bit more closer together. And similar to the previous model the structure of the GLM is fairly reasonable. 
 
 ## 4.3 Model 3 Evaluation(Repeated Reg + Normal)
 
-##mcmc_ stable
 
 ```{r}
-mcmc_trace(model_3)
-mcmc_dens_overlay(model_3) 
+mcmc_trace(model_3, pars=c("(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day","b[(Intercept) State:AK]","b[(Intercept) State:WA]"),facet_args = list(ncol = 3, strip.position = "left"))
+
+mcmc_trace(model_3, pars = c("sigma","Sigma[State:(Intercept),(Intercept)]"))
+
+mcmc_dens_overlay(model_3, pars = c("(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day","b[(Intercept) State:AK]","b[(Intercept) State:WA]"),facet_args = list(ncol = 3, strip.position = "left")) 
+
+mcmc_dens_overlay(model_3, pars = c("sigma","Sigma[State:(Intercept),(Intercept)]"))
 ```
+
+Compared to the previous model, we see that our chains are more stable for the intercept and the percent_white variables as the peaks are closer together. We also see that our $\sigma_b^2$ is almost always above 0, and the density has a mean around 75 similar to our repeated measures model. 
 
 ##ppcheck
 ```{r}
-pp_check(model_3)
+pp_check(model_3, nreps=50)
 ```
-
+As seen in our prior posterior predictive checks, they have similar errors around the tails. But it seems that our GLM structure is also reasonable for this model. 
 ## 4.4 Model 4 Evaluation (Longitudinal)
 
-##mcmc_ stable
+##mcmc plots
 
 ```{r}
-mcmc_trace(complexmod)
-mcmc_dens_overlay(complexmod) 
+# Trace plots
+mcmc_trace(complexmod,pars = c("(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day","b[Day State:AK]","b[Day State:WA]"),facet_args = list(ncol = 3, strip.position = "left")) 
+mcmc_trace(complexmod, pars = c("sigma"),regex_pars = "Sigma",facet_args = list(ncol = 2, strip.position = "left"))
+
+# Density plots
+mcmc_dens_overlay(complexmod, pars = c("(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day","b[Day State:AK]","b[Day State:WA]"),regex_pars = "Sigma",facet_args = list(ncol = 4, strip.position = "left"))
+
+mcmc_dens_overlay(complexmod, pars = c("sigma"),regex_pars = "Sigma",facet_args = list(ncol = 2, strip.position = "left"))
 ```
+
+In the dens overlay we can see that our value for $\sigma_{1b}^2$ is close to zero we could argue that random slopes are not necessary, but the mean of  $\sigma_{1b}^2$ is around 2-2.5. Similar to our previous dens overlay checks our value of $\sigma_b^2$ is almost always above zero and its mean is around 75, which means that random intercepts are necessary. 
 
 ##ppcheck
 
 ```{r}
-pp_check(complexmod)
+pp_check(complexmod, nreps = 50)
 ```
+Overall all ppchecks tend to have the similar graph because we are assuming a normal relationship on the response variable for all of them. 
+
+
 
 ## Are our models strong?: Prediction & classification summaries
 
-```{r}
+```{r, message=FALSE, include=FALSE}
 #Repeated Measures
 set.seed(454)
 pred_1 <- posterior_predict(
@@ -513,7 +541,7 @@ sum1<-prediction_summary(y = model_data$ChinaVirusInterest,
 ```
 
 
-```{r}
+```{r, message=FALSE, include=FALSE}
 #Normal Regression
 set.seed(454)
 pred_2 <- posterior_predict(
@@ -524,18 +552,18 @@ sum2<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_2)
 ```
 
-```{r}
+```{r, message=FALSE, include=FALSE}
 #Repeated Measures + Normal Regression
 set.seed(454)
 pred_3 <- posterior_predict(
-  model_2,
+  model_3,
   newdata = model_data, transform = TRUE)
 
 sum3<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_3)
 ```
 
-```{r}
+```{r, message=FALSE, include=FALSE}
 #Longitudinal Model
 set.seed(454)
 pred_4 <- posterior_predict(
@@ -546,11 +574,6 @@ sum4<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_4)
 ```
 
-```{r}
-all_summ<-rbind(sum1,sum2,sum3,sum4)
-rownames(all_summ)<- c("Model 1","Model 2","Model 3","Model 4")
-all_summ
-```
 
 \
 \
@@ -559,9 +582,21 @@ all_summ
 
 # 5. Results (Will)
 
-## 5.1 Posterior Predctions All States 
+## 5.1 Posterior Predictions All States 
 
 ### 5.1.a Table 
+
+```{r}
+all_summ<-rbind(sum1,sum2,sum3,sum4)
+rownames(all_summ)<- c("Model 1","Model 2","Model 3","Model 4")
+all_summ
+```
+
+As we can see in the table above, the lowest mae was achieved by our most complex model, Model 4 which allowed for both random slopes and random intercepts. But the mae value is not that different from the mae acchieved by Model 3 which was more simple allowing only for random intercepts. Interestingly Model 1 our simplest model had a higher proportion of the data falling within the 95% posterior predictive interval. 
+
+### Why we chose Model 3 as our best model?
+
+We believe that the decreases in mae and increases of the proporiton of values observed within 50% of the posterior predictive interval do not justify increasing the complexity. Which is why we argue that Model 3 is the best model because it acchieves similar results to model 4 without making it computationally expensive. But if we want a more precise model we would use Model 4. 
 
 ## 5.2 Posterior Prediction One State
 
