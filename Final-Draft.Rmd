@@ -147,7 +147,7 @@ Finaldata<- Finaldata%>%
 The purpose of the visualizations below is to aid us in deepening our understanding of how our variables of interest intereact with one another and how they are structured. We chose to investigate the variables that are listed above because in our background reserach, we found that these factors on their own have proven to indicate some kind of infleucne on our outcome variable, interest in the term "China Virus." With our new combined datasets, we hope to see that our intuition, background reserach and the data align with one another to tell an interesting narrative.
 
 ### Figure 1
-```{r, echo=FALSE, warning=FALSE, fig.align=center}
+```{r, echo=FALSE, warning=FALSE, fig.align="center"}
 Finaldata$hover <- with(Finaldata, paste(polyname, "<br>","Positive Cases:", positive, "<br>","Negative Cases:", negative,"<br>",
                            "Total Cases:", totalTestResults,"<br>", "% White:", percent_white,"<br>",
                             "% Asian:", percent_asian, "<br>", "State Color:", StateColor,
@@ -179,7 +179,7 @@ fig
 This visualization aims to establish our understnading of what our outcome variable looks like in our data across the United States. It also provides information on the distribution and geographical patterns of several variables of interest (hover for additional information). As we can see, the Google interest in the term "China Virus" is highly varibale across all states. The states that are on the higher end of the scale are: Louisianna, Florida, Oklahoma, Michigan, Arizona, Nebraska, and Alaska. This implies that predicting interest in "China Virus" by region would most likely be ineffective.Additionally, the majority of these high interest states have a large number of positive reported cases. This is an interesting obesrvation given that reporting of positive cases differs across states and may be influencing the general public differently by state. Moreover, the majority of the high interest states are also designated as "red" with the exception of Michigan which is "blue." This indcates that the variable State Color may be one of the most effective predictors for our models. This visual includes information on white and asian percentages by state but Figure 2 provides a more informative depiction of the geographic distribution. 
 
 ### Figure 2
-```{r, echo=FALSE, warning=FALSE, fig.align=center}
+```{r, echo=FALSE, warning=FALSE, fig.align="center"}
 #########white fig
 whitefig <- plot_geo(Finaldata, locationmode = 'USA-states')
 whitefig <- whitefig %>% add_trace(
@@ -209,11 +209,11 @@ subplot(whitefig,asianfig)
 ```
 With this visual we hope to illuminate what the dispersion of white identifying and asian identifying indivudals looks like by state. Our background reserach supports the idea that anti-Asian sentiment may occur more in places where there is a low proportion of Asian-Americans. However, this comparison of percentages highlights that the Asian population across the entire US is pretty low. This suggests that including `percent_asian` in our model will most likley be ineffective thus, it may be more informative to include `percent_white` as an indicator of diversity. While it sounds counter-intuitive the idea would be that the lower the `percent_white` is by state means that there is a higher percentage of non-white identifying individuals. Thus, this variable may prove influential in our models. 
 
-#### Figure 3
+### Figure 3
 
 During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement labeled the Corona Virus as "China Virus" and we wanted to see how his comments affected search patterns across states.
 
-```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= center}
+```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= "center"}
 
 a<-Finaldata %>% 
   #filter(Day<=day2)%>%
@@ -231,7 +231,7 @@ This plot shows the relationship of “China Virus” search interest over our t
 
 ### Figure 4
 
-```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= center}
+```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= "center"}
 b<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
   geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State") + labs(fill="State", x = "Interest in China Virus", y = "Density")
 
@@ -241,7 +241,7 @@ ggplotly(b)
 Figure 4 aims to address the question: What structure does intrest in the "China Virus" look like and what is its variance look like too? As we can see, the majority of states behave relatively normal with a small bump at 0. One could argue against a normal distribution as some states like Deleware,Texas, Washington and Alabama look a bit right skewed but overall a normal distribution is the best at describing these densities as a whole.  Additionally, we can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusual peaks around the 25-50 range. It is is also interesting interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states. Again, this prompts more questions about the characteristics of the states themeselves. While this shows us that a Normal Regression model may suffice we still explored the possibility of varying slopes among states below. 
 
 ### Figure 5
-```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= center}
+```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= "center"}
 IAtoMT <- Finaldata %>% select(c(State,ChinaVirusInterest,Day)) %>% filter (State %in% c("IA","ID","IL","LA","MA","MD","ME","MI","MN","MO","MS","MT"))
 
 plot1<- ggplot(IAtoMT, aes(x = Day, y = ChinaVirusInterest, color = factor(State))) + 
@@ -455,6 +455,9 @@ complexmod <- stan_glmer(
 \
 \
 
+
+
+
 # 4. Model Evaluation
 
 
@@ -517,6 +520,7 @@ mcmc_trace(NR_model,pars = c("sigma","(Intercept)","percent_white","StateColorre
 # Density plots
 mcmc_dens_overlay(NR_model, pars = c("sigma","(Intercept)","percent_white","StateColorred","StateColorpurple","positive","Day"),facet_args = list(ncol = 3, strip.position = "left"))
 ```
+
 Compared to the previous model, it looks that our chains are more stable and they have closer peaks. 
 
 ### 4.2b Posterior Predictive Check
@@ -524,6 +528,7 @@ Compared to the previous model, it looks that our chains are more stable and the
 ```{r, echo=FALSE, warning=FALSE}
 pp_check(NR_model, nreps = 50)
 ```
+
 
 Although our posterior predictive check is pretty similar to our previous model, we see that the peaks are a bit more closer together. And similar to the previous model the structure of the GLM is fairly reasonable. 
 
@@ -541,12 +546,14 @@ mcmc_dens_overlay(model_3, pars = c("(Intercept)","percent_white","StateColorred
 mcmc_dens_overlay(model_3, pars = c("sigma","Sigma[State:(Intercept),(Intercept)]"))
 ```
 
+
 Compared to the previous model, we see that our chains are more stable for the intercept and the percent_white variables as the peaks are closer together. We also see that our $\sigma_b^2$ is almost always above 0, and the density has a mean around 75 similar to our repeated measures model. 
 
 ### 4.3b Posterior Predictive Check 
 ```{r, echo=FALSE, warning=FALSE}
 pp_check(model_3, nreps=50)
 ```
+
 As seen in our prior posterior predictive checks, they have similar errors around the tails. But it seems that our GLM structure is also reasonable for this model. 
 
 ## 4.4 Model 4 Evaluation (Longitudinal)
@@ -571,6 +578,7 @@ In the dens overlay we can see that our value for $\sigma_{1b}^2$ is close to ze
 ```{r, echo=FALSE, warning=FALSE}
 pp_check(complexmod, nreps = 50)
 ```
+
 Overall all ppchecks tend to have the similar graph because we are assuming a normal relationship on the response variable for all of them. 
 
 
