@@ -144,10 +144,9 @@ Finaldata<- Finaldata%>%
 
 ## 2.3 Visualizations 
 
-The purpose of the visualizations below is to aid us in deepening our understanding of how our variables of interest intereact with one another and how they are structured. We chose to investigate the variables that are listed above because in our background reserach, we found that these factors on their own have proven to indicate some kind of infleucne on our outcome variable, interest in the term "China Virus." With our new combined datasets, we hope to see that our intuition, background reserach and the data align with one another to tell an interesting narrative. Further, we have broken these visualizations into the categories of demographics, Google interest in China Virus, and COVID-19 statistics since those were the themes that repeatdly appeared in our resreach and disucussions. 
+The purpose of the visualizations below is to aid us in deepening our understanding of how our variables of interest intereact with one another and how they are structured. We chose to investigate the variables that are listed above because in our background reserach, we found that these factors on their own have proven to indicate some kind of infleucne on our outcome variable, interest in the term "China Virus." With our new combined datasets, we hope to see that our intuition, background reserach and the data align with one another to tell an interesting narrative.
 
-### 2.3a Demographic 
-
+### Figure 1
 ```{r, echo=FALSE, warning=FALSE, fig.align=center}
 Finaldata$hover <- with(Finaldata, paste(polyname, "<br>","Positive Cases:", positive, "<br>","Negative Cases:", negative,"<br>",
                            "Total Cases:", totalTestResults,"<br>", "% White:", percent_white,"<br>",
@@ -166,18 +165,20 @@ g <- list(
 fig <- plot_geo(Finaldata, locationmode = 'USA-states')
 fig <- fig %>% add_trace(
     z = ~ChinaVirusInterest, text = ~hover, locations = ~State,
-    color = ~ChinaVirusInterest, colors = 'RdGy'
+    color = ~ChinaVirusInterest, colors = 'OrRd'
   ) 
   
 fig <- fig %>% colorbar(title = "Level of Interest") 
-fig <- fig %>% layout(
+fig <- fig %>% layout(      # put legend in center of x-axis
     title = '2020 Google Search Interest of "China Virus" by State <br>(Hover for additional information)', geo=g
   )
+
 fig
 ```
 
-This visualization aims to establish our understnading of what our outcome variable looks like in our data across the United States. It also provides information on the distribution and geographical patterns of several variables of interest (hover for additional information). As we can see, the Google interest in the term "China Virus" is highly varibale across all states. The states that are on the higher end of the scale are: Louisianna, Florida, Oklahoma, Michigan, Arizona, Nebraska, and Alaska. At first glance, this implies that predicting interest in "China Virus" by region would probably be ineffective.
+This visualization aims to establish our understnading of what our outcome variable looks like in our data across the United States. It also provides information on the distribution and geographical patterns of several variables of interest (hover for additional information). As we can see, the Google interest in the term "China Virus" is highly varibale across all states. The states that are on the higher end of the scale are: Louisianna, Florida, Oklahoma, Michigan, Arizona, Nebraska, and Alaska. This implies that predicting interest in "China Virus" by region would most likely be ineffective.Additionally, the majority of these high interest states have a large number of positive reported cases. This is an interesting obesrvation given that reporting of positive cases differs across states and may be influencing the general public differently by state. Moreover, the majority of the high interest states are also designated as "red" with the exception of Michigan which is "blue." This indcates that the variable State Color may be one of the most effective predictors for our models. This visual includes information on white and asian percentages by state but Figure 2 provides a more informative depiction of the geographic distribution. 
 
+### Figure 2
 ```{r, echo=FALSE, warning=FALSE, fig.align=center}
 #########white fig
 whitefig <- plot_geo(Finaldata, locationmode = 'USA-states')
@@ -187,8 +188,9 @@ whitefig <- whitefig %>% add_trace(
   )
 whitefig <- whitefig %>% colorbar(title = "% White")
 whitefig <- whitefig %>% layout(
-    title = 'Percent White Identifying by State', geo=g
-  )
+    title = 'Percent White Identifying by State', geo=g,legend = list(orientation = "h",   # show entries horizontally
+                     xanchor = "center",  # use center of legend as anchor
+                     x = 0.5))             # put legend in center of x-axis
 
 #### Asian fig
 asianfig <- plot_geo(Finaldata, locationmode = 'USA-states')
@@ -198,15 +200,16 @@ asianfig <- asianfig %>% add_trace(
   )
 asianfig <- asianfig %>% colorbar(title = "% Asian")
 asianfig <- asianfig %>% layout(
-    title = 'Comparison of Percent Asian and White Identifying by State',geo=g
-  )
+    title = 'Comparison of Percent Asian and White Identifying by State',geo=g, 
+    legend = list(orientation = "h",   # show entries horizontally
+                     xanchor = "center",  # use center of legend as anchor
+                     x = 0.5))             # put legend in center of x-axis
+  
 subplot(whitefig,asianfig)
 ```
+With this visual we hope to illuminate what the dispersion of white identifying and asian identifying indivudals looks like by state. Our background reserach supports the idea that anti-Asian sentiment may occur more in places where there is a low proportion of Asian-Americans. However, this comparison of percentages highlights that the Asian population across the entire US is pretty low. This suggests that including `percent_asian` in our model will most likley be ineffective thus, it may be more informative to include `percent_white` as an indicator of diversity. While it sounds counter-intuitive the idea would be that the lower the `percent_white` is by state means that there is a higher percentage of non-white identifying individuals. Thus, this variable may prove influential in our models. 
 
-
-Our first visualization is looking at the percent of residents that identify as white within the United States compared to those whom identify as asian. As you can see, there is a higher percent of white identifying residents overall but most specifically in the Midwest and northeast states. In regards to Asian-Americans, there is practically less than .1% per state with the exception of California and New York. From this visualization we can also see that places like Texas, California, and New Mexico have much lower white identifying residents which could provide important information for us in our actual analysis. 
-
-### 2.3b Google China Virus
+#### Figure 3
 
 During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement labeled the Corona Virus as "China Virus" and we wanted to see how his comments affected search patterns across states.
 
@@ -215,27 +218,29 @@ During the 2020-03-14 - 2020-03-21 week, Trump in an official press announcement
 a<-Finaldata %>% 
   #filter(Day<=day2)%>%
   #filter(Day>=day1)%>%
-  group_by(Region, Day) %>% 
-  summarize(ChinaVirusSearch = median(ChinaVirusInterest)) %>% 
-  ggplot(aes(x=Day, y=ChinaVirusSearch, color=Region))+
-  geom_point()+ geom_line()
+  group_by(StateColor, Day) %>% 
+  summarize(ChinaVirusSearch = mean(ChinaVirusInterest)) %>% 
+  ggplot(aes(x=Day, y=ChinaVirusSearch, color=StateColor)) +
+  geom_point()+ geom_line() + labs(x = " Date", y = "China Virus Interest", title = " China Virus Interest by Day and State Color") +theme_minimal()
 
 ggplotly(a)
 ```
 
-This plot shows the relationship of “China Virus” search interest over grouped by region. This plots shows that there are certainly key events that trigger an uptick in searches overall. In this plot it is not clear which region may search China Virus more or less often, but it does show a that the regions move together in search interest, which would imply federal level events like a Donald Trump tweet to trigger these interest spikes. 
+This plot shows the relationship of “China Virus” search interest over our time period of interest grouped by State Color. For each State Color, we can see an overall increasing interest in the term "China Virus" but especially among the Democratic and Swing states. While this seems contradictory to our intuition this pattern can be explained by the  the complicated nature of US poltics. We dug deeper into why this pattern would occur and found that Democrats tend to take more initiative in researching terms they have heard on the news, especially from the White House COVID-19 briefings, over Republicans. So while interest in the term China Virus is more popular in blue states, the intentions may be different than Red states. This finding is very important to note because when we include State Color in our models, we have to be wary on how we interpret the coefficients associated with Red, Blue and Purple.
+
+
+### Figure 4
 
 ```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= center}
 b<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
-  geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State") + labs(fill="State")
+  geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State") + labs(fill="State", x = "Interest in China Virus", y = "Density")
 
 ggplotly(b)
 ```
 
-As we can see from the density plot of the China Virus Interest during our time period 2020-03-14 - 2020-03-21, it behaves relatively normal with a small bump at 0. As a group we believe this bump occurs as 0 is the lowest value it can take and because of that limitation of the China Virus Interest we see a small bump around 0. One could argue against a normal distribution as it kinda looks a bit right skewed. But our team believes that a normal distribution is the best at describing the density.  
+Figure 4 aims to address the question: What structure does intrest in the "China Virus" look like and what is its variance look like too? As we can see, the majority of states behave relatively normal with a small bump at 0. One could argue against a normal distribution as some states like Deleware,Texas, Washington and Alabama look a bit right skewed but overall a normal distribution is the best at describing these densities as a whole.  Additionally, we can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusual peaks around the 25-50 range. It is is also interesting interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states. Again, this prompts more questions about the characteristics of the states themeselves. While this shows us that a Normal Regression model may suffice we still explored the possibility of varying slopes among states below. 
 
-We can see that the variability in Google interest in the term China Virus is has quite a large range between states. There are very few states that have high densities among the upper echelons of the interest scale but there are some interesting peaks of densities among the lower values. For example, we can see that Alaska, Wyoming and Iowa have unusual peaks around the 25-50 range. It is is also interesting interesting to note that there isn't an *obvious* mean or median value of China Virus interest among the states.
-
+### Figure 5
 ```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= center}
 IAtoMT <- Finaldata %>% select(c(State,ChinaVirusInterest,Day)) %>% filter (State %in% c("IA","ID","IL","LA","MA","MD","ME","MI","MN","MO","MS","MT"))
 
@@ -243,26 +248,13 @@ plot1<- ggplot(IAtoMT, aes(x = Day, y = ChinaVirusInterest, color = factor(State
     geom_point() + 
     geom_smooth(method = "lm", se = FALSE) + 
     theme(legend.position = "none") +
-    facet_wrap(~State)
+    facet_wrap(~State)+ 
+    labs(title="Slopes of China Virus Interest by State and Date", x= "Date", y="China Virus Interest")
 
 ggplotly(plot1)
 ```
 
-
-### 2.3c COVID-19
-
-```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= center}
-c <-  ggplot(Finaldata, aes(y=positive, x=Winner, fill=(Winner)))+
-      geom_boxplot() +
-      facet_wrap(~Region)+
-      theme(legend.position = "none") +
-      scale_fill_manual(values = c("Democrat"="blue3", "Republican"= "red3"))+
-      lims(y= c(0,1000))+
-      ggtitle("Positive COVID-19 Cases by State Political Party Winner & Region")
-ggplotly(c)
-```
-
-This visualisation depicts the distribution of positive COVID-19 cases by region and by which political party won in the 2016 elections. We can see that Democrat states in the Midwest, Mountain, and West have a larger range and higher quantile metrics for positive cases overall. For the Northeast and South regions the mean of positive COVID-19 cases are higher but not significantly. This is an interesting pattern considering that poltical party affiliation appears to interact with the number of postive cases by region. 
+Figure 5 helps inform us on what level of complexity our model may need to be. We originally visualized all 50 states slopes but for the purposes of this report, it is more effective to observe a select few. As we can see states like Iowa and Missouri have a negative slope which indicates that the rate of their interst in the term China Virus decreases over time. However states like Louisianna, Maryland, Michigan and Mississippi have upward slopes which indcates the opposite of Iowa and Missouri. Then there are the states that have a relatively flat slope which means rate of interest neither increases or decreases overtime. Thus, these plots tell us that we will want to explore a longitudinal model because states do seem to have varying rates of interest however, it may not be entirely necessary because the slopes do not seem to varying drastically in steepness. 
 
 
 \
@@ -270,7 +262,7 @@ This visualisation depicts the distribution of positive COVID-19 cases by region
 
 
 
-# 3. Methods & Models (Feddy and Will)
+# 3. Methods & Models
 
 ## 3.1 Model 1 Repeated Measures Model
  
@@ -463,7 +455,7 @@ complexmod <- stan_glmer(
 \
 \
 
-# 4. Model Evaluation (RESULTS)
+# 4. Model Evaluation
 
 
 ## 4.1 Model 1 Evaluation (Repeated measures)
@@ -592,10 +584,9 @@ Overall all ppchecks tend to have the similar graph because we are assuming a no
 
 
 
-# 5. Results (Will)
+# 5. Results
 
 ## 5.1 Posterior Predictions All States 
-
 
 ### 5.1a 
 ```{r, message=FALSE, include=FALSE}
@@ -695,7 +686,7 @@ summary(pred_FL_NR)
 ```
 
 
-###5.3c
+### 5.3c
 ```{r, echo=FALSE, warning=FALSE}
 ### For predicting one case 
 new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive = 658, StateColor="purple")
