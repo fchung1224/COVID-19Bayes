@@ -610,7 +610,7 @@ pred_FL_RM <- posterior_predict(
   RM_model,
   newdata = new_FL)
 
-pred_FL_RM <- data.frame(y_new = pred_FL[-1])
+pred_FL_RM <- data.frame(y_new = pred_FL_RM[-1])
 
 ggplot(pred_FL_RM, aes(x=y_new))+geom_density()
 
@@ -625,7 +625,7 @@ pred_FL_NR <- posterior_predict(
   NR_model,
   newdata = new_FL)
 
-pred_FL_NR <- data.frame(y_new = pred_FL[-1])
+pred_FL_NR <- data.frame(y_new = pred_FL_NR[-1])
 
 ggplot(pred_FL_NR, aes(x=y_new))+geom_density()
 
@@ -640,7 +640,7 @@ pred_FL_3 <- posterior_predict(
   model_3,
   newdata = new_FL)
 
-pred_FL_3 <- data.frame(y_new = pred_FL[-1])
+pred_FL_3 <- data.frame(y_new = pred_FL_3[-1])
 
 ggplot(pred_FL_3, aes(x=y_new))+geom_density()
 
@@ -656,22 +656,23 @@ pred_FL_complex <- posterior_predict(
   complexmod,
   newdata = new_FL)
 
-pred_FL_complex <- data.frame(y_new = pred_FL[-1])
+pred_FL_complex <- data.frame(y_new = pred_FL_complex[-1])
 
 ggplot(pred_FL_complex, aes(x=y_new))+geom_density()
 
-summary(pred_FL_complex)
+complex<-summary(pred_FL_complex)
 ```
 
 
 
 ```{r}
-
 actual_FL_pred<-Finaldata %>% select(c(State, ChinaVirusInterest)) %>% filter(State =="FL") %>% summarise(mean=mean(ChinaVirusInterest))
-
 actual_FL_pred
 ```
 
+```{r}
+modelevalFL<-read_csv("MODELEVAL.csv")
+```
 
 
 ## 5.3 Final Model 
