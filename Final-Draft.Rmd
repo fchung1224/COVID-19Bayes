@@ -670,9 +670,13 @@ actual_FL_pred<-Finaldata %>% select(c(State, ChinaVirusInterest)) %>% filter(St
 actual_FL_pred
 ```
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 modelevalFL<-read_csv("MODELEVAL.csv")
+modelevalFL
 ```
+
+In this table each model's prediction of Florida on the final day of our target window compared with how the actual value in the set. We find that the predictions, especially with our more complex Models 3 & 4 are not particularly close, especially with Model 4 having an error of close to 6. However, we are aware that our MAEs have improved with the more sophisticated models. 
+
 
 
 ## 5.3 Final Model 
@@ -685,6 +689,8 @@ modelevalFL<-read_csv("MODELEVAL.csv")
 # 6.Conclusion 
 
 ## 6.1 Limitations
+
+
 
 ## 6.2 Future Work
 
