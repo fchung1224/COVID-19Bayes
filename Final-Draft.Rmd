@@ -1,11 +1,12 @@
 ---
-title: "Predicting Which States are Most Interested in the term *China Virus* Based off Identity Politics, Demography and COVID-19 Statistics "
+title: "He Said What Now?!: Predicting Interest in the Term *China Virus* by State"
 author: "Federico Chung, Will Madairy, Sofia Pozsonyiova, Quinn Rafferty"
 date: 'May 8,2020'
 output:
   html_document:
     toc: true
     toc_float: true
+    code_folding: hide
 ---
 
 ```{r, warning=FALSE, include=FALSE, message=FALSE}
@@ -107,6 +108,11 @@ Finaldata<- Finaldata%>%
 
 ## 2.1 Data Descriptions
 
+
+
+
+
+
 ## 2.2 Variables of interest
 +------------------------+---------------------------------------------------+
 | Variables:             | Description:                                      |
@@ -136,7 +142,9 @@ Finaldata<- Finaldata%>%
 |                        | West, South, Mountain, Northeast, Midwest         |
 +------------------------+---------------------------------------------------+
 
-## 2.3 Visualizations _NEED TO WEAVE A COHEASIVE MESSAGE BETWEEN THESE VISUALIZATIONS TO TELL A STORY _
+## 2.3 Visualizations 
+
+The purpose of the visualizations below is to aid us in deepening our understanding of how our variables of interest intereact with one another and how they are structured. We chose to investigate the variables that are listed above because in our background reserach, we found that these factors on their own have proven to indicate some kind of infleucne on our outcome variable, interest in the term "China Virus." With our new combined datasets, we hope to see that our intuition, background reserach and the data align with one another to tell an interesting narrative. Further, we have broken these visualizations into the categories of demographics, Google interest in China Virus, and COVID-19 statistics since those were the themes that repeatdly appeared in our resreach and disucussions. 
 
 ### 2.3a Demographic 
 
@@ -158,13 +166,19 @@ g <- list(
 fig <- plot_geo(Finaldata, locationmode = 'USA-states')
 fig <- fig %>% add_trace(
     z = ~ChinaVirusInterest, text = ~hover, locations = ~State,
-    color = ~ChinaVirusInterest, colors = 'Oranges'
-  )
-fig <- fig %>% colorbar(title = "Interest")
+    color = ~ChinaVirusInterest, colors = 'RdGy'
+  ) 
+  
+fig <- fig %>% colorbar(title = "Level of Interest") 
 fig <- fig %>% layout(
     title = '2020 Google Search Interest of "China Virus" by State <br>(Hover for additional information)', geo=g
   )
+fig
+```
 
+This visualization aims to establish our understnading of what our outcome variable looks like in our data across the United States. It also provides information on the distribution and geographical patterns of several variables of interest (hover for additional information). As we can see, the Google interest in the term "China Virus" is highly varibale across all states. The states that are on the higher end of the scale are: Louisianna, Florida, Oklahoma, Michigan, Arizona, Nebraska, and Alaska. At first glance, this implies that predicting interest in "China Virus" by region would probably be ineffective.
+
+```{r, echo=FALSE, warning=FALSE, fig.align=center}
 #########white fig
 whitefig <- plot_geo(Finaldata, locationmode = 'USA-states')
 whitefig <- whitefig %>% add_trace(
@@ -186,11 +200,7 @@ asianfig <- asianfig %>% colorbar(title = "% Asian")
 asianfig <- asianfig %>% layout(
     title = 'Comparison of Percent Asian and White Identifying by State',geo=g
   )
-
-fig
 subplot(whitefig,asianfig)
-
-
 ```
 
 
