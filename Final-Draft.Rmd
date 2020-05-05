@@ -529,6 +529,17 @@ Overall all ppchecks tend to have the similar graph because we are assuming a no
 
 ## Are our models strong?: Prediction & classification summaries
 
+
+
+\
+\
+
+
+
+# 5. Results (Will)
+
+## 5.1 Posterior Predictions All States 
+
 ```{r, message=FALSE, include=FALSE}
 #Repeated Measures
 set.seed(454)
@@ -563,7 +574,7 @@ sum3<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_3)
 ```
 
-```{r, message=FALSE, include=FALSE}
+```{r message=FALSE, include=FALSE}
 #Longitudinal Model
 set.seed(454)
 pred_4 <- posterior_predict(
@@ -573,16 +584,6 @@ pred_4 <- posterior_predict(
 sum4<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_4)
 ```
-
-
-\
-\
-
-
-
-# 5. Results (Will)
-
-## 5.1 Posterior Predictions All States 
 
 ### 5.1.a Table 
 
@@ -599,6 +600,79 @@ As we can see in the table above, the lowest mae was achieved by our most comple
 We believe that the decreases in mae and increases of the proporiton of values observed within 50% of the posterior predictive interval do not justify increasing the complexity. Which is why we argue that Model 3 is the best model because it acchieves similar results to model 4 without making it computationally expensive. But if we want a more precise model we would use Model 4. 
 
 ## 5.2 Posterior Prediction One State
+
+
+```{r}
+### For predicting one case 
+new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive_rate = 0.11) #Doesn't recognize state
+set.seed(454)
+pred_FL_RM <- posterior_predict(
+  RM_model,
+  newdata = new_FL)
+
+pred_FL_RM <- data.frame(y_new = pred_FL[-1])
+
+ggplot(pred_FL_RM, aes(x=y_new))+geom_density()
+
+summary(pred_FL_RM)
+```
+
+```{r}
+### For predicting one case 
+new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive = 658, StateColor="purple") 
+set.seed(454)
+pred_FL_NR <- posterior_predict(
+  NR_model,
+  newdata = new_FL)
+
+pred_FL_NR <- data.frame(y_new = pred_FL[-1])
+
+ggplot(pred_FL_NR, aes(x=y_new))+geom_density()
+
+summary(pred_FL_NR)
+```
+
+```{r}
+### For predicting one case 
+new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive = 658, StateColor="purple")
+set.seed(454)
+pred_FL_3 <- posterior_predict(
+  model_3,
+  newdata = new_FL)
+
+pred_FL_3 <- data.frame(y_new = pred_FL[-1])
+
+ggplot(pred_FL_3, aes(x=y_new))+geom_density()
+
+summary(pred_FL_3)
+```
+
+
+```{r}
+### For predicting one case 
+new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive = 658, StateColor="purple")
+set.seed(454)
+pred_FL_complex <- posterior_predict(
+  complexmod,
+  newdata = new_FL)
+
+pred_FL_complex <- data.frame(y_new = pred_FL[-1])
+
+ggplot(pred_FL_complex, aes(x=y_new))+geom_density()
+
+summary(pred_FL_complex)
+```
+
+
+
+```{r}
+
+actual_FL_pred<-Finaldata %>% select(c(State, ChinaVirusInterest)) %>% filter(State =="FL") %>% summarise(mean=mean(ChinaVirusInterest))
+
+actual_FL_pred
+```
+
+
 
 ## 5.3 Final Model 
 
