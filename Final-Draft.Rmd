@@ -596,9 +596,6 @@ Overall all ppchecks tend to have the similar graph because we are assuming a no
 
 
 
-## 4.5 Are our models strong?: Prediction & classification summaries
-
-
 
 \
 \
@@ -610,7 +607,6 @@ Overall all ppchecks tend to have the similar graph because we are assuming a no
 
 ## 5.1 Posterior Predictions All States 
 
-### 5.1a 
 ```{r, message=FALSE, include=FALSE}
 #Repeated Measures
 set.seed(454)
@@ -620,10 +616,7 @@ pred_1 <- posterior_predict(
 
 sum1<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_1)
-```
 
-### 5.1b
-```{r, message=FALSE, include=FALSE}
 #Normal Regression
 set.seed(454)
 pred_2 <- posterior_predict(
@@ -632,11 +625,7 @@ pred_2 <- posterior_predict(
 
 sum2<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_2)
-```
 
-
-### 5.1c
-```{r, message=FALSE, include=FALSE}
 #Repeated Measures + Normal Regression
 set.seed(454)
 pred_3 <- posterior_predict(
@@ -645,10 +634,7 @@ pred_3 <- posterior_predict(
 
 sum3<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_3)
-```
 
-### 5.1d
-```{r message=FALSE, include=FALSE}
 #Longitudinal Model
 set.seed(454)
 pred_4 <- posterior_predict(
@@ -767,7 +753,7 @@ In this table each model's prediction of Florida on the final day of our target 
 
 
 
-## 5.3 Final Model 
+## 5.4 Final Model 
 
 
 
