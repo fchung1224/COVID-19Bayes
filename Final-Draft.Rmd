@@ -645,8 +645,6 @@ sum4<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_4)
 ```
 
-Before 
-
 ### 5.2 Table 
 
 ```{r, echo=FALSE, warning=FALSE}
@@ -760,7 +758,7 @@ In this table each model's prediction of Florida on the final day of our target 
 
 # 6.Conclusion 
 
-As mentioned above we concluded model 3 to be our best model. That being said, looking at the model summary we see some interesting patterns arise. First off, we see that on average "China Virus" interest is actually a lot higher in blue  states than purple or red. In fact, for every percent increase we see that red states actually have almost a 4% decrease in "China Virus" interest as compared to blue states. In addition, our model shows that with every increase in percent white residents, "China Virus" interest increases by 1%. Model 3 also tells us that there doesn't seem to be much of a change when we consider a state's positive cases. Thus, what our model is essentially saying is that "China Virus" interest is a lot higher for blue states that have higher percent white populations. These conclusions were interesting to us because we did not expect states that are blue to have a higher interest in the term. However, in a way it makes sense as statistics show that blue states tend to have higher rates of political engagement which would make sense as to why they had more searches for the term after Trump's Tweet. 
+As mentioned above we concluded model 3 to be our best model. That being said, looking at the model summary we see some interesting patterns arise. First off, we see that on average "China Virus" interest is actually a lot higher in blue states than purple or red. In fact, for every percent increase, we see that red states actually have almost a 4% decrease in "China Virus" interest as compared to blue states. In addition, our model shows that with every increase in percent white residents, "China Virus" interest increases by 1%. Model 3 also tells us that there doesn't seem to be much of a change when we consider a state's positive cases. Thus, what our model is essentially saying is that "China Virus" interest is a lot higher for blue states that have higher percent white populations. These conclusions were interesting to us because we did not expect states that are blue to have a higher interest in the term. However, in a way, our results make sense as statistics show that blue states tend to have higher rates of political engagement which could explain why blue states had much more searches for the term after it was tweeted. 
 
 ```{r}
 head(data.frame(summary(model_3)),-2)
