@@ -752,14 +752,6 @@ modelevalFL
 In this table each model's prediction of Florida on the final day of our target window compared with how the actual value in the set. We find that the predictions, especially with our more complex Models 3 & 4 are not particularly close, especially with Model 4 having an error of close to 6. However, we are aware that our MAEs are smaller in Models 3 and 4. 
 
 
-
-## 5.4 Final Model 
-
-
-
-
-
-
 \
 \
 
