@@ -82,7 +82,7 @@ On March 17, 2020 President Trump referred to the Coronavirus as the "China Viru
 In addition, given the influence of identity politics we may expect the term "China Virus" to be more polarizing to certain identities and states.The Pew Research Center discovered that nearly three-quarters of Republicans and Republican-leaning independents view China unfavorably (Devlin, et al 2020. But the majority of reports to the AAPI were from Democrat leaning states like California, Washington and Illinois [Jeung & Nham 2020]. Moreover, states that have a higher number of reported positive cases tend to have a higher interest in Googling the term "China Virus" (2020).  Thus, this begs the question: What factors of the political, demographic and COVID-19 spheres best predicts the level of interest a state will have in the term "China Virus"? 
 
 ## 1.2 Brief Synopsis
-In order to answer this question, we utilized Monte Carlo Markov Chains to build four predictive models that included some of the variables mentioned above. Model 1, a repeated measures model, is our simplest model, Model 2 is a normal regression based, Model 3 is a combination of normal and repeated measures, and Model 4, our most complex model, is longitudinal based. We then ran several different diagnostic tests such as MCMC and PP checks to evaluate the quality and structures of our models. While all the models had some different levels of predictive strength, our best model was a normal regression and repeated measures model, Model 3. This model proved to provide the best balance between complexity and quality.Model 3 captures important attributes that the normal model and repeated measures did not and it achieves similar results to our complex model, Model 4, without the heavy computational toll. Overall, we hope this project inspires others to explore the interconnectedness of health, communication, politics and demography. 
+In order to answer this question, we utilized Monte Carlo Markov Chains to build four predictive models that included some of the variables mentioned above. Model 1, a repeated measures model, is our simplest model, Model 2 is a normal regression based, Model 3 is a combination of normal and repeated measures, and Model 4, our most complex model, is longitudinal based. We then ran several different diagnostic tests such as MCMC and PP checks to evaluate the quality and structures of our models. While all the models had some different levels of predictive strength, our best model was a normal regression and repeated measures model, Model 3. This model proved to provide the best balance between complexity and quality.Model 3 captures important attributes that the normal model and repeated measures did not and it achieves similar results to our complex model, Model 4, without the heavy computational toll. Overall, we hope this project inspires others to explore the interconnection of health, communication, politics and demography. 
 
 
 \
@@ -110,7 +110,7 @@ Finaldata<- Finaldata%>%
 ## 2.1 Data Descriptions
 
 
-Given the complexity of our research question and the limited data on COVID-19, we resorted to creating our own dataset. This was done by combining multiple existing datasets from various sources that touch on different political, demographic, and COVID-19 characteristics on the state level. Our demographic dataset was created using data from the US Census Bureau’s American Community Survey (ACS) which is an ongoing survey administered by the U.S. Census Bureau. It  gathers information on income, employment, housing characteristics, etc, annually for all the 50 U.S. States on the county and state level. The ACS dataset was then merged with a 2016 county level election outcomes dataset that was scraped from Townhall.com and Alicia Johnson’s state political leaning set which categorizes each county as belonging to a blue/red/purple state based on the state categorizations at 279towin. The final merged dataset was then then transformed to be on the state level and provided us with our state-level political and demographic characteristics. Google Trends data was used to measure people's interest in the term "China Virus" over time. The data was directly downloaded from the platform, for our chosen time frame of 2020-03-14 - 2020-03-21. Lastly, the COVID-19 data is provided by The COVID Tracking Project(CTP) which is updated regularly. The data points come directly from state/district/territory public health authorities—or, occasionally, from trusted news reporting, official press conferences, or from tweets or Facebook updates from state public health authorities or governors. Together these datasets allowed us to be able to tackle our question of interest. Together these datasets allowed us to be able to analyze which factors of the political, demographic and COVID-19 spheres best predict the level of interest a state will have in the term "China Virus. 
+Given the complexity of our research question and the limited data on COVID-19, we resorted to creating our own data set. This was done by combining multiple existing data sets from various sources that touch on different political, demographic, and COVID-19 characteristics on the state level. Our demographic data set was created using data from the US Census Bureau’s American Community Survey (ACS) which is an ongoing survey administered by the U.S. Census Bureau. It  gathers information on income, employment, housing characteristics, etc, annually for all the 50 U.S. States on the county and state level. The ACS data set was then merged with a 2016 county level election outcomes data set that was scraped from Town hall.com and Alicia Johnson’s state political leaning set which categorizes each county as belonging to a blue/red/purple state based on the state categorizations at 279town. The final merged data set was then then transformed to be on the state level and provided us with our state-level political and demographic characteristics. Google Trends data was used to measure people's interest in the term "China Virus" over time. The data was directly downloaded from the platform, for our chosen time frame of 2020-03-14 - 2020-03-21. Lastly, the COVID-19 data is provided by The COVID Tracking Project(CTP) which is updated regularly. The data points come directly from state/district/territory public health authorities—or, occasionally, from trusted news reporting, official press conferences, or from tweets or Facebook updates from state public health authorities or governors. Together these data sets allowed us to be able to tackle our question of interest. Together these data sets allowed us to be able to analyze which factors of the political, demographic and COVID-19 spheres best predict the level of interest a state will have in the term "China Virus. 
 
 
 
@@ -143,11 +143,11 @@ Given the complexity of our research question and the limited data on COVID-19, 
 | `totalTestResults`     | Total Number test results (Positive + Negative)   | COVID-19        |
 +------------------------+---------------------------------------------------+-----------------+
 
-For our variable selection process we initially grouped each variable to be either relating to Demographic, Political, COVID-19, or "Interest" characteristics. From there we chose the most robust variable out of each category, and used it to create our final models. This process resulted in a final dataset containing over 400 observations and 10 out of the original 34 different variables. 
+For our variable selection process we initially grouped each variable to be either relating to Demographic, Political, COVID-19, or "Interest" characteristics. From there we chose the most robust variable out of each category, and used it to create our final models. This process resulted in a final data set containing over 400 observations and 10 out of the original 34 different variables. 
 
 ## 2.3 Visualizations 
 
-The purpose of the visualizations below is to aid us in deepening our understanding of how our variables of interest interact with one another and how they are structured. We chose to investigate the variables that are listed above because in our background research, we found that these factors on their own have proven to indicate some kind of influence on our outcome variable, interest in the term "China Virus." With our new combined datasets, we hope to see that our intuition, background research and the data align with one another to tell an interesting narrative.
+The purpose of the visualizations below is to aid us in deepening our understanding of how our variables of interest interact with one another and how they are structured. We chose to investigate the variables that are listed above because in our background research, we found that these factors on their own have proven to indicate some kind of influence on our outcome variable, interest in the term "China Virus." With our new combined data sets, we hope to see that our intuition, background research and the data align with one another to tell an interesting narrative.
 
 ### Figure 1
 ```{r, echo=FALSE, warning=FALSE, fig.align="center"}
@@ -210,6 +210,7 @@ asianfig <- asianfig %>% layout(
   
 subplot(whitefig,asianfig)
 ```
+
 With this visual we hope to illuminate what the dispersion of white identifying and Asian identifying individuals looks like by state. Our background research supports the idea that anti-Asian sentiment may occur more in places where there is a low proportion of Asian-Americans. However, this comparison of percentages highlights that the Asian population across the entire US is pretty low. This suggests that including `percent_asian` in our model will most likely be ineffective thus, it may be more informative to include `percent_white` as an indicator of diversity. While it sounds counter-intuitive the idea would be that the lower the `percent_white` is by state means that there is a higher percentage of non-white identifying individuals. Thus, this variable may prove influential in our models. 
 
 ### Figure 3
@@ -236,7 +237,7 @@ This plot shows the relationship of “China Virus” search interest over our t
 
 ```{r, warning=FALSE, message= FALSE, echo=FALSE, fig.align= "center"}
 b<- ggplot(Finaldata, aes(x = ChinaVirusInterest, fill = as.factor(State))) + 
-  geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State") + labs(fill="State", x = "Interest in China Virus", y = "Density")
+  geom_density(alpha = 0.5)+ ggtitle("China Virus Density by State") + labs(fill="State", x = "Interest in China Virus", y = "Density") +theme_minimal()
 
 ggplotly(b)
 ```
@@ -252,7 +253,8 @@ plot1<- ggplot(IAtoMT, aes(x = Day, y = ChinaVirusInterest, color = factor(State
     geom_smooth(method = "lm", se = FALSE) + 
     theme(legend.position = "none") +
     facet_wrap(~State)+ 
-    labs(title="Slopes of China Virus Interest by State and Date", x= "Date", y="China Virus Interest")
+    labs(title="Slopes of China Virus Interest by State and Date", x= "Date", y="China Virus Interest")+
+    theme_minimal()
 
 ggplotly(plot1)
 ```
@@ -269,7 +271,7 @@ Figure 5 helps inform us on what level of complexity our model may need to be. W
 
 ## 3.1 Model 1 Repeated Measures Model
  
-  For our simplest model we decided to use a repeated measures model. Our team decided that the repeated measures model was necessary component because of how our data is set up. As we can see in our dataset, each state has a value for their `ChinaVirusInterest` for each day in our target period (2020-03-14 - 2020-03-21). Given the ability to use repeated measures and our prior understanding of the varying characteristics (demographic,political,covid-impact) within different states, the repeated measures model allows us to capture these differences in `ChinaVirusInterest` with the $\theta_i$ value which represents each state's mean value.
+  For our simplest model we decided to use a repeated measures model. Our team decided that the repeated measures model was necessary component because of how our data is set up. As we can see in our data set, each state has a value for their `ChinaVirusInterest` for each day in our target period (2020-03-14 - 2020-03-21). Given the ability to use repeated measures and our prior understanding of the varying characteristics (demographic,political,covid-impact) within different states, the repeated measures model allows us to capture these differences in `ChinaVirusInterest` with the $\theta_i$ value which represents each state's mean value.
   
 
 
@@ -684,7 +686,7 @@ pred_FL_RM <- posterior_predict(
 
 pred_FL_RM <- data.frame(y_new = pred_FL_RM[-1])
 
-ggplot(pred_FL_RM, aes(x=y_new))+geom_density()
+ggplot(pred_FL_RM, aes(x=y_new))+geom_density()+theme_minimal()
 
 summary(pred_FL_RM)
 ```
@@ -703,10 +705,11 @@ pred_FL_NR <- posterior_predict(
 
 pred_FL_NR <- data.frame(y_new = pred_FL_NR[-1])
 
-ggplot(pred_FL_NR, aes(x=y_new))+geom_density()
+ggplot(pred_FL_NR, aes(x=y_new))+geom_density()+theme_minimal()
 
 summary(pred_FL_NR)
 ```
+
 Model 2 looks at Florida on day 7, with the number of positive cases being 658 with the percentage of white residents being 5%. Model 2 predicts the mean interest to be 46.95% which is a lot better than model 1. However, the interest could vary greatly, and the space under the curve is much more condescended to the mean. 
 
 ### 5.3c
@@ -720,10 +723,11 @@ pred_FL_3 <- posterior_predict(
 
 pred_FL_3 <- data.frame(y_new = pred_FL_3[-1])
 
-ggplot(pred_FL_3, aes(x=y_new))+geom_density()
+ggplot(pred_FL_3, aes(x=y_new))+geom_density()+theme_minimal()
 
 summary(pred_FL_3)
 ```
+
 Model 3 looks at Florida on day 7, with the number of positive cases being 658 with the percentage of white residents being 5%, and also classifies Florida as a purple state. Model 3 predicts the mean interest to be 50.04%. For this model we see that the peak is around that 50%, but the range can vary from 0 to 100%. 
 
 ### 5.3d
@@ -737,11 +741,12 @@ pred_FL_complex <- posterior_predict(
 
 pred_FL_complex <- data.frame(y_new = pred_FL_complex[-1])
 
-ggplot(pred_FL_complex, aes(x=y_new))+geom_density()
+ggplot(pred_FL_complex, aes(x=y_new))+geom_density()+theme_minimal()
 
 complex<-summary(pred_FL_complex)
 complex
 ```
+
 Our final model predicts the same aspects as model 3. Our model predicted "China Virus" interest to be 53.16, which is a lot higher than our other models. Also, we see that the area under the curve is a lot more spread out as well. 
 
 ### 5.3e
@@ -749,6 +754,7 @@ Our final model predicts the same aspects as model 3. Our model predicted "China
 actual_FL_pred<-Finaldata %>% select(c(State, ChinaVirusInterest)) %>% filter(State =="FL") %>% summarise(mean=mean(ChinaVirusInterest))
 actual_FL_pred
 ```
+
 The actual mean of interest in the term China Virus in Florida is 47.625! We can use this value to assess how closely our models predicted the interest to be. 
 
 
@@ -778,21 +784,21 @@ In this table each model's prediction of Florida on the final day of our target 
 
 Our data itself brings about a couple of limitations: 
 
-COVID-19 Dataset: 
-One of the biggest weakness of this dataset is the fact there there is no designed standardized method for states to follow for data collection and reporting.  For example, some states, like Oregon, provide the full set of numbers but others provide some or none of these numbers on an ongoing basis. Some crucial states in this outbreak, notably California, Washington, and New York, have not been regularly reporting their total number of people tested. This is rather concerning as there could be important trends  that are not being captured due to the under and over reporting. 
+**COVID-19 Data set:** 
+One of the biggest weakness of this data set is the fact there there is no designed standardized method for states to follow for data collection and reporting.  For example, some states, like Oregon, provide the full set of numbers but others provide some or none of these numbers on an ongoing basis. Some crucial states in this outbreak, notably California, Washington, and New York, have not been regularly reporting their total number of people tested. This is rather concerning as there could be important trends  that are not being captured due to the under and over reporting. 
 
-Google Trends: 
-The main downside to the Google Trends dataset is the method of the indexing that the platform uses. Since each state is guaranteed to have a 100-level interest on their peak interest day the comparison from state to state becomes less meaningful. Additionally, the actual unknown search values can vary greatly across different states. 
+**Google Trends:** 
+The main downside to the Google Trends data set is the method of the indexing that the platform uses. Since each state is guaranteed to have a 100-level interest on their peak interest day the comparison from state to state becomes less meaningful. Additionally, the actual unknown search values can vary greatly across different states. 
 
-Demographics & Political: 
-Overall, the demographics and political dataset is rather comprehensive and accurate. However, the biggest limitation arises with the State of Alaska. Since the State of Alaska reports results at the precinct or state level so there was no county-level data available and many datasets excluded the state. Therefore, demographic and election information for Alaska had to be manually entered. 
+**Demographics & Political:** 
+Overall, the demographics and political data set is rather comprehensive and accurate. However, the biggest limitation arises with the State of Alaska. Since the State of Alaska reports results at the precinct or state level so there was no county-level data available and many data sets excluded the state. Therefore, demographic and election information for Alaska had to be manually entered. 
 
-In addition to our data limitation, a couple of limitations arose with our final models. For our models we used a Normal distribution which goes from 0 - 100, however, our final distributions turn our to be rather truncated with values going above and below 0 and 100 this causes us to have wider guesses. Also, when running a ppcheck on each of our models we saw that our resulting distribution wasn't a perfect normal as there were two visible bumps on each of the tail ends. These bumps would need further exploring, however, we assume them to be outliers within our data. 
+In addition to our data limitation, a couple of limitations arose with our final models. For our models we used a Normal distribution which goes from 0 - 100, however, our final distributions turn our to be rather truncated with values going above and below 0 and 100 this causes us to have wider guesses. Also, when running a pp check on each of our models we saw that our resulting distribution wasn't a perfect normal as there were two visible bumps on each of the tail ends. These bumps would need further exploring, however, we assume them to be outliars within our data. 
 
 ## 6.2 Future Work
 
 
-The Google Trends platform provided us with some interesting findings, however, it doesn't tell us how people actually responded to the term "China Virus". Thus, it would be interesting to incorporate Twitter data into the analysis. Scrapping Twitter would allow us to analyze the actual emotional response to Trump's statement and incorporate a sentimental analysis. Additionally, in the future we hope to look at how the stay at home orders impacted "China Virus" interest as well. 
+The Google Trends platform provided us with some interesting findings, however, it doesn't tell us how people actually responded to the term "China Virus". Thus, it would be interesting to incorporate Twitter data into the analysis. Scrapping Twitter would allow us to analyze the actual emotional response to Trump's statement and incorporate a sentimental analysis. Additionally, in the future we hope to look at how the stay at home orders impacted "China Virus" interest as well.
 
 
 \
@@ -801,7 +807,7 @@ The Google Trends platform provided us with some interesting findings, however, 
 
 # 7. Acknowledgments
 
-We thank Alicia Johnson for not only providing us an aspect of our final dataset but also for helping us throughout the entirety of the project. 
+We thank Alicia Johnson for not only providing us an aspect of our final data set but also for helping us throughout the entirety of the project. 
 
 
 # 8. References
