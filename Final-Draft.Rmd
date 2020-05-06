@@ -479,7 +479,7 @@ mcmc_dens_overlay(RM_model, pars = c("(Intercept)","Sigma[State:(Intercept),(Int
 
 By looking at the mcmc trace plot and density overlay we see that our MCMC chains are fairly stable. However, looking at the density overlay we can see it could do with a bit more stability as the peaks for our Intercept become more spread out around the 40-42.5 range. From the above plots, we also see that our value of $\sigma_b^2$ is greater than 0. Our value of sigma is around 75 meaning that we must include random intercepts in our final model
 
-```{r, message=FALSE, include=FALSE}
+```{r, message=FALSE, include=TRUE}
 g1 <- mcmc_dens(RM_model, pars = "sigma") + 
   labs(x = expression(sigma[w])) +
   lims(x=c(5, 25))
@@ -522,6 +522,11 @@ Overall, we can see that our repeated measures model tells us that the structure
 ## 4.2 Model 2 Evaluation (Normal Regression)
 
 ### 4.2a MCMC Plots
+
+```{r}
+NR_model
+```
+
 
 ```{r}
 # Trace plots
