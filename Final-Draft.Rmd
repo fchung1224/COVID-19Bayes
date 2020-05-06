@@ -645,8 +645,6 @@ sum4<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_4)
 ```
 
-### 5.2 Table 
-
 ```{r, echo=FALSE, warning=FALSE}
 all_summ<-rbind(sum1,sum2,sum3,sum4)
 rownames(all_summ)<- c("Model 1","Model 2","Model 3","Model 4")
@@ -655,7 +653,7 @@ all_summ
 
 As we can see in the table above, the lowest mae was achieved by our most complex model, Model 4 which allowed for both random slopes and random intercepts. But the mae value is not that different from the mae achieved by Model 3 which was more simple allowing only for random intercepts. Interestingly Model 1 our simplest model had a higher proportion of the data falling within the 95% posterior predictive interval. 
 
-### 5.2a Model 3 is the best
+### 5.2 Model 3 is the best
 
 We believe that the decreases in mae and increases of the proportion of values observed within 50% of the posterior predictive interval do not justify increasing the complexity. Which is why we argue that Model 3 is the best model because it achieves similar results to model 4 without making it computationally expensive. But if we want a more precise model we would use Model 4. But out mcmc_dens and our visualizations showed that there are different slopes across states and thus a more reasonable approach would be to use Model 4. 
 
@@ -773,7 +771,7 @@ In this table each model's prediction of Florida on the final day of our target 
 As mentioned above we concluded model 3 to be our best model. That being said, looking at the model summary we see some interesting patterns arise. First off, we see that on average "China Virus" interest is actually a lot higher in blue states than purple or red. In fact, for every percent increase, we see that red states actually have almost a 4% decrease in "China Virus" interest as compared to blue states. In addition, our model shows that with every increase in percent white residents, "China Virus" interest increases by 1%. Model 3 also tells us that there doesn't seem to be much of a change when we consider a state's positive cases. Thus, what our model is essentially saying is that "China Virus" interest is a lot higher for blue states that have higher percent white populations. These conclusions were interesting to us because we did not expect states that are blue to have a higher interest in the term. However, in a way, our results make sense as statistics show that blue states tend to have higher rates of political engagement which could explain why blue states had much more searches for the term after it was tweeted. 
 
 ```{r}
-head(data.frame(summary(model_3)),-2)
+head(data.frame(summary(model_3)))
 ```
 
 
