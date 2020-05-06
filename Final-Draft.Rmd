@@ -662,26 +662,29 @@ We believe that the decreases in mae and increases of the proportion of values o
 ## 5.3 Posterior Prediction One State
 
 ### 5.3a
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, include=FALSE}
 ### For predicting one case 
-new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive_rate = 0.11) 
+new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive = 658) 
 set.seed(454)
 pred_FL_RM <- posterior_predict(
   RM_model,
   newdata = new_FL)
 
 pred_FL_RM <- data.frame(y_new = pred_FL_RM[-1])
+```
 
+```{r echo=FALSE, warning=FALSE}
 ggplot(pred_FL_RM, aes(x=y_new))+geom_density()+theme_minimal()
 
 summary(pred_FL_RM)
 ```
 
-After creating predictions for all the states, we wanted to focus on just one state. That said, we looked at Florida and created future "China Virus" interest predictions for it using each of our models. Our first model, predicts "'China Virus" interest for Florida on Day 7, with the positive rate being 11% and assumes the percentage of white residents is to be 5%. Model 1 predicts the mean interest to be 45.27%, however, as one could see from the above visualization the interest could vary greatly, but there is a higher chance for it to be between 20% - 80%. 
+After creating predictions for all the states, we wanted to focus on just one state. That said, we looked at Florida and created future "China Virus" interest predictions for it using each of our models. Our first model, predicts "'China Virus" interest for Florida on Day 7, with the amount of positive cases being 658 and assumes the percentage of white residents is to be 5%. Model 1 predicts the mean interest to be 45.27%, however, as one could see from the above visualization the interest could vary greatly, but there is a higher chance for it to be between 20% - 80%. 
 
 
 ### 5.3b
-```{r, echo=FALSE, warning=FALSE}
+
+```{r, echo=FALSE, warning=FALSE, include=FALSE}
 ### For predicting one case 
 new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive = 658, StateColor="purple") 
 set.seed(454)
@@ -691,6 +694,9 @@ pred_FL_NR <- posterior_predict(
 
 pred_FL_NR <- data.frame(y_new = pred_FL_NR[-1])
 
+```
+
+```{r echo=FALSE, warning=FALSE}
 ggplot(pred_FL_NR, aes(x=y_new))+geom_density()+theme_minimal()
 
 summary(pred_FL_NR)
@@ -699,7 +705,7 @@ summary(pred_FL_NR)
 Model 2 looks at Florida on day 7, with the number of positive cases being 658 with the percentage of white residents being 5%. Model 2 predicts the mean interest to be 46.95% which is a lot better than model 1. However, the interest could vary greatly, and the space under the curve is much more condescended to the mean. 
 
 ### 5.3c
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, include=FALSE}
 ### For predicting one case 
 new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive = 658, StateColor="purple")
 set.seed(454)
@@ -709,6 +715,9 @@ pred_FL_3 <- posterior_predict(
 
 pred_FL_3 <- data.frame(y_new = pred_FL_3[-1])
 
+```
+
+```{r echo=FALSE, warning=FALSE}
 ggplot(pred_FL_3, aes(x=y_new))+geom_density()+theme_minimal()
 
 summary(pred_FL_3)
@@ -717,7 +726,7 @@ summary(pred_FL_3)
 Model 3 looks at Florida on day 7, with the number of positive cases being 658 with the percentage of white residents being 5%, and also classifies Florida as a purple state. Model 3 predicts the mean interest to be 50.04%. For this model we see that the peak is around that 50%, but the range can vary from 0 to 100%. 
 
 ### 5.3d
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, include=FALSE}
 ### For predicting one case 
 new_FL <- data.frame(Day = 7 , State = "FL",percent_white = 0.5, positive = 658, StateColor="purple")
 set.seed(454)
@@ -727,6 +736,9 @@ pred_FL_complex <- posterior_predict(
 
 pred_FL_complex <- data.frame(y_new = pred_FL_complex[-1])
 
+```
+
+```{r echo=FALSE, warning=FALSE}
 ggplot(pred_FL_complex, aes(x=y_new))+geom_density()+theme_minimal()
 
 complex<-summary(pred_FL_complex)
