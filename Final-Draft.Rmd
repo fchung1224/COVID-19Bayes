@@ -645,6 +645,8 @@ sum4<-prediction_summary(y = model_data$ChinaVirusInterest,
   yrep = pred_4)
 ```
 
+Before 
+
 ### 5.2 Table 
 
 ```{r, echo=FALSE, warning=FALSE}
@@ -758,6 +760,13 @@ In this table each model's prediction of Florida on the final day of our target 
 
 # 6.Conclusion 
 
+As mentioned above we concluded model 3 to be our best model. That being said, looking at the model summary we see some interesting patterns arise. First off, we see that on average "China Virus" interest is actually a lot higher in blue  states than purple or red. In fact, for every percent increase we see that red states actually have almost a 4% decrease in "China Virus" interest as compared to blue states. In addition, our model shows that with every increase in percent white residents, "China Virus" interest increases by 1%. Model 3 also tells us that there doesn't seem to be much of a change when we consider a state's positive cases. Thus, what our model is essentially saying is that "China Virus" interest is a lot higher for blue states that have higher percent white populations. These conclusions were interesting to us because we did not expect states that are blue to have a higher interest in the term. However, in a way it makes sense as statistics show that blue states tend to have higher rates of political engagement which would make sense as to why they had more searches for the term after Trump's Tweet. 
+
+```{r}
+head(data.frame(summary(model_3)),-2)
+```
+
+
 ## 6.1 Limitations
 
 Our data itself brings about a couple of limitations: 
@@ -771,12 +780,16 @@ The main downside to the Google Trends data set is the method of the indexing th
 **Demographics & Political:** 
 Overall, the demographics and political data set is rather comprehensive and accurate. However, the biggest limitation arises with the State of Alaska. Since the State of Alaska reports results at the precinct or state level so there was no county-level data available and many data sets excluded the state. Therefore, demographic and election information for Alaska had to be manually entered. 
 
-In addition to our data limitation, a couple of limitations arose with our final models. For our models we used a Normal distribution which goes from 0 - 100, however, our final distributions turn our to be rather truncated with values going above and below 0 and 100 this causes us to have wider guesses. Also, when running a pp check on each of our models we saw that our resulting distribution wasn't a perfect normal as there were two visible bumps on each of the tail ends. These bumps would need further exploring, however, we assume them to be outliars within our data. 
+
+In addition to our data limitation, our final model has clear limitations as well. Firstly, our model has a very high Mae, which is attributed to the fact that we expect the interest over time to be linear, but as seen in the visualizations there are states that do not behave linearly. We believe that using a Bayesian time series approach would resolve this limitation. 
+
+Additionally, our variable of interest only goes from 0-100, but as seen above, our models predict far beyond that range meaning that our predictions are very wide. In other words, our models are not as certain about where the interests lies for each state. Also, when running a pp check on each of our models we saw that our resulting distribution wasn’t a perfect normal as there were two visible bumps on each of the tail ends. These bumps would need further exploring, however, we assume them to occur naturally specially at 0, as it is possible no one in the state looked for that term during that day. 
+
 
 ## 6.2 Future Work
 
 
-The Google Trends platform provided us with some interesting findings, however, it doesn't tell us how people actually responded to the term "China Virus". Thus, it would be interesting to incorporate Twitter data into the analysis. Scrapping Twitter would allow us to analyze the actual emotional response to Trump's statement and incorporate a sentimental analysis. Additionally, in the future we hope to look at how the stay at home orders impacted "China Virus" interest as well.
+The Google Trends platform provided us with some interesting findings, however, it doesn't tell us how people actually responded to the term "China Virus". Thus, it would be interesting to incorporate Twitter data into the analysis. Scrapping Twitter would allow us to analyze the actual emotional response to Trump's statement and incorporate a sentimental analysis. Additionally, in the future we hope to explore our analysis using Bayesian time series to better understand the variables that we chose. 
 
 
 \
