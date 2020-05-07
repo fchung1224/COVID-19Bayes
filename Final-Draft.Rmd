@@ -521,12 +521,14 @@ Overall, we can see that our repeated measures model tells us that the structure
 
 ## 4.2 Model 2 Evaluation (Normal Regression)
 
-### 4.2a MCMC Plots
 
 ```{r}
 NR_model
 ```
 As we see in here, we see that as the days increase we see our China Virus Interest increasing by 0.9 percent. The percent white showed us that as percent white increases, the median China Virus Interest increases by 1.1%. And if a state is red, it will have -3.2 percentage points less compared to a state that is blue. And finally, interestingly the positive count has no influence on how much the percent white changes. 
+
+### 4.2a MCMC Plots
+
 
 ```{r}
 # Trace plots
